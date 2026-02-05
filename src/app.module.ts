@@ -8,9 +8,14 @@ import { DataSource } from 'typeorm';
 import { User } from './users/user.entity';
 import { Role } from './users/role.entity';
 import { UserRole } from './users/userrole.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     AuthModule,
     UsersModule,
     TypeOrmModule.forRoot({
@@ -28,5 +33,7 @@ import { UserRole } from './users/userrole.entity';
   providers: [AppService],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) {
+    
+  }
 }

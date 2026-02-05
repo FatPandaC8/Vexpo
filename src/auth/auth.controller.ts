@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { LoginDTO } from './dto/login.dto';
 import { AuthService } from './auth.service';
+import { Public } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -26,6 +27,7 @@ export class AuthController {
   @Post('logout')
   async logout() {}
 
+  @Public()
   @Get('profile')
   async profile(@Request() req) {
     return req.user;

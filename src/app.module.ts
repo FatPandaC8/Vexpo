@@ -17,6 +17,8 @@ import { MeModule } from './me/me.module';
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
 import { UserRole } from './entities/userrole.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -45,7 +47,12 @@ import { UserRole } from './entities/userrole.entity';
     MeModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}

@@ -25,15 +25,22 @@ export class UsersService {
     );
   }
 
+  async findOneById(id: number): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: ['roles', 'roles.role'],
+    });
+  }
+
   async findAll() {
     return this.usersRepository.find({relations: ['roles']});
   }
 
   async createUserOnly(data: {
-    name: string,
-    email: string,
-    password: string
-  }) {
+    name: string;
+    email: string;
+    password: string | null;
+  }): Promise<User | User[]> {
     const user = this.usersRepository.create(data);
     return this.usersRepository.save(user);
   }

@@ -4,6 +4,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  // Recap: Strategy in this context is strategy pattern -- lets you define a family of algorithms
+  // put each into a separate class, and make their objects interchangable
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

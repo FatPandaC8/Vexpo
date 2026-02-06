@@ -49,7 +49,7 @@ export class AuthService {
   ): Promise<{ access_token: string }> {
     const user = await this.usersService.findOneByEmail(dto.email);
     if (!user) throw new NotFoundException("User not found");
-    const isMatchPassword = await bcrypt.compare(dto.password, user.password);
+    const isMatchPassword = await bcrypt.compare(dto.password, user.password as string);
     if (!isMatchPassword) {
       throw new UnauthorizedException('Invalud credentials');
     }
@@ -71,5 +71,64 @@ export class AuthService {
     // for future, need to add db for token, actual delete token from the db
     // for ref: https://viblo.asia/p/logout-voi-jwt-gAm5yyak5db
     console.log("LOG OUT");
+  }
+
+async oauthLogin(oauthUser: {
+    email: string;
+    name: string;
+    picture?: string;
+  }): Promise<{ access_token: string; is_new_user: boolean }> {
+    
+    let user = await this.usersService.findOneByEmail(oauthUser.email);
+    if (user) {
+      const payload = {
+        sub: user.id,
+        email: user.email,
+        roles: user.roles.map(ur => ur.role.name.toUpperCase())
+      }
+      return {
+        access_token: await this.jwtService.signAsync(payload),
+        is_new_user: false,
+      };
+    } else {
+      const newUser = await this.usersService.createUserOnly({
+        name: oauthUser.name,
+        email: oauthUser.email,
+        password: null, // OAuth users don't have passwords
+      });
+
+      const tempPayload = {
+        sub: newUser.id,
+        email: newUser.email,
+        temp: true, 
+      };
+
+      return {
+        access_token: await this.jwtService.signAsync(tempPayload, {
+          expiresIn: '10m',
+        }),
+        is_new_user: true,
+      }
+    }
+
+  }
+  async completeOAuthRegistration(
+    userId: number,
+    role: 'visitor' | 'company' | 'organizer',
+  ): Promise<{ access_token: string }> {
+    await this.usersService.assignRole(userId, role);
+
+    const user = await this.usersService.findOneById(userId);
+    if (!user) throw new NotFoundException('User if not found');
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      roles: user.roles.map(ur => ur.role.name.toUpperCase())
+    }
+
+    return {
+      access_token: await this.jwtService.signAsync(payload)
+    }
   }
 }

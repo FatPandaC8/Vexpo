@@ -11,8 +11,10 @@ import {
 import { LoginDTO } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard, Public } from './jwt-auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 // endpoints which serve sensitive data must be protected by
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

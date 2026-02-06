@@ -16,12 +16,18 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(email);
+    const user = await this.usersService.findOneByEmail(email);
     if (user?.password !== password) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalud credentials');
     }
 
-    const payload = { sub: user.id };
+    const payload = { 
+      sub: user.id,
+      roles: user.roles.map(ur => ur.role.name.toUpperCase()),
+    };
+
+    console.log("Payload: " + payload.roles + " - " + payload.sub);
+
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

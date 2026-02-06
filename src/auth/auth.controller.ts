@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Post,
   Request,
-  Response,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { LoginDTO } from './dto/login.dto';
@@ -16,6 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { RegisterDTO } from './dto/register.dto';
 import { GoogleOAuthGuard } from './google-auth.guard';
 import { OAuthCompleteDTO } from './dto/oauthcomplete.dto';
+import express from 'express';
 // endpoints which serve sensitive data must be protected by
 
 @ApiTags('Authentication')
@@ -33,13 +34,13 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
-  async googleAuthRedirect(@Request() req, @Response() res: Response) {
+  async googleAuthRedirect(@Request() req, @Res() res: express.Response ) {
     const result = await this.authService.oauthLogin(req.user);
 
     if (result.is_new_user) {
       // New user - needs to select role
       return res.json({
-        message: 'New user.',
+        message: 'New user detected. Please complete registration by selecting a role.',
         access_token: result.access_token,
         is_new_user: true,
         next_step: 'POST /auth/oauth/complete with role selection',
@@ -53,7 +54,6 @@ export class AuthController {
       });
     }
   }
-
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)

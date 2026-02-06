@@ -40,8 +40,10 @@ export class UsersService {
     name: string;
     email: string;
     password: string | null;
-  }): Promise<User | User[]> {
-    const user = this.usersRepository.create(data);
+  }): Promise<User> {
+    const user = this.usersRepository.create(data as Partial<User>);
+    // the Partial<User> is a workaround, as first it need roles but oauth does not have role yet when signing up
+    // so cast it as that, with default value of []
     return this.usersRepository.save(user);
   }
 

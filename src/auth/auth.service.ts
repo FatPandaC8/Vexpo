@@ -66,5 +66,10 @@ export class AuthService {
     };
   }
 
-  async logout() {}
+  async logout() {
+    // for now, the jwt token is deleted only by client => which is not secure
+    // for future, need to add db for token, actual delete token from the db
+    // for ref: https://viblo.asia/p/logout-voi-jwt-gAm5yyak5db
+    console.log("LOG OUT");
+  }
 }

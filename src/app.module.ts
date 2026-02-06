@@ -5,9 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { User } from './users/user.entity';
-import { Role } from './users/role.entity';
-import { UserRole } from './users/userrole.entity';
+
 import { ConfigModule } from '@nestjs/config';
 import { ExposModule } from './expos/expos.module';
 import { BoothsModule } from './booths/booths.module';
@@ -16,6 +14,9 @@ import { CompaniesModule } from './companies/companies.module';
 import { VisitsModule } from './visits/visits.module';
 import { SystemModule } from './system/system.module';
 import { MeModule } from './me/me.module';
+import { User } from './entities/user.entity';
+import { Role } from './entities/role.entity';
+import { UserRole } from './entities/userrole.entity';
 
 @Module({
   imports: [

@@ -1,6 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
+import { JwtService } from '@nestjs/jwt';
+// passport-jwt is for securing RESTful endpoints with JWT
+
 
 @Injectable()
 export class AuthService {
@@ -9,7 +11,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn() {}
+  async register() {}
 
   async login(
     email: string,
@@ -25,4 +27,6 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
+
+  async logout() {}
 }

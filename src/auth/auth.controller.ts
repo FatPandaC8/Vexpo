@@ -12,7 +12,7 @@ import {
 import { LoginDTO } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard, Public } from './jwt-auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterDTO } from './dto/register.dto';
 import { GoogleOAuthGuard } from './google-auth.guard';
 import { OAuthCompleteDTO } from './dto/oauthcomplete.dto';
@@ -20,10 +20,12 @@ import express from 'express';
 // endpoints which serve sensitive data must be protected by
 
 @ApiTags('Authentication')
+@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-
+  
+  @ApiOperation({description: "Redirect to google for authentication."})
   @Public()
   @Get('google')
   @UseGuards(GoogleOAuthGuard)
@@ -31,6 +33,7 @@ export class AuthController {
     // redirect to Google
   }
 
+  @ApiOperation({description: "Call back for Google to continue signing in."})
   @Public()
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
@@ -55,6 +58,8 @@ export class AuthController {
     }
   }
 
+  @ApiOperation({description: "After successfully sign in with google accounts, redirect to this to choose a role."})
+  @ApiOkResponse({description: "Return access token"})
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('oauth/complete')
@@ -66,6 +71,9 @@ export class AuthController {
     return this.authService.completeOAuthRegistration(userId, dto.role);
   }
 
+  @ApiOperation({description: "Register a new user."})
+  @ApiOkResponse({description: "Register successfully and return access token"})
+  @ApiBadRequestResponse({description: "This email has been registered"})
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
@@ -73,6 +81,8 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
+  @ApiOperation({description: "Login into an user."})
+  @ApiOkResponse({description: "Return access token"})
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -80,12 +90,14 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @ApiOperation({description: "Log out of current user."})
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout() {
     return this.authService.logout();
   }
 
+  @ApiOperation({description: "See the profile of current user."})
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async profile(@Request() req) {

@@ -19,6 +19,7 @@ async function bootstrap() {
     .setDescription('Vexpo API description')
     .setVersion('1.0')
     .addTag('auth')
+    .addBearerAuth()
     .build();
 
   const documentFactory = () =>

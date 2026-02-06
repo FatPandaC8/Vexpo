@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 export class RegisterDTO {
   @IsString()
   @IsNotEmpty()
-  username: string;
+  name: string;
 
   @IsEmail()
   @IsNotEmpty()
@@ -13,4 +13,7 @@ export class RegisterDTO {
   @IsNotEmpty()
   @MinLength(8)
   password: string;
+
+  @IsString()
+  role: 'visitor' | 'company' | 'organizer';
 }

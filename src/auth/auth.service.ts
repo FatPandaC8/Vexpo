@@ -1,6 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { RegisterDTO } from './dto/register.dto';
+import { LoginDTO } from './dto/login.dto';
 // passport-jwt is for securing RESTful endpoints with JWT
 
 @Injectable()
@@ -10,14 +13,44 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register() {}
+  async register(dto: RegisterDTO) { // register : assigning role instead of register with role
+    // people can register as a company or as a visitor
+    // the organizer can be assigned
+    const {name, email, password, role} = dto;
+
+    const existingUser = await this.usersService.findOneByEmail(email);
+    if (existingUser) {
+      throw new BadRequestException('Email already exists');      
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await this.usersService.createUserOnly({
+      name, 
+      email,
+      password: hashed,
+    });
+
+    await this.usersService.assignRole(user.id, role);
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role
+    }
+
+    console.log("Register payload: ", payload);
+
+    return {
+      access_token: await this.jwtService.signAsync(payload)
+    }
+  }
 
   async login(
-    email: string,
-    password: string,
+    dto: LoginDTO,
   ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOneByEmail(email);
-    if (user?.password !== password) {
+    const user = await this.usersService.findOneByEmail(dto.email);
+    if (!user) throw new NotFoundException("User not found");
+    const isMatchPassword = await bcrypt.compare(dto.password, user.password);
+    if (!isMatchPassword) {
       throw new UnauthorizedException('Invalud credentials');
     }
 

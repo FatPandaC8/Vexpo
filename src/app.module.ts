@@ -9,6 +9,13 @@ import { User } from './users/user.entity';
 import { Role } from './users/role.entity';
 import { UserRole } from './users/userrole.entity';
 import { ConfigModule } from '@nestjs/config';
+import { ExposModule } from './expos/expos.module';
+import { BoothsModule } from './booths/booths.module';
+import { ReportsModule } from './reports/reports.module';
+import { CompaniesModule } from './companies/companies.module';
+import { VisitsModule } from './visits/visits.module';
+import { SystemModule } from './system/system.module';
+import { MeModule } from './me/me.module';
 
 @Module({
   imports: [
@@ -28,12 +35,17 @@ import { ConfigModule } from '@nestjs/config';
       entities: [User, Role, UserRole],
       synchronize: true, // for dev only, not for production
     }),
+    ExposModule,
+    BoothsModule,
+    ReportsModule,
+    CompaniesModule,
+    VisitsModule,
+    SystemModule,
+    MeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {
-    
-  }
+  constructor(private dataSource: DataSource) {}
 }

@@ -3,7 +3,6 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 // passport-jwt is for securing RESTful endpoints with JWT
 
-
 @Injectable()
 export class AuthService {
   constructor(

@@ -15,6 +15,6 @@ export class User {
   @Column()
   password: string;
 
-  @OneToMany(() => UserRole, ur => ur.user)
+  @OneToMany(() => UserRole, (ur) => ur.user)
   roles: UserRole[];
 }

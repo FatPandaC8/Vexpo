@@ -9,6 +9,6 @@ export class Role {
   @Column({ unique: true })
   name: string;
 
-  @OneToMany(() => UserRole, ur => ur.role)
+  @OneToMany(() => UserRole, (ur) => ur.role)
   users: UserRole[];
 }

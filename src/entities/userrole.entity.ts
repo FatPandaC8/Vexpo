@@ -7,10 +7,13 @@ export class UserRole {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, user => user.roles, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.roles, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Role, role => role.users, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Role, (role) => role.users, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   role: Role;
 
   // later: @ManyToOne of org_id, expo_id, comp_id

@@ -17,23 +17,29 @@ export class UsersService {
   ) {}
 
   async findOneByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne(
-      {
-        where: {email},
-        relations: ['roles', 'roles.role'],
-      }
-    );
+    return this.usersRepository.findOne({
+      where: { email },
+      relations: ['roles', 'roles.role'], // if no relation, user will be loaded with no role
+      // if only have roles, user's role attribute will be empty
+      // if have roles.role, user's role attribute is loaded with roles
+    });
   }
 
   async findOneById(id: number): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { id },
       relations: ['roles', 'roles.role'],
+      lock: {
+        mode: 'pessimistic_read',
+      },
     });
   }
 
   async findAll() {
-    return this.usersRepository.find({relations: ['roles']});
+    return this.usersRepository.find({
+      relations: ['roles', 'roles.role'],
+      select: ['id', 'name', 'email'],
+    });
   }
 
   async createUserOnly(data: {
@@ -48,11 +54,23 @@ export class UsersService {
   }
 
   async assignRole(userId: number, roleName: string) {
-    const user = await this.usersRepository.findOneBy({id: userId});
+    const exists = await this.userRoleRepository.findOne({
+      where: {
+        user: { id: userId },
+        role: { name: roleName },
+      },
+    });
+
+    if (exists) return exists;
+
+    const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) throw new NotFoundException('User not found');
 
     const role = await this.roleRepository.findOne({
-      where: {name: roleName},
+      where: { name: roleName },
+      lock: {
+        mode: 'pessimistic_write', // you're the only one who can write at this time
+      },
     });
 
     if (!role) throw new NotFoundException('Role not found');
@@ -63,5 +81,15 @@ export class UsersService {
     });
 
     return this.userRoleRepository.save(userRole);
+  }
+
+  async setRole(userId: number, roleName: string) {
+    await this.userRoleRepository.delete({ user: { id: userId } });
+    return this.assignRole(userId, roleName);
+  }
+
+  async deleteUser(id: number) {
+    const result = await this.usersRepository.delete(id);
+    if (result.affected === 0) throw new NotFoundException('User not found');
   }
 }

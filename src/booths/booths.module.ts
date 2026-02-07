@@ -4,6 +4,6 @@ import { BoothsService } from './booths.service';
 
 @Module({
   controllers: [BoothsController],
-  providers: [BoothsService]
+  providers: [BoothsService],
 })
 export class BoothsModule {}

@@ -1,10 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsIn, IsString } from "class-validator";
-
+import { ApiProperty } from '@nestjs/swagger';
+import { IsIn, IsString } from 'class-validator';
 
 export class OAuthCompleteDTO {
-    @ApiProperty({example: "COMPANY"})
-    @IsString()
-    @IsIn(['visitor', 'company', 'organizer'])
-    role: 'visitor' | 'company' | 'organizer';
+  @ApiProperty({ example: 'EXHIBITOR' })
+  @IsString()
+  @IsIn(['visitor', 'exhibitor', 'organizer'])
+  role: 'visitor' | 'exhibitor' | 'organizer';
 }

@@ -4,6 +4,6 @@ import { ExposService } from './expos.service';
 
 @Module({
   controllers: [ExposController],
-  providers: [ExposService]
+  providers: [ExposService],
 })
 export class ExposModule {}

@@ -21,6 +21,8 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { Expo } from './entities/expo.entity';
 import { Registration } from './entities/registration.entity';
 import { Report } from './entities/report.entity';
+import { Booth } from './entities/booth.entity';
+import { Company } from './entities/company.entity';
 
 @Module({
   imports: [
@@ -37,7 +39,7 @@ import { Report } from './entities/report.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'vexpo',
-      entities: [User, Role, UserRole, Expo, Registration, Report],
+      entities: [User, Role, UserRole, Expo, Registration, Report, Booth, Company],
       autoLoadEntities: true,
       synchronize: true, // for dev only, not for production
     }),

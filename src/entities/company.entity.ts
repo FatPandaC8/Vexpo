@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Booth } from "./booth.entity";
 
 @Entity('company')
 export class Company {
@@ -28,4 +29,7 @@ export class Company {
 
     @Column()
     description: string;
+
+    @OneToMany(() => Booth, (booth) => booth.company)
+    booths: Booth[];
 }

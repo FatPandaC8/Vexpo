@@ -18,7 +18,7 @@ export class RegisterDTO {
   @MinLength(8)
   password: string;
 
-  @ApiProperty({ example: 'COMPANY' })
+  @ApiProperty({ example: 'exhibitor' })
   @IsString()
-  role: 'visitor' | 'company' | 'organizer';
+  role: 'visitor' | 'exhibitor' | 'organizer' | 'admin';
 }

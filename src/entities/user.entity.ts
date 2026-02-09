@@ -1,5 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { UserRole } from './userrole.entity';
+import { Registration } from './registration.entity';
+import { Report } from './report.entity';
 
 @Entity('user')
 export class User {
@@ -17,4 +19,10 @@ export class User {
 
   @OneToMany(() => UserRole, (ur) => ur.user)
   roles: UserRole[];
+
+  @OneToMany(() => Registration, (registration) => registration.user)
+  registrations: Registration[];
+
+  @OneToMany(() => Report, (report) => report.user)
+  reports: Report[];
 }

@@ -29,9 +29,6 @@ export class UsersService {
     return this.usersRepository.findOne({
       where: { id },
       relations: ['roles', 'roles.role'],
-      lock: {
-        mode: 'pessimistic_read',
-      },
     });
   }
 
@@ -63,20 +60,14 @@ export class UsersService {
 
     if (exists) return exists;
 
-    const user = await this.usersRepository.findOneBy({ id: userId });
-    if (!user) throw new NotFoundException('User not found');
-
     const role = await this.roleRepository.findOne({
       where: { name: roleName },
-      lock: {
-        mode: 'pessimistic_write', // you're the only one who can write at this time
-      },
     });
 
     if (!role) throw new NotFoundException('Role not found');
 
     const userRole = this.userRoleRepository.create({
-      user,
+      userId,
       role,
     });
 

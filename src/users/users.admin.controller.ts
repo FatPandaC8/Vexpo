@@ -12,9 +12,17 @@ import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Admin')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
 @Controller('admin/users')
@@ -23,6 +31,7 @@ export class UserAdminController {
 
   @ApiOperation({ description: 'Get all the users.' })
   @ApiOkResponse({ description: 'A list of users' })
+  @ApiForbiddenResponse({ description: 'Forbidden resource' })
   @Get()
   findAll() {
     return this.userService.findAll();
@@ -42,10 +51,11 @@ export class UserAdminController {
   }
 
   @ApiOperation({ description: 'Delete the user.' })
+  @ApiBadRequestResponse({ description: 'Admins cannot delete themselves' })
   @Delete(':id')
   deleteUser(@Param('id') userId: number, @Req() req) {
     if (req.user.id === userId) {
-      throw new BadRequestException('Admin cannot delete themselves');
+      throw new BadRequestException('Admins cannot delete themselves');
     }
     return this.userService.deleteUser(userId);
   }

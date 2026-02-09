@@ -58,7 +58,7 @@ export class AuthService {
       user.password as string,
     );
     if (!isMatchPassword) {
-      throw new UnauthorizedException('Invalud credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload = {

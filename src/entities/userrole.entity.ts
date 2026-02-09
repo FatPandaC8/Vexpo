@@ -1,4 +1,10 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 import { User } from './user.entity';
 import { Role } from './role.entity';
 
@@ -7,6 +13,12 @@ import { Role } from './role.entity';
 export class UserRole {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  userId: number;
+
+  @Column()
+  roleId: number;
 
   @ManyToOne(() => User, (user) => user.roles, { onDelete: 'CASCADE' })
   user: User;

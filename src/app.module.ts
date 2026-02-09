@@ -18,6 +18,9 @@ import { Role } from './entities/role.entity';
 import { UserRole } from './entities/userrole.entity';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { Expo } from './entities/expo.entity';
+import { Registration } from './entities/registration.entity';
+import { Report } from './entities/report.entity';
 
 @Module({
   imports: [
@@ -34,7 +37,8 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
       username: 'postgres',
       password: 'postgres',
       database: 'vexpo',
-      entities: [User, Role, UserRole],
+      entities: [User, Role, UserRole, Expo, Registration, Report],
+      autoLoadEntities: true,
       synchronize: true, // for dev only, not for production
     }),
     ExposModule,

@@ -9,15 +9,28 @@ import { Repository } from 'typeorm';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
     @InjectRepository(UserRole)
     private userRoleRepository: Repository<UserRole>,
   ) {}
 
+  // PUBLIC API
+
+  profile(userId: number) {
+    return this.userRepository.findOne({
+      where: {
+        id: userId
+      },
+      select: ['name', 'email']
+    });
+  }
+
+  // /PUBLIC API
+
   async findOneByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({
+    return this.userRepository.findOne({
       where: { email },
       relations: ['roles', 'roles.role'], // if no relation, user will be loaded with no role
       // if only have roles, user's role attribute will be empty
@@ -26,14 +39,14 @@ export class UsersService {
   }
 
   async findOneById(id: number): Promise<User | null> {
-    return this.usersRepository.findOne({
+    return this.userRepository.findOne({
       where: { id },
       relations: ['roles', 'roles.role'],
     });
   }
 
   async findAll() {
-    return this.usersRepository.find({
+    return this.userRepository.find({
       relations: ['roles', 'roles.role'],
       select: ['id', 'name', 'email'],
     });
@@ -44,10 +57,10 @@ export class UsersService {
     email: string;
     password: string | null;
   }): Promise<User> {
-    const user = this.usersRepository.create(data as Partial<User>);
+    const user = this.userRepository.create(data as Partial<User>);
     // the Partial<User> is a workaround, as first it need roles but oauth does not have role yet when signing up
     // so cast it as that, with default value of []
-    return this.usersRepository.save(user);
+    return this.userRepository.save(user);
   }
 
   async assignRole(userId: number, roleName: string) {
@@ -80,7 +93,7 @@ export class UsersService {
   }
 
   async deleteUser(id: number) {
-    const result = await this.usersRepository.delete(id);
+    const result = await this.userRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException('User not found');
   }
 }

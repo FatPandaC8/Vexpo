@@ -1,21 +1,21 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Expo } from "./expo.entity";
-import { Company } from "./company.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Expo } from './expo.entity';
+import { Company } from './company.entity';
 
 @Entity('booth')
 export class Booth {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    expoId: number;
+  @Column()
+  expoId: number;
 
-    @Column()
-    exhibitorId: number;
+  @Column()
+  exhibitorId: number;
 
-    @ManyToOne(() => Expo, (expo) => expo.booths)
-    expo: Expo
+  @ManyToOne(() => Expo, (expo) => expo.booths)
+  expo: Expo;
 
-    @ManyToOne(() => Company, (company) => company.booths)
-    company: Company;
+  @ManyToOne(() => Company, (company) => company.booths)
+  company: Company;
 }

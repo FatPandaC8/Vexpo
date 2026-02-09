@@ -12,12 +12,9 @@ import { ReportsModule } from './reports/reports.module';
 import { CompaniesModule } from './companies/companies.module';
 import { VisitsModule } from './visits/visits.module';
 import { SystemModule } from './system/system.module';
-import { MeModule } from './me/me.module';
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
 import { UserRole } from './entities/userrole.entity';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { Expo } from './entities/expo.entity';
 import { Registration } from './entities/registration.entity';
 import { Report } from './entities/report.entity';
@@ -39,7 +36,16 @@ import { Company } from './entities/company.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'vexpo',
-      entities: [User, Role, UserRole, Expo, Registration, Report, Booth, Company],
+      entities: [
+        User,
+        Role,
+        UserRole,
+        Expo,
+        Registration,
+        Report,
+        Booth,
+        Company,
+      ],
       autoLoadEntities: true,
       synchronize: true, // for dev only, not for production
     }),
@@ -49,16 +55,9 @@ import { Company } from './entities/company.entity';
     CompaniesModule,
     VisitsModule,
     SystemModule,
-    MeModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}

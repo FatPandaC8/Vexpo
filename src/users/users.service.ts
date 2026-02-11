@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Registration } from 'src/entities/registration.entity';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
 import { UserRole } from 'src/entities/userrole.entity';
@@ -14,6 +15,8 @@ export class UsersService {
     private roleRepository: Repository<Role>,
     @InjectRepository(UserRole)
     private userRoleRepository: Repository<UserRole>,
+    @InjectRepository(Registration)
+    private registrationRepository: Repository<Registration>,
   ) {}
 
   // PUBLIC API
@@ -25,6 +28,27 @@ export class UsersService {
       },
       select: ['name', 'email']
     });
+  }
+
+  async register(expoId: number, userId: number) {
+    // check if the expoId and userId has already been in the database:
+    // if not -> create a new row
+    // else -> return 403
+    const exists = await this.registrationRepository.findOne({
+      where: {
+        expoId: expoId,
+        userId: userId
+      }
+    });
+
+    if (exists) return exists;
+
+    const visitor_expo = await this.registrationRepository.create({
+      expoId: expoId,
+      userId: userId,
+    });
+
+    return this.registrationRepository.save(visitor_expo);
   }
 
   // /PUBLIC API

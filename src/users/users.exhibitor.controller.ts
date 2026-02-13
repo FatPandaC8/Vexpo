@@ -16,6 +16,9 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { BoothsService } from 'src/booths/booths.service';
 import { CreateBoothContentDTO } from 'src/booths/dto/create-booth-content.dto';
 import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
+import { UpdateCompanyDto } from 'src/companies/dto/update-company.dto';
+import { CompaniesService } from 'src/companies/companies.service';
+import { CreateCompanyDto } from 'src/companies/dto/create-company.dto';
 
 @ApiTags('Exhibitor')
 @ApiBearerAuth()
@@ -23,7 +26,10 @@ import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
 @Roles('EXHIBITOR')
 @Controller()
 export class UserExhibitorController {
-  constructor(private boothsService: BoothsService) {}
+  constructor(
+    private boothsService: BoothsService,
+    private companyService: CompaniesService,
+  ) {}
 
   @Post('expos/:expoId/booths')
   @ApiOperation({ summary: 'Register booth for an expo' })
@@ -53,5 +59,21 @@ export class UserExhibitorController {
       req.user.userId,
       dto,
     );
+  }
+
+  @Post('companies')
+  @ApiOperation({ summary: 'Register a company' })
+  async registerCompany(@Body() dto: CreateCompanyDto, @Request() req) {
+    return this.companyService.createCompany(req.user.userId, dto);
+  }
+
+  @Patch('companies/:companyId')
+  @ApiOperation({ summary: "Update company's details" })
+  async updateCompany(
+    @Param('companyId', ParseIntPipe) companyId: number,
+    @Body() dto: UpdateCompanyDto,
+    @Request() req,
+  ) {
+    return this.companyService.updateCompany(req.user.userId, dto);
   }
 }

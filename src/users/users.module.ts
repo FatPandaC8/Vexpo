@@ -13,12 +13,15 @@ import { BoothsModule } from 'src/booths/booths.module';
 import { ExposModule } from 'src/expos/expos.module';
 import { UserExhibitorController } from './users.exhibitor.controller';
 import { UserOrganizerController } from './users.organizer.controller';
+import { CompaniesModule } from 'src/companies/companies.module';
+import { Company } from 'src/entities/company.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role, UserRole, Registration]),
+    TypeOrmModule.forFeature([User, Role, UserRole, Registration, Company]),
     BoothsModule,
     ExposModule,
+    CompaniesModule,
   ],
   providers: [UsersService],
   exports: [UsersService, TypeOrmModule],

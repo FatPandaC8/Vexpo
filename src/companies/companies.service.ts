@@ -46,7 +46,7 @@ export class CompaniesService {
   async createCompany(userId: number, dto: CreateCompanyDto) {
     const company = this.companyRepository.create({
       ...dto,
-      exhibitorId: userId
+      exhibitorId: userId,
     });
     return this.companyRepository.save(company);
   }

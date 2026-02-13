@@ -5,11 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Booth } from 'src/entities/booth.entity';
 import { Registration } from 'src/entities/registration.entity';
 import { Expo } from 'src/entities/expo.entity';
+import { ExposAdminController } from './expos.admin.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Expo, Booth, Registration])],
   exports: [ExposService, TypeOrmModule],
-  controllers: [ExposController],
+  controllers: [ExposController, ExposAdminController],
   providers: [ExposService],
 })
 export class ExposModule {}

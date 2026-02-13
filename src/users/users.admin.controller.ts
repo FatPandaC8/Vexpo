@@ -1,10 +1,15 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -20,8 +25,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { UpdateUserRoleDTO } from './dto/update-user-role.dto';
 
-@ApiTags('Admin')
+@ApiTags('Admin - Users')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
@@ -33,27 +39,33 @@ export class UserAdminController {
   @ApiOkResponse({ description: 'A list of users' })
   @ApiForbiddenResponse({ description: 'Forbidden resource' })
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 20
+  ) {
+    return this.userService.findAllPaginated(page, limit);
   }
 
   @ApiOperation({ description: 'Get the user based on their id.' })
   @ApiOkResponse({ description: 'The specific user' })
   @Get(':id')
-  findUserId(@Param('id') userId: number) {
+  findUserId(@Param('id', ParseIntPipe) userId: number) {
     return this.userService.findOneById(userId);
   }
 
   @ApiOperation({ description: "Edit the user's role." })
-  @Patch(':id')
-  editUserRole(@Param('id') userId: number, @Param('role') newRole: string) {
-    return this.userService.setRole(userId, newRole);
+  @Patch(':id/role')
+  editUserRole(
+    @Param('id', ParseIntPipe) userId: number,
+    @Body() dto: UpdateUserRoleDTO) {
+    return this.userService.setRole(userId, dto.role);
   }
 
   @ApiOperation({ description: 'Delete the user.' })
   @ApiBadRequestResponse({ description: 'Admins cannot delete themselves' })
   @Delete(':id')
-  deleteUser(@Param('id') userId: number, @Req() req) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteUser(@Param('id', ParseIntPipe) userId: number, @Req() req) {
     if (req.user.id === userId) {
       throw new BadRequestException('Admins cannot delete themselves');
     }

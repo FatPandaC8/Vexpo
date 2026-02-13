@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Expo } from './expo.entity';
 import { Company } from './company.entity';
 
@@ -18,4 +18,10 @@ export class Booth {
 
   @ManyToOne(() => Company, (company) => company.booths)
   company: Company;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

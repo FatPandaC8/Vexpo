@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
     /**
-     * Reflector is a soecific injectabe service or class 
+     * Reflector is a soecific injectabe service or class
      * designed to interact (attach) with metadata
      * added via decorator
      */

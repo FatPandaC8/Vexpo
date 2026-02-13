@@ -4,6 +4,7 @@ import { Registration } from 'src/entities/registration.entity';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
 import { UserRole } from 'src/entities/userrole.entity';
+import { Visit } from 'src/entities/visit.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -17,6 +18,8 @@ export class UsersService {
     private userRoleRepository: Repository<UserRole>,
     @InjectRepository(Registration)
     private registrationRepository: Repository<Registration>,
+    @InjectRepository(Visit)
+    private visitRepository: Repository<Visit>,
   ) {}
 
   // PUBLIC API
@@ -24,31 +27,10 @@ export class UsersService {
   profile(userId: number) {
     return this.userRepository.findOne({
       where: {
-        id: userId
+        id: userId,
       },
-      select: ['name', 'email']
+      select: ['name', 'email'],
     });
-  }
-
-  async register(expoId: number, userId: number) {
-    // check if the expoId and userId has already been in the database:
-    // if not -> create a new row
-    // else -> return 403
-    const exists = await this.registrationRepository.findOne({
-      where: {
-        expoId: expoId,
-        userId: userId
-      }
-    });
-
-    if (exists) return exists;
-
-    const visitor_expo = await this.registrationRepository.create({
-      expoId: expoId,
-      userId: userId,
-    });
-
-    return this.registrationRepository.save(visitor_expo);
   }
 
   // /PUBLIC API
@@ -119,5 +101,50 @@ export class UsersService {
   async deleteUser(id: number) {
     const result = await this.userRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException('User not found');
+  }
+
+  async registerForExpo(expoId: number, userId: number) {
+    const exists = await this.registrationRepository.findOne({
+      where: { expoId, userId }
+    });
+
+    if (exists) {
+      return exists;
+    }
+
+    const registration = this.registrationRepository.create({
+      expoId,
+      userId,
+    });
+
+    return this.registrationRepository.save(registration);
+  }
+
+  async getVisitedBooths(userId: number) {
+    return this.visitRepository.find({
+      where: { userId },
+      relations: ['booth', 'booth.expo', 'booth.company'],
+      order: { visitedAt: 'DESC' },
+    });
+  }
+
+  async findAllPaginated(page: number = 1, limit: number = 20) {
+    const [items, total] = await this.userRepository.findAndCount({
+      relations: ['roles', 'roles.role'],
+      select: ['id', 'name', 'email'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { id: 'DESC' },
+    });
+
+    return {
+      items,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

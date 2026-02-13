@@ -37,13 +37,13 @@ export class ExposAdminController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateExpoDTO,
   ) {
-    // return this.exposService.updateExpo(id, dto);
+    return this.exposService.updateExpo(id, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete expo (admin)' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteExpo(@Param('id', ParseIntPipe) id: number) {
-    // return this.exposService.deleteExpo(id);
+    return this.exposService.deleteExpo(id);
   }
 }

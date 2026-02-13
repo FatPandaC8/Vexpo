@@ -9,7 +9,6 @@ import { Repository } from 'typeorm';
 import { UpdateExpoDTO } from './dto/update-expo.dto';
 import { CreateExpoDTO } from './dto/create-expo.dto';
 import { Booth } from 'src/entities/booth.entity';
-import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
 
 @Injectable()
 export class ExposService {
@@ -49,9 +48,9 @@ export class ExposService {
     await this.findExpoById(expoId);
 
     return this.boothRepository.find({
-      where: { 
+      where: {
         expoId,
-        status: 'approved'
+        status: 'approved',
       },
       relations: ['company'],
       order: { createdAt: 'DESC' },
@@ -117,7 +116,7 @@ export class ExposService {
     });
   }
 
-  // Admin 
+  // Admin
   async updateExpo(id: number, dto: UpdateExpoDTO) {
     const expo = await this.findExpoById(id);
     Object.assign(expo, dto);

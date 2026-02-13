@@ -16,12 +16,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
   // verify callback is where you tell passport how to interact with your user store
   // whether the credential are valid | return a full user if GUD else null
-  async validate(
+  validate(
     accessToken: string,
     refreshToken: string,
     profile: any,
     done: VerifyCallback,
-  ): Promise<any> {
+  ) {
     const { name, emails, photos } = profile;
     const user = {
       email: emails[0].value,

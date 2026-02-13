@@ -17,7 +17,7 @@ export class Company {
   name: string;
 
   @Column()
-  userId: number;
+  exhibitorId: number;
 
   @Column()
   country: string;
@@ -29,7 +29,7 @@ export class Company {
   email: string;
 
   @Column({ nullable: true })
-  phone: number;
+  phone: string;
 
   @Column({ nullable: true })
   website: string;

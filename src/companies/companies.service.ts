@@ -44,11 +44,11 @@ export class CompaniesService {
   }
 
   async createCompany(userId: number, dto: CreateCompanyDto) {
-    // const company = this.companyRepository.create({
-    //   ...dto,
-    //   userId,
-    // });
-    // return this.companyRepository.save(company);
+    const company = this.companyRepository.create({
+      ...dto,
+      exhibitorId: userId
+    });
+    return this.companyRepository.save(company);
   }
 
   async updateCompany(id: number, dto: UpdateCompanyDto) {

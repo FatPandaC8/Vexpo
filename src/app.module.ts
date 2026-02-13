@@ -32,15 +32,7 @@ import { Company } from './entities/company.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'vexpo',
-      entities: [
-        User,
-        Role,
-        UserRole,
-        Expo,
-        Registration,
-        Booth,
-        Company,
-      ],
+      entities: [User, Role, UserRole, Expo, Registration, Booth, Company],
       autoLoadEntities: true,
       synchronize: true, // for dev only, not for production
     }),

@@ -16,12 +16,7 @@ import { UserOrganizerController } from './users.organizer.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      User,
-      Role,
-      UserRole,
-      Registration,
-    ]),
+    TypeOrmModule.forFeature([User, Role, UserRole, Registration]),
     BoothsModule,
     ExposModule,
   ],

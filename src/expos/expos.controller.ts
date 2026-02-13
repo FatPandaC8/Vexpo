@@ -11,9 +11,9 @@ export class ExposController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all expos' })
-  @ApiQuery({name: 'type', required: false})
+  @ApiQuery({ name: 'type', required: false })
   async findAllExpos(@Query('type') type?: string) {
-    return this.expoService.findAll({type});
+    return this.expoService.findAll({ type });
   }
 
   @Public()

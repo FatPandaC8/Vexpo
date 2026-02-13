@@ -27,6 +27,6 @@ export class ExposController {
   @Get(':id/booths')
   @ApiOperation({ description: 'Get all booths of an expo' })
   async findAllBoothsByExpoId(@Param('expoId', ParseIntPipe) expoId: number) {
-    return this.expoService.findAllBoothByExpoId(expoId);
+    return this.expoService.findAllBoothsByExpoId(expoId);
   }
 }

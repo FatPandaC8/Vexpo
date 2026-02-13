@@ -21,6 +21,7 @@ import { BoothsService } from 'src/booths/booths.service';
 import { CreateExpoDTO } from 'src/expos/dto/create-expo.dto';
 import { UpdateExpoDTO } from 'src/expos/dto/update-expo.dto';
 import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
+import { UpdateBoothStatusDTO } from 'src/booths/dto/update-booth-status.dto';
 
 @ApiTags('Organizer')
 @ApiBearerAuth()
@@ -82,13 +83,13 @@ export class UserOrganizerController {
   @ApiOperation({ summary: 'Approve or reject booth' })
   async updateBoothStatus(
     @Param('boothId', ParseIntPipe) boothId: number,
-    @Body() dto: UpdateBoothContentDTO,
+    @Body() dto: UpdateBoothStatusDTO,
     @Request() req,
   ) {
-    return this.boothsService.updateBoothByExhibitor(
+    return this.boothsService.updateBoothStatus(
       boothId,
       req.user.userId,
-      dto,
+      dto.status,
     );
   }
 }

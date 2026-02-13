@@ -9,6 +9,7 @@ import { Booth } from 'src/entities/booth.entity';
 import { Repository } from 'typeorm';
 import { UpdateBoothContentDTO } from './dto/update-booth.dto';
 import { CreateBoothContentDTO } from './dto/create-booth-content.dto';
+import { UpdateBoothStatusDTO } from './dto/update-booth-status.dto';
 
 @Injectable()
 export class BoothsService {

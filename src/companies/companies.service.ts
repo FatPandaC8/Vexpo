@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'src/entities/company.entity';
 import { Repository } from 'typeorm';
-import { CreateCompanyDto } from './dto/create-company.dto';
+import { RegisterCompanyDTO } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 
 @Injectable()
@@ -43,7 +43,7 @@ export class CompaniesService {
     return company;
   }
 
-  async createCompany(userId: number, dto: CreateCompanyDto) {
+  async registerCompany(userId: number, dto: RegisterCompanyDTO) {
     const company = this.companyRepository.create({
       ...dto,
       exhibitorId: userId,

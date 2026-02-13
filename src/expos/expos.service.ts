@@ -43,7 +43,7 @@ export class ExposService {
     return expo;
   }
 
-  async findAllBoothByExpoId(expoId: number) {
+  async findAllBoothsByExpoId(expoId: number) {
     // need to make a booth content table
     await this.findExpoById(expoId);
 
@@ -110,7 +110,7 @@ export class ExposService {
     }
 
     return this.boothRepository.find({
-      where: { expoId, status: 'approved' },
+      where: { expoId },
       relations: ['company'],
       order: { createdAt: 'DESC' },
     });

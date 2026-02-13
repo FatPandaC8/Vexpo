@@ -7,7 +7,7 @@ import {
   IsUrl,
 } from 'class-validator';
 
-export class CreateCompanyDto {
+export class RegisterCompanyDTO {
   @ApiProperty({ example: 'TechCorp Inc.' })
   @IsString()
   @IsNotEmpty()

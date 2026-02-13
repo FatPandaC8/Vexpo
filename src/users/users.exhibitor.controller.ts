@@ -18,7 +18,7 @@ import { CreateBoothContentDTO } from 'src/booths/dto/create-booth-content.dto';
 import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
 import { UpdateCompanyDto } from 'src/companies/dto/update-company.dto';
 import { CompaniesService } from 'src/companies/companies.service';
-import { CreateCompanyDto } from 'src/companies/dto/create-company.dto';
+import { RegisterCompanyDTO } from 'src/companies/dto/create-company.dto';
 
 @ApiTags('Exhibitor')
 @ApiBearerAuth()
@@ -63,8 +63,8 @@ export class UserExhibitorController {
 
   @Post('companies')
   @ApiOperation({ summary: 'Register a company' })
-  async registerCompany(@Body() dto: CreateCompanyDto, @Request() req) {
-    return this.companyService.createCompany(req.user.userId, dto);
+  async registerCompany(@Body() dto: RegisterCompanyDTO, @Request() req) {
+    return this.companyService.registerCompany(req.user.userId, dto);
   }
 
   @Patch('companies/:companyId')

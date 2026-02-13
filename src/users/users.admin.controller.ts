@@ -39,10 +39,7 @@ export class UserAdminController {
   @ApiOkResponse({ description: 'A list of users' })
   @ApiForbiddenResponse({ description: 'Forbidden resource' })
   @Get()
-  findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20
-  ) {
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 20) {
     return this.userService.findAllPaginated(page, limit);
   }
 
@@ -57,7 +54,8 @@ export class UserAdminController {
   @Patch(':id/role')
   editUserRole(
     @Param('id', ParseIntPipe) userId: number,
-    @Body() dto: UpdateUserRoleDTO) {
+    @Body() dto: UpdateUserRoleDTO,
+  ) {
     return this.userService.setRole(userId, dto.role);
   }
 

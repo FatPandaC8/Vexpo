@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsDateString, IsOptional, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDateString,
+  IsOptional,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateExpoDTO {
   @ApiProperty({ example: 'Tech Expo 2024' })

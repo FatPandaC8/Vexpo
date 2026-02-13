@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Expo } from './expo.entity';
 import { User } from './user.entity';
 
@@ -18,4 +18,7 @@ export class Registration {
 
   @ManyToOne(() => User, (user) => user.registrations, { onDelete: 'CASCADE' })
   user: User;
+
+  @CreateDateColumn()
+  registeredAt: Date;
 }

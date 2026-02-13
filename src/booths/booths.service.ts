@@ -1,4 +1,9 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booth } from 'src/entities/booth.entity';
 import { Repository } from 'typeorm';
@@ -27,10 +32,14 @@ export class BoothsService {
     return booth;
   }
 
-  async createBooth(expoId: number, exhibitorId: number, dto: CreateBoothContentDTO) {
+  async createBooth(
+    expoId: number,
+    exhibitorId: number,
+    dto: CreateBoothContentDTO,
+  ) {
     // Check if user already has a booth for this expo
     const existingBooth = await this.boothRepository.findOne({
-      where: { expoId, exhibitorId }
+      where: { expoId, exhibitorId },
     });
 
     if (existingBooth) {
@@ -56,12 +65,12 @@ export class BoothsService {
   }
 
   async updateBoothByExhibitor(
-    boothId: number, 
-    exhibitorId: number, 
-    dto: UpdateBoothContentDTO
+    boothId: number,
+    exhibitorId: number,
+    dto: UpdateBoothContentDTO,
   ) {
     const booth = await this.boothRepository.findOne({
-      where: { id: boothId }
+      where: { id: boothId },
     });
 
     if (!booth) {
@@ -76,38 +85,10 @@ export class BoothsService {
     return this.boothRepository.save(booth);
   }
 
-  // async getExhibitorStats(exhibitorId: number) {
-  //   const booths = await this.boothRepository.find({
-  //     where: { exhibitorId },
-  //     relations: ['expo'],
-  //   });
-
-  //   const totalBooths = booths.length;
-  //   const totalVisits = booths.reduce((sum, booth) => sum + booth.visitCount, 0);
-  //   const boothsByStatus = booths.reduce((acc, booth) => {
-  //     acc[booth.status] = (acc[booth.status] || 0) + 1;
-  //     return acc;
-  //   }, {} as Record<string, number>);
-
-  //   return {
-  //     totalBooths,
-  //     totalVisits,
-  //     averageVisitsPerBooth: totalBooths > 0 ? totalVisits / totalBooths : 0,
-  //     boothsByStatus,
-  //     booths: booths.map(b => ({
-  //       id: b.id,
-  //       name: b.name,
-  //       expo: b.expo.name,
-  //       status: b.status,
-  //       visitCount: b.visitCount,
-  //     })),
-  //   };
-  // }
-
   async updateBoothStatus(
-    boothId: number, 
-    organizerId: number, 
-    status: 'pending' | 'approved' | 'rejected'
+    boothId: number,
+    organizerId: number,
+    status: 'pending' | 'approved' | 'rejected',
   ) {
     const booth = await this.boothRepository.findOne({
       where: { id: boothId },
@@ -119,7 +100,9 @@ export class BoothsService {
     }
 
     if (booth.expo.organizerId !== organizerId) {
-      throw new ForbiddenException('You can only approve booths for your own expos');
+      throw new ForbiddenException(
+        'You can only approve booths for your own expos',
+      );
     }
 
     booth.status = status;

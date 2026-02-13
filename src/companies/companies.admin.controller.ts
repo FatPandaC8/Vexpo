@@ -9,7 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -30,7 +30,7 @@ export class CompaniesAdminController {
   @ApiOperation({ summary: 'Get all companies' })
   async getAllCompanies(
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20
+    @Query('limit') limit: number = 20,
   ) {
     return this.companiesService.findAllPaginated(page, limit);
   }
@@ -45,7 +45,7 @@ export class CompaniesAdminController {
   @ApiOperation({ summary: 'Update company' })
   async updateCompany(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateCompanyDto
+    @Body() dto: UpdateCompanyDto,
   ) {
     return this.companiesService.updateCompany(id, dto);
   }

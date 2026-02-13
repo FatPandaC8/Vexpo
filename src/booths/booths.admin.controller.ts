@@ -10,7 +10,7 @@ import {
   ParseIntPipe,
   UseGuards,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -31,7 +31,7 @@ export class BoothsAdminController {
   @ApiOperation({ summary: 'Get all booths' })
   async getAllBooths(
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20
+    @Query('limit') limit: number = 20,
   ) {
     return this.boothsService.findAllPaginated(page, limit);
   }
@@ -46,7 +46,7 @@ export class BoothsAdminController {
   @ApiOperation({ summary: 'Update booth' })
   async updateBooth(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateBoothContentDTO
+    @Body() dto: UpdateBoothContentDTO,
   ) {
     return this.boothsService.updateBooth(id, dto);
   }

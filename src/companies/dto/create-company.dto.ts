@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEmail, IsOptional, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEmail,
+  IsOptional,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateCompanyDto {
   @ApiProperty({ example: 'TechCorp Inc.' })

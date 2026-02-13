@@ -4,7 +4,6 @@ import { Registration } from 'src/entities/registration.entity';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
 import { UserRole } from 'src/entities/userrole.entity';
-import { Visit } from 'src/entities/visit.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -18,8 +17,6 @@ export class UsersService {
     private userRoleRepository: Repository<UserRole>,
     @InjectRepository(Registration)
     private registrationRepository: Repository<Registration>,
-    @InjectRepository(Visit)
-    private visitRepository: Repository<Visit>,
   ) {}
 
   // PUBLIC API
@@ -32,8 +29,6 @@ export class UsersService {
       select: ['name', 'email'],
     });
   }
-
-  // /PUBLIC API
 
   async findOneByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({
@@ -105,7 +100,7 @@ export class UsersService {
 
   async registerForExpo(expoId: number, userId: number) {
     const exists = await this.registrationRepository.findOne({
-      where: { expoId, userId }
+      where: { expoId, userId },
     });
 
     if (exists) {
@@ -120,15 +115,16 @@ export class UsersService {
     return this.registrationRepository.save(registration);
   }
 
-  async getVisitedBooths(userId: number) {
-    return this.visitRepository.find({
+  async getMyRegistrations(userId: number) {
+    return this.registrationRepository.find({
       where: { userId },
-      relations: ['booth', 'booth.expo', 'booth.company'],
-      order: { visitedAt: 'DESC' },
+      relations: ['expo'],
+      order: { registeredAt: 'DESC' },
     });
   }
 
   async findAllPaginated(page: number = 1, limit: number = 20) {
+    // TODO: not optimized if the the number are large Bach :(
     const [items, total] = await this.userRepository.findAndCount({
       relations: ['roles', 'roles.role'],
       select: ['id', 'name', 'email'],

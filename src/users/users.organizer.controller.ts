@@ -1,16 +1,16 @@
-import { 
-  Controller, 
-  Post, 
+import {
+  Controller,
+  Post,
   Get,
   Patch,
   Delete,
-  Param, 
+  Param,
   Body,
   ParseIntPipe,
   UseGuards,
   Request,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -50,12 +50,12 @@ export class UserOrganizerController {
   async updateExpo(
     @Param('expoId', ParseIntPipe) expoId: number,
     @Body() dto: UpdateExpoDTO,
-    @Request() req
+    @Request() req,
   ) {
     return this.exposService.updateExpoByOrganizer(
-      expoId, 
-      req.user.userId, 
-      dto
+      expoId,
+      req.user.userId,
+      dto,
     );
   }
 
@@ -64,7 +64,7 @@ export class UserOrganizerController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteExpo(
     @Param('expoId', ParseIntPipe) expoId: number,
-    @Request() req
+    @Request() req,
   ) {
     return this.exposService.deleteExpoByOrganizer(expoId, req.user.userId);
   }
@@ -73,12 +73,9 @@ export class UserOrganizerController {
   @ApiOperation({ summary: 'Get all booths of an expo' })
   async getExpoBooths(
     @Param('expoId', ParseIntPipe) expoId: number,
-    @Request() req
+    @Request() req,
   ) {
-    return this.exposService.getExpoBoothsByOrganizer(
-      expoId, 
-      req.user.userId
-    );
+    return this.exposService.getExpoBoothsByOrganizer(expoId, req.user.userId);
   }
 
   @Patch('booths/:boothId/status')
@@ -86,18 +83,12 @@ export class UserOrganizerController {
   async updateBoothStatus(
     @Param('boothId', ParseIntPipe) boothId: number,
     @Body() dto: UpdateBoothContentDTO,
-    @Request() req
+    @Request() req,
   ) {
     return this.boothsService.updateBoothByExhibitor(
-      boothId, 
-      req.user.userId, 
+      boothId,
+      req.user.userId,
       dto,
     );
   }
-
-  // @Get('me/organizer-stats')
-  // @ApiOperation({ summary: 'Get organizer statistics' })
-  // async getOrganizerStats(@Request() req) {
-  //   return this.exposService.getOrganizerStats(req.user.userId);
-  // }
 }

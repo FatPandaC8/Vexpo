@@ -1,13 +1,13 @@
-import { 
-  Controller, 
-  Post, 
+import {
+  Controller,
+  Post,
   Get,
   Patch,
-  Param, 
+  Param,
   Body,
   ParseIntPipe,
   UseGuards,
-  Request
+  Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -30,7 +30,7 @@ export class UserExhibitorController {
   async registerBooth(
     @Param('expoId', ParseIntPipe) expoId: number,
     @Body() dto: CreateBoothContentDTO,
-    @Request() req
+    @Request() req,
   ) {
     return this.boothsService.createBooth(expoId, req.user.userId, dto);
   }
@@ -46,18 +46,12 @@ export class UserExhibitorController {
   async updateBooth(
     @Param('boothId', ParseIntPipe) boothId: number,
     @Body() dto: UpdateBoothContentDTO,
-    @Request() req
+    @Request() req,
   ) {
     return this.boothsService.updateBoothByExhibitor(
-      boothId, 
-      req.user.userId, 
-      dto
+      boothId,
+      req.user.userId,
+      dto,
     );
   }
-
-//   @Get('me/exhibitor-stats')
-//   @ApiOperation({ summary: 'Get exhibitor statistics' })
-//   async getExhibitorStats(@Request() req) {
-//     return this.boothsService.getExhibitorStats(req.user.userId);
-//   }
 }

@@ -1,4 +1,13 @@
-import { Controller, Get, Param, ParseIntPipe, Post, Req, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { UsersService } from './users.service';
@@ -16,14 +25,14 @@ export class UserVisitorController {
   @ApiOperation({ summary: 'Register for an expo as visitor' })
   async registerForExpo(
     @Param('expoId', ParseIntPipe) expoId: number,
-    @Request() req
+    @Request() req,
   ) {
     return this.userService.registerForExpo(expoId, req.user.userId);
   }
 
-  @Get('me/visited-booths')
-  @ApiOperation({ summary: 'Get all booths visited by current user' })
-  async getVisitedBooths(@Request() req) {
-    return this.userService.getVisitedBooths(req.user.userId);
+  @Get('me/registrations')
+  @ApiOperation({ summary: 'Get all my expo registrations' })
+  async getMyRegistrations(@Request() req) {
+    return this.userService.getMyRegistrations(req.user.userId);
   }
 }

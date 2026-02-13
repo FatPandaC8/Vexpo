@@ -8,7 +8,7 @@ import {
   ParseIntPipe,
   UseGuards,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -35,7 +35,7 @@ export class ExposAdminController {
   @ApiOperation({ summary: 'Update expo (admin)' })
   async updateExpo(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateExpoDTO
+    @Body() dto: UpdateExpoDTO,
   ) {
     // return this.exposService.updateExpo(id, dto);
   }

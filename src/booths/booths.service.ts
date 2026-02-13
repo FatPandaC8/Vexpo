@@ -2,7 +2,7 @@ import { ConflictException, ForbiddenException, Injectable, NotFoundException } 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booth } from 'src/entities/booth.entity';
 import { Repository } from 'typeorm';
-import { UpdateBoothDTO } from './dto/update-booth.dto';
+import { UpdateBoothContentDTO } from './dto/update-booth.dto';
 import { CreateBoothContentDTO } from './dto/create-booth-content.dto';
 
 @Injectable()
@@ -40,7 +40,8 @@ export class BoothsService {
     const booth = this.boothRepository.create({
       ...dto,
       expoId,
-      exhibitorId
+      exhibitorId,
+      status: 'pending',
     });
 
     return this.boothRepository.save(booth);
@@ -57,7 +58,7 @@ export class BoothsService {
   async updateBoothByExhibitor(
     boothId: number, 
     exhibitorId: number, 
-    dto: UpdateBoothDTO
+    dto: UpdateBoothContentDTO
   ) {
     const booth = await this.boothRepository.findOne({
       where: { id: boothId }
@@ -121,11 +122,12 @@ export class BoothsService {
       throw new ForbiddenException('You can only approve booths for your own expos');
     }
 
-    // booth. = status;
+    booth.status = status;
     return this.boothRepository.save(booth);
   }
 
   async findAllPaginated(page: number = 1, limit: number = 20) {
+    // not optimized, use index instead, for now this should work :)
     const [items, total] = await this.boothRepository.findAndCount({
       relations: ['expo', 'company'],
       skip: (page - 1) * limit,
@@ -144,7 +146,7 @@ export class BoothsService {
     };
   }
 
-  async updateBooth(id: number, dto: UpdateBoothDTO) {
+  async updateBooth(id: number, dto: UpdateBoothContentDTO) {
     const booth = await this.getBoothById(id);
     Object.assign(booth, dto);
     return this.boothRepository.save(booth);

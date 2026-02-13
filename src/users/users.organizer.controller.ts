@@ -1,4 +1,3 @@
-// src/users/users.organizer.controller.ts
 import { 
   Controller, 
   Post, 
@@ -21,7 +20,7 @@ import { ExposService } from 'src/expos/expos.service';
 import { BoothsService } from 'src/booths/booths.service';
 import { CreateExpoDTO } from 'src/expos/dto/create-expo.dto';
 import { UpdateExpoDTO } from 'src/expos/dto/update-expo.dto';
-// import { UpdateBoothStatusDto } from 'src/booths/dto/update-booth-status.dto';
+import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
 
 @ApiTags('Organizer')
 @ApiBearerAuth()
@@ -82,19 +81,19 @@ export class UserOrganizerController {
     );
   }
 
-//   @Patch('booths/:boothId/status')
-//   @ApiOperation({ summary: 'Approve or reject booth' })
-//   async updateBoothStatus(
-//     @Param('boothId', ParseIntPipe) boothId: number,
-//     @Body() dto: UpdateBoothStatusDto,
-//     @Request() req
-//   ) {
-//     return this.boothsService.updateBoothByExhibitor(
-//       boothId, 
-//       req.user.userId, 
-//       dto.status
-//     );
-//   }
+  @Patch('booths/:boothId/status')
+  @ApiOperation({ summary: 'Approve or reject booth' })
+  async updateBoothStatus(
+    @Param('boothId', ParseIntPipe) boothId: number,
+    @Body() dto: UpdateBoothContentDTO,
+    @Request() req
+  ) {
+    return this.boothsService.updateBoothByExhibitor(
+      boothId, 
+      req.user.userId, 
+      dto,
+    );
+  }
 
   // @Get('me/organizer-stats')
   // @ApiOperation({ summary: 'Get organizer statistics' })

@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { UpdateExpoDTO } from './dto/update-expo.dto';
 import { CreateExpoDTO } from './dto/create-expo.dto';
 import { Booth } from 'src/entities/booth.entity';
-import { UpdateBoothDTO } from 'src/booths/dto/update-booth.dto';
+import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
 
 @Injectable()
 export class ExposService {
@@ -100,7 +100,7 @@ export class ExposService {
     }
 
     return this.boothRepository.find({
-      where: { expoId },
+      where: { expoId, status: 'approved' },
       relations: ['company'],
       order: { createdAt: 'DESC' },
     });
@@ -164,7 +164,7 @@ export class ExposService {
     };
   }
 
-  async updateBooth(id: number, dto: UpdateBoothDTO) {
+  async updateBooth(id: number, dto: UpdateBoothContentDTO) {
     // const booth = await this.getBoothById(id);
     // Object.assign(booth, dto);
     // return this.boothRepository.save(booth);

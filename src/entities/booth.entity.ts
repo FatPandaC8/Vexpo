@@ -13,6 +13,9 @@ export class Booth {
   @Column()
   exhibitorId: number;
 
+  @Column()
+  status: 'pending' | 'approved' | 'rejected';
+
   @ManyToOne(() => Expo, (expo) => expo.booths)
   expo: Expo;
 

@@ -17,7 +17,7 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { BoothsService } from './booths.service';
-import { UpdateBoothDTO } from './dto/update-booth.dto';
+import { UpdateBoothContentDTO } from './dto/update-booth.dto';
 
 @ApiTags('Admin - Booths')
 @ApiBearerAuth()
@@ -37,22 +37,22 @@ export class BoothsAdminController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get booth by ID (admin)' })
+  @ApiOperation({ summary: 'Get booth by ID ' })
   async getBooth(@Param('id', ParseIntPipe) id: number) {
     return this.boothsService.getBoothById(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update booth (admin)' })
+  @ApiOperation({ summary: 'Update booth' })
   async updateBooth(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateBoothDTO
+    @Body() dto: UpdateBoothContentDTO
   ) {
     return this.boothsService.updateBooth(id, dto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete booth (admin)' })
+  @ApiOperation({ summary: 'Delete booth' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBooth(@Param('id', ParseIntPipe) id: number) {
     return this.boothsService.deleteBooth(id);

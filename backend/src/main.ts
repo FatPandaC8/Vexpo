@@ -24,9 +24,14 @@ async function bootstrap() {
 
   const documentFactory = () =>
     SwaggerModule.createDocument(app, config, options);
+
   SwaggerModule.setup('api', app, documentFactory);
+
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   await app.listen(process.env.PORT as string);
 }
 bootstrap();
+
+// csrf later.
+// rate limit later - exclude: users (auth)

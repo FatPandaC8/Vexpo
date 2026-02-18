@@ -1,7 +1,7 @@
 <template>
     <!--Most pages has footers [REMINDER]-->
     <!--Footer vs Div: Use footer for more semantics, and it's better for screen reader & SEO-->
-    <div class="min-h-screen">
+    <div>
         <footer class=" text-white py-12 mt-20 bg-slate-800">
             <div class="px-6 max-w-7xl mx-auto">
                 <!--UPPER FOOTER-->

@@ -21,7 +21,7 @@ const selectedTab = ref('Home')
 
 <template>
     <!--3 divs: Logo + Tabs + Account-->
-    <header class="flex justify-between items-center bg-blue-50 h-20 sticky top-0 shadow-md">
+    <header class="flex justify-between items-center bg-blue-50 h-20 sticky top-0 shadow-md z-50">
         <!--Logo-->
         <div class="mb-6 flex items-center ml-20 mt-5">
             <Logo class="w-10 h-10"/>

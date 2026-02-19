@@ -53,13 +53,44 @@ import Header from '~/components/Header.vue';
 
         <!--Why-->
         <div>
+            <div class="flex flex-col items-center text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">
+                    Why Choose ExpoVerse?
+                </h1>
+                <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+                    Powerful features designed to make virtual exhibitions engaging and productive.
+                </p>
+            </div>
 
+            <div class="grid grid-cols-4 gap-4 bg-white pl-30 pr-30 mb-20">
+                <UCard>
+                    <h1>Interactive 2D Maps</h1>
+                    <p>Navigate expo halls with ease using out intuitive floor plans</p>
+                </UCard>
+
+                <UCard>
+                    <h1>Live Booth Experience</h1>
+                    <p>Immersive 3D booths</p>
+                </UCard>
+
+                <UCard>
+                    <h1>Networking Hub</h1>
+                    <p>Connect with exhibitors and organizers throughout the expo</p>
+                </UCard>
+
+                <UCard>
+                    <h1>Event Scheduling</h1>
+                    <p>Book meeting and never miss upcoming events</p>
+                </UCard>
+            </div>
         </div>
         <!--Why-->
 
         <!--Motto-->
         <div>
-
+            <UCard class="flex justify-center">
+                <h1>Ready to Transform Your Events?</h1>
+            </UCard>
         </div>
         <!--Motto-->
     </main>

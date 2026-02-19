@@ -58,12 +58,12 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
 
 <template>
     <!--The design has 2 parts: the footer & auth part-->
-    <div class="bg-linear-to-r from-blue-50 to-blue-500">
+    <div class="bg-linear-to-r from-[#fbfff1] to-[#3d52d5]">
         <div class="p-50">
             <!--Breadcrumb-->
             <div class="flex flex-1 mb-10 items-center ml-25">
                 <UIcon name="i-lucide-arrow-left"/>
-                <NuxtLink to="#" class="text-gray-500 ml-2 hover:text-gray-400">
+                <NuxtLink to="/" class="text-gray-500 ml-2 hover:text-gray-400">
                     Back to Home
                 </NuxtLink>
             </div>
@@ -73,7 +73,7 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
                 <!--Info-->
                 <div class="pr-20">
                     <div class="mb-6 gap-3 flex items-center">
-                        <Logo />
+                        <Logo class="w-25 h-25"/>
                         <div>
                             <h1 class="text-3xl font-bold text-blue-600 mb-2 ml-3">ExpoVerse</h1>
                             <p class="text-sm ml-3 text-gray-500">Virtual Expo Platform</p>
@@ -122,8 +122,8 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
                         trigger: `
                                 flex-1 text-center rounded-full py-2 text-sm font-semibold
                                 transition-all duration-300 ease-in-out
-                                text-blue-700
-                                data-[state=active]:bg-blue-600
+                                text-gray-500
+                                data-[state=active]:bg-[#3d52d5]
                                 data-[state=active]:text-white
                                 `,
                         indicator: 'rounded-full bg-white shadow-md'
@@ -183,7 +183,7 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
                                     <UButton 
                                         type="submit"
                                         block 
-                                        class="bg-linear-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/30 text-white cursor-pointer h-8 rounded-xl"
+                                        class="bg-linear-to-r from-[#3d52d5] to-[#090c9b] hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/30 text-white cursor-pointer h-8 rounded-xl"
                                         size="lg">
                                         Sign In
                                     </UButton>

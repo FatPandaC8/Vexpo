@@ -2,6 +2,7 @@
 import Footer from '~/components/Footer.vue'
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import Logo from '~/components/Logo.vue'
 
 const activeTab = ref('signin')
 const rememberMe = ref(true)
@@ -60,7 +61,7 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
     <div class="bg-linear-to-r from-blue-50 to-blue-500">
         <div class="p-50">
             <!--Breadcrumb-->
-            <div class="flex flex-1 mb-10 items-center">
+            <div class="flex flex-1 mb-10 items-center ml-25">
                 <UIcon name="i-lucide-arrow-left"/>
                 <NuxtLink to="#" class="text-gray-500 ml-2 hover:text-gray-400">
                     Back to Home
@@ -68,17 +69,20 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
             </div>
             <!--Breadcrumb-->
     
-            <div class="grid grid-cols-2">
+            <div class="grid grid-cols-2 ml-25 mt-20 gap-15">
                 <!--Info-->
-                <div class="mr-5">
-                    <div class="mb-8 gap-3">
-                        <h1 class="text-3xl font-bold text-blue-600">ExpoVerse</h1>
-                        <p class="text-sm text-muted-foreground">Virtual Expo Platform</p>
+                <div class="pr-20">
+                    <div class="mb-6 gap-3 flex items-center">
+                        <Logo />
+                        <div>
+                            <h1 class="text-3xl font-bold text-blue-600 mb-2 ml-3">ExpoVerse</h1>
+                            <p class="text-sm ml-3 text-gray-500">Virtual Expo Platform</p>
+                        </div>
                     </div>
     
                     <p class="font-bold text-4xl mb-4">Welcome to the Future of Virtual Event</p>
     
-                    <p class="text-lg text-muted-foreground mb-8">
+                    <p class="text-lg text-gray-500 mb-8">
                         Connect with thousands of exhibitors, explore interactive booths, and network 
                         with professionals from around the world.
                     </p>
@@ -108,7 +112,7 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
                 <!--Info-->
         
                 <!--Auth-->
-                <UCard class="w-full max-w-lg border-blue-100 bg-white/90 backdrop-blur-sm shadow-2xl shadow-blue-500/10 p-9 rounded-2xl flex flex-col">
+                <UCard class="w-full max-w-xl border-blue-100 bg-white/90 backdrop-blur-sm shadow-2xl shadow-blue-500/10 p-9 rounded-2xl flex flex-col">
                     <UTabs 
                     v-model="activeTab"
                     :items="items" 

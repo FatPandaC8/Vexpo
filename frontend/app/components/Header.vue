@@ -23,7 +23,7 @@ const selectedTab = ref('Home')
     <!--3 divs: Logo + Tabs + Account-->
     <header class="flex justify-between items-center bg-blue-50 h-20 sticky top-0 shadow-md">
         <!--Logo-->
-        <div class="mb-6 flex items-center ml-5 mt-5">
+        <div class="mb-6 flex items-center ml-20 mt-5">
             <Logo class="w-10 h-10"/>
             <div>
                 <h2 class="text-lg font-bold text-[#3d52d5] ml-3">ExpoVerse</h2>
@@ -33,24 +33,50 @@ const selectedTab = ref('Home')
         <!--Logo-->
 
         <!--Tabs-->
-        <UTabs :items="tabs_items" variant="pill" :ui="{
-            list: 'flex justify-between rounded gap-3 mt-3',
-            trigger: `
-                flex-1 text-center rounded-xl py-2 px-5 text-sm font-semibold cursor-pointer
-                hover:rounded-xl hover:bg-gray-200 hover:text-blue-400
-                transition-all duration-300 ease-in-out
-                text-[#b4c5e4]
-                data-[state=active]:bg-[#3d52d5]
-                data-[state=active]:text-white
-                `,
-        }"/>
+        <nav class="flex gap-3">
+            <NuxtLink
+                to="/"
+                class="gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-[#b4c5e4] hover:bg-gray-200 hover:text-blue-400 transition flex items-center"
+                active-class="bg-[#3d52d5] text-white"
+            >
+                <UIcon name="i-lucide-house"/>
+                <span class="mt-1">Home</span>
+            </NuxtLink>
+
+            <NuxtLink
+                to="/expos"
+                class="px-5 py-2 rounded-xl text-sm font-semibold text-[#b4c5e4] hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
+                active-class="bg-[#3d52d5] text-white"
+            >
+                <UIcon name="i-lucide-calendar"/>
+                <span class="mt-1">Expos</span>
+            </NuxtLink>
+
+            <NuxtLink
+                to="/companies"
+                class="px-5 py-2 rounded-xl text-sm font-semibold text-[#b4c5e4] hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
+                active-class="bg-[#3d52d5] text-white"
+            >
+                <UIcon name="i-lucide-building"/>
+                <span class="mt-1">Companies</span>
+            </NuxtLink>
+
+            <NuxtLink
+                to="/dashboard"
+                class="px-5 py-2 rounded-xl text-sm font-semibold text-[#b4c5e4] hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
+                active-class="bg-[#3d52d5] text-white"
+            >
+                <UIcon name="i-lucide-layout-dashboard"/>
+                <span class="mt-1">Dashboard</span>
+            </NuxtLink>
+        </nav>
+
         <!--Tabs-->
 
         <!--Account-->
-        <div class="flex items-center mr-10">
+        <div class="flex items-center mr-20">
             <UIcon name="i-lucide-user" class="mr-2 w-10"/>
             <UButton 
-                v-model="selectedTab"
                 block 
                 class="text-center bg-linear-to-r from-[#3d52d5] to-[#090c9b] shadow-lg shadow-blue-500/30 text-white cursor-pointer h-8 rounded-xl"
                 size="lg"

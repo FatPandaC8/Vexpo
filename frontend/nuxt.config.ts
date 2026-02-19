@@ -9,5 +9,5 @@ export default defineNuxtConfig({
       tailwindcss() as any,
     ],
   },
-  modules: ['@nuxt/ui', 'nuxt-svgo']
+  modules: ['@nuxt/ui', 'nuxt-svgo', '@nuxt/image']
 });

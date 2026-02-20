@@ -61,11 +61,10 @@ defineExpose({ refresh: () => {
   <aside class="flex flex-col h-full">
 
     <!-- Tabs -->
-    <div class="grid grid-cols-3 gap-0.5 p-1 mb-4 bg-gray-100 rounded-xl">
+    <div class="grid grid-cols-2 gap-0.5 p-1 mb-4 bg-gray-100 rounded-xl">
       <button
         v-for="tab in [
           { key: 'registrations', label: 'My Expos',  icon: 'i-lucide-ticket'      },
-          { key: 'browse',        label: 'Browse',     icon: 'i-lucide-search'      },
           { key: 'visited',       label: 'Visited',    icon: 'i-lucide-store'       },
         ]"
         :key="tab.key"
@@ -89,10 +88,7 @@ defineExpose({ refresh: () => {
         </button>
       </div>
 
-      <div v-if="loadingRegs" class="space-y-2">
-        <div v-for="i in 3" :key="i" class="h-16 rounded-xl bg-gray-100 animate-pulse" />
-      </div>
-      <div v-else-if="registrations.length === 0" class="flex flex-col items-center justify-center flex-1 text-center py-8">
+      <div v-if="registrations.length === 0" class="flex flex-col items-center justify-center flex-1 text-center py-8">
         <div class="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center mb-3">
           <UIcon name="i-lucide-ticket" class="w-6 h-6 text-gray-300" />
         </div>
@@ -119,44 +115,6 @@ defineExpose({ refresh: () => {
       </div>
     </template>
 
-    <!-- Browse All Expos -->
-    <template v-else-if="section === 'browse'">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">All Expos</span>
-        <button class="text-[#3d52d5] hover:text-blue-800 transition" @click="loadExpos">
-          <UIcon name="i-lucide-refresh-cw" class="w-3.5 h-3.5" :class="{ 'animate-spin': loadingExpos }" />
-        </button>
-      </div>
-
-      <div v-if="loadingExpos" class="space-y-2">
-        <div v-for="i in 4" :key="i" class="h-16 rounded-xl bg-gray-100 animate-pulse" />
-      </div>
-      <div v-else-if="expos.length === 0" class="flex flex-col items-center justify-center flex-1 text-center py-8">
-        <UIcon name="i-lucide-calendar-x" class="w-8 h-8 text-gray-300 mb-2" />
-        <p class="text-xs text-gray-400">No expos available</p>
-      </div>
-      <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
-        <button
-          v-for="expo in expos"
-          :key="expo.id"
-          class="w-full text-left rounded-xl border p-3 transition-all"
-          :class="activeView === 'expo-detail' && activeId === expo.id
-            ? 'border-[#3d52d5]/40 bg-blue-50'
-            : 'border-gray-100 bg-white hover:border-blue-200 hover:bg-blue-50/30'"
-          @click="emit('select', { view: 'expo-detail', data: expo })"
-        >
-          <p class="text-sm font-semibold text-gray-800 truncate">{{ expo.title }}</p>
-          <p class="text-xs text-gray-400 mt-0.5 truncate">{{ expo.location ?? '—' }}</p>
-          <span
-            class="inline-block mt-1.5 text-xs font-medium px-1.5 py-0.5 rounded-md"
-            :class="expo.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
-          >
-            {{ expo.status ?? 'upcoming' }}
-          </span>
-        </button>
-      </div>
-    </template>
-
     <!-- Visited Booths -->
     <template v-else>
       <div class="flex items-center justify-between mb-3">
@@ -166,10 +124,7 @@ defineExpose({ refresh: () => {
         </button>
       </div>
 
-      <div v-if="loadingVisited" class="space-y-2">
-        <div v-for="i in 3" :key="i" class="h-16 rounded-xl bg-gray-100 animate-pulse" />
-      </div>
-      <div v-else-if="visitedBooths.length === 0" class="flex flex-col items-center justify-center flex-1 text-center py-8">
+      <div v-if="visitedBooths.length === 0" class="flex flex-col items-center justify-center flex-1 text-center py-8">
         <div class="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center mb-3">
           <UIcon name="i-lucide-store" class="w-6 h-6 text-gray-300" />
         </div>

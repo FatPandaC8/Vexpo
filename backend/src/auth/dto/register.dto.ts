@@ -20,5 +20,5 @@ export class RegisterDTO {
 
   @ApiProperty({ example: 'exhibitor' })
   @IsString()
-  role: 'visitor' | 'exhibitor' | 'organizer' | 'admin';
+  role: 'visitor' | 'exhibitor' | 'organizer';
 }

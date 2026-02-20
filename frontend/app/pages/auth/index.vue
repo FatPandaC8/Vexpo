@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// admin@admin.com - admin123
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import Logo from '~/components/Logo.vue'
@@ -16,7 +17,7 @@ const items = [
   { label: 'Sign Up', value: 'signup', slot: 'signup' }
 ]
 
-const roles = ['Visitor', 'Exhibitor', 'Organizer']
+const roles = ['visitor', 'exhibitor', 'organizer']
 
 // Separate form states
 // The reactive state might seem like a computed, but no

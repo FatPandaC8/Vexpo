@@ -117,13 +117,8 @@ const activeSection = computed(() => sections.find(s => s.key === section.value)
       </div>
     </div>
 
-    <!-- Loading skeletons -->
-    <div v-if="loading" class="space-y-2">
-      <div v-for="i in 5" :key="i" class="h-14 rounded-xl bg-gray-100 animate-pulse" />
-    </div>
-
     <!-- Empty -->
-    <div v-else-if="items.length === 0" class="flex flex-col items-center justify-center flex-1 py-8 text-center">
+    <div v-if="items.length === 0" class="flex flex-col items-center justify-center flex-1 py-8 text-center">
       <UIcon :name="activeSection.icon" class="w-8 h-8 text-gray-300 mb-2" />
       <p class="text-xs text-gray-400">No {{ activeSection.label.toLowerCase() }} found</p>
     </div>

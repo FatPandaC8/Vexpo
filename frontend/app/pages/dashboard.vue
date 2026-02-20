@@ -148,7 +148,7 @@ const welcomeConfig = computed(() => {
           />
 
           <DashboardOrganizerSidebar
-            v-else-if="auth.isOrganizer"
+            v-else-if="auth.isOrganizer.value"
             ref="organizerSidebar"
             :active-view="activeView"
             :active-id="activeId"

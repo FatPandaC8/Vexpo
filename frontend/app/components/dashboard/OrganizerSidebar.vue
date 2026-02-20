@@ -105,7 +105,7 @@ const statusColor: Record<string, string> = {
             size="xs"
             icon="i-lucide-plus"
             class="bg-[#3d52d5] text-white hover:bg-blue-700"
-            @click="emit('select', { view: 'create-expo' })"
+            @click="emit('select', { view: 'expo-create' })"
           >
             New
           </UButton>
@@ -129,11 +129,7 @@ const statusColor: Record<string, string> = {
           @click="emit('select', { view: 'expo-manage', data: expo })"
         >
           <p class="text-sm font-semibold text-gray-800 truncate">
-            {{ expo.title }}
-          </p>
-
-          <p class="text-xs text-gray-400 mt-0.5 truncate">
-            {{ expo.location ?? '—' }}
+            {{ expo.name }}
           </p>
         </button>
       </div>
@@ -151,7 +147,7 @@ const statusColor: Record<string, string> = {
             variant="ghost"
             size="xs"
             icon="i-lucide-refresh-cw"
-            :loading="loadingExpos"
+            :loading="loadingBooths"
             class="text-[#3d52d5] hover:text-blue-800"
             @click="loadBooths"
         />

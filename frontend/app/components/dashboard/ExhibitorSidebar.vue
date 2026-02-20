@@ -95,10 +95,7 @@ const statusColor: Record<string, string> = {
         </button>
       </div>
 
-      <div v-if="loadingBooths" class="space-y-2">
-        <div v-for="i in 3" :key="i" class="h-16 rounded-xl bg-gray-100 animate-pulse" />
-      </div>
-      <div v-else-if="booths.length === 0" class="flex flex-col items-center justify-center flex-1 text-center py-8">
+      <div v-if="booths.length === 0" class="flex flex-col items-center justify-center flex-1 text-center py-8">
         <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mb-3">
           <UIcon name="i-lucide-store" class="w-6 h-6 text-violet-400" />
         </div>
@@ -136,10 +133,7 @@ const statusColor: Record<string, string> = {
         </button>
       </div>
 
-      <div v-if="loadingExpos" class="space-y-2">
-        <div v-for="i in 4" :key="i" class="h-16 rounded-xl bg-gray-100 animate-pulse" />
-      </div>
-      <div v-else-if="expos.length === 0" class="flex flex-col items-center justify-center flex-1 py-8 text-center">
+      <div v-if="expos.length === 0" class="flex flex-col items-center justify-center flex-1 py-8 text-center">
         <UIcon name="i-lucide-calendar-x" class="w-8 h-8 text-gray-300 mb-2" />
         <p class="text-xs text-gray-400">No expos available</p>
       </div>
@@ -172,11 +166,7 @@ const statusColor: Record<string, string> = {
         </button>
       </div>
 
-      <div v-if="loadingCompany" class="space-y-2">
-        <div class="h-20 rounded-xl bg-gray-100 animate-pulse" />
-      </div>
-
-      <div v-else-if="!myCompany" class="flex flex-col items-center justify-center flex-1 text-center py-8">
+      <div v-if="!myCompany" class="flex flex-col items-center justify-center flex-1 text-center py-8">
         <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mb-3">
           <UIcon name="i-lucide-building-2" class="w-6 h-6 text-violet-400" />
         </div>

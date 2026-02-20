@@ -54,7 +54,7 @@ function onBoothRegistered() {
   // Keep the success state visible in the panel — don't navigate away
 }
 
-function onCompanySaved(company: any) {
+function onCompanyUpdated(company: any) {
   // Switch to edit mode with the newly saved company
   select({ view: 'company-edit', data: company })
 }
@@ -148,7 +148,7 @@ const welcomeConfig = computed(() => {
           />
 
           <DashboardOrganizerSidebar
-            v-else-if="auth.isOrganizer.value"
+            v-else-if="auth.isOrganizer"
             ref="organizerSidebar"
             :active-view="activeView"
             :active-id="activeId"
@@ -243,7 +243,7 @@ const welcomeConfig = computed(() => {
         <!-- Create company -->
         <DashboardPanelsCompanyForm
           v-else-if="activeView === 'company-create'"
-          @saved="onCompanySaved"
+          @saved="onCompanyUpdated"
         />
 
         <!-- Edit company -->
@@ -257,17 +257,17 @@ const welcomeConfig = computed(() => {
         <!-- ORGANIZER PANELS -->
 
         <!-- Manage expo: edit details + approve booths -->
-        <DashboardPanelsExpoManage
+        <DashboardPanelsExpoForm
           v-else-if="activeView === 'expo-manage' && activeData"
           :expo="activeData"
-          @updated="onExpoUpdated"
+          @saved="onExpoUpdated"
           @deleted="onExpoDeleted"
         />
 
-        <!-- Create new expo -->
+        <!--Create Expo-->
         <DashboardPanelsExpoForm
-          v-else-if="activeView === 'create-expo'"
-          @created="onExpoCreated"
+          v-else-if="activeView === 'expo-create'"
+          @saved="onExpoCreated"
         />
 
         <!-- Manage booths -->

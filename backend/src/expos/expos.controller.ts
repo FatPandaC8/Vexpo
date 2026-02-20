@@ -19,7 +19,7 @@ export class ExposController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get expo details by ID' })
-  async findExpoById(@Param('expoId', ParseIntPipe) expoId: number) {
+  async findExpoById(@Param('id', ParseIntPipe) expoId: number) {
     return this.expoService.findExpoById(expoId);
   }
 

@@ -74,6 +74,6 @@ export class UserExhibitorController {
     @Body() dto: UpdateCompanyDto,
     @Request() req,
   ) {
-    return this.companyService.updateCompany(req.user.userId, dto);
+    return this.companyService.updateCompany(companyId, dto);
   }
 }

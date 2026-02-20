@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui';
+import Header from '~/components/Header.vue';
 
 const cat_items = ref<TabsItem[]>([
     {
@@ -33,6 +34,7 @@ const status_items = ref<TabsItem[]>([
 </script>
 
 <template>
+    <Header/>
     <section class="grid grid-cols-2 pt-20">
         <!--Search & Filters-->
         <div class="space-y-6 sticky top-24 h-fit w-72 ml-20">

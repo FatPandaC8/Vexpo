@@ -3,6 +3,7 @@
 </script>
 
 <template>
+    <Header/>
     <main class="bg-white">
         <!--Intro-->
         <section class="min-h-screen flex items-center">
@@ -20,6 +21,7 @@
     
                     <div class="flex gap-5">
                         <UButton 
+                            to="http://localhost:3001/expos"
                             block 
                             class="bg-linear-to-r from-[#3d52d5] to-[#090c9b] hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/30 text-white cursor-pointer h-10 w-40 rounded-xl items-center flex"
                             size="lg">
@@ -33,21 +35,6 @@
                             size="lg">
                             Watch Demo
                         </UButton>
-                    </div>
-                    <USeparator class="mt-12 max-w-lg text-gray-300"/>
-                    <div className="flex items-center gap-8 mt-10 ">
-                        <div>
-                            <div className="text-3xl font-bold text-[#3d52d5]">500+</div>
-                            <div className="text-sm text-gray-500/75">Active Expos</div>
-                        </div>
-                        <div>
-                            <div className="text-3xl font-bold text-[#3d52d5]">50K+</div>
-                            <div className="text-sm text-gray-500/75">Exhibitors</div>
-                        </div>
-                        <div>
-                            <div className="text-3xl font-bold text-[#3d52d5]">2M+</div>
-                            <div className="text-sm text-gray-500/75">Visitors</div>
-                        </div>
                     </div>
                 </div>
                 <!--Intro info-->
@@ -151,4 +138,5 @@
         </section>
         <!--Motto-->
     </main>
+    <Footer/>
 </template>

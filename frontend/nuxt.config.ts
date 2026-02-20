@@ -9,5 +9,10 @@ export default defineNuxtConfig({
       tailwindcss() as any,
     ],
   },
-  modules: ['@nuxt/ui', 'nuxt-svgo', '@nuxt/image']
+  modules: ['@nuxt/ui', 'nuxt-svgo', '@nuxt/image'],
+  runtimeConfig: {
+    public: {
+      apiBase: 'http://localhost:3000'
+    }
+  }
 });

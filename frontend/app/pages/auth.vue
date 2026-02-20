@@ -2,6 +2,7 @@
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import Logo from '~/components/Logo.vue'
+import Footer from '~/components/Footer.vue'
 
 const activeTab = ref('signin')
 const rememberMe = ref(true)
@@ -46,19 +47,62 @@ const signUpSchema = z.object({
   path: ['confirmPassword']
 })
 
-function onSignIn(event: FormSubmitEvent<typeof signInState>) {
-  console.log('Sign In:', event.data)
+const config = useRuntimeConfig()
+const router = useRouter()
+
+async function onSignIn(event: FormSubmitEvent<typeof signInState>) {
+  try {
+    const res: any = await $fetch(
+      `${config.public.apiBase}/auth/login`,
+      {
+        method: 'POST',
+        body: event.data
+      }
+    )
+
+    // Save JWT
+    localStorage.setItem('token', res.access_token)
+
+    router.push('/dashboard')
+  } catch (err: any) {
+    alert(err?.data?.message || 'Login failed')
+  }
 }
 
-function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
-  console.log('Sign Up:', event.data)
+async function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
+  try {
+    const res: any = await $fetch(
+      `${config.public.apiBase}/auth/register`,
+      {
+        method: 'POST',
+        body: {
+          name: event.data.name,
+          email: event.data.email,
+          password: event.data.password,
+          role: event.data.role.toLowerCase()
+        }
+      }
+    )
+
+    localStorage.setItem('token', res.access_token)
+
+    router.push('/dashboard')
+  } catch (err: any) {
+    alert(err?.data?.message || 'Registration failed')
+  }
 }
+
+function googleLogin() {
+    const config = useRuntimeConfig()
+    window.location.href = `${config.public.apiBase}/auth/google`
+}
+
 </script>
 
 <template>
     <!--The design has 2 parts: the footer & auth part-->
     <div class="bg-linear-to-r from-[#fbfff1] to-[#3d52d5]">
-        <div class="p-50">
+        <div class="p-50 h-fit">
             <!--Breadcrumb-->
             <div class="flex flex-1 mb-10 items-center ml-25">
                 <UIcon name="i-lucide-arrow-left"/>
@@ -198,6 +242,7 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
                                     
                                     <div class="flex items-center justify-center">
                                         <UButton
+                                        @click="googleLogin"
                                         variant="outline"
                                         block 
                                         class="border border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-blue-500 hover:cursor-pointer h-8 rounded-xl"
@@ -352,6 +397,7 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
                 <!--Auth-->
             </div>
         </div>
+        <Footer/>
     </div>
 </template>
 

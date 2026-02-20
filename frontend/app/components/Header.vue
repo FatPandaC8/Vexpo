@@ -80,7 +80,7 @@ const selectedTab = ref('Home')
                 block 
                 class="text-center bg-linear-to-r from-[#3d52d5] to-[#090c9b] shadow-lg shadow-blue-500/30 text-white cursor-pointer h-8 rounded-xl"
                 size="lg"
-                to="http://localhost:3000/auth"
+                to="http://localhost:3001/auth"
             >
                 Sign In
             </UButton>

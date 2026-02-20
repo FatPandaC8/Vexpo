@@ -48,21 +48,13 @@ export class AuthController {
 
     if (result.is_new_user) {
       // New user - needs to select role
-      return res.json({
-        message:
-          'New user detected. Please complete registration by selecting a role.',
-        access_token: result.access_token,
-        is_new_user: true,
-        next_step: 'POST /auth/oauth/complete with role selection',
-      });
-    } else {
-      // Existing user - return full access token
-      return res.json({
-        message: 'Authentication successful',
-        access_token: result.access_token,
-        is_new_user: false,
-      });
-    }
+      return res.redirect(
+        `http://localhost:3001/auth/select-role?token=${result.access_token}`
+      );
+    } 
+    return res.redirect(
+      `http://localhost:3001/dashboard?token=${result.access_token}`
+    );
   }
 
   @ApiOperation({

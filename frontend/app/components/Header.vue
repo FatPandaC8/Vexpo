@@ -5,22 +5,9 @@ const auth = useAuth();
 // Recap: computed - define a value that depends on other reactive data values
 const userMenuItems = computed(() => [
   [
-    {
-      label: auth.user.value?.name ?? 'My Account',
-      disabled: true,
-      slot: 'account',
-    },
-  ],
-  [
     { label: 'Dashboard', icon: 'i-lucide-layout-dashboard', to: '/dashboard' },
     { label: 'My Profile', icon: 'i-lucide-user', to: '/me' },
-  ],
-  [
-    {
-      label: 'Sign Out',
-      icon: 'i-lucide-log-out',
-      onSelect: () => auth.logout(),
-    },
+    { label: 'Sign Out', icon: 'i-lucide-log-out', onSelect: () => auth.logout() },
   ],
 ])
 
@@ -74,23 +61,26 @@ const userMenuItems = computed(() => [
         <div class="flex items-center mr-20">
             <!-- Logged IN: dropdown -->
             <template v-if="auth.isLoggedIn">
-                <UDropdownMenu :items="userMenuItems" :ui="{ content: 'w-52 rounded-xl shadow-lg z-[200]'}">
+                <UDropdownMenu :items="userMenuItems" 
+                :ui="{ 
+                    content: 'w-52 rounded-xl z-100 bg-blue-100 p-4 max-w-60 border border-blue-400',
+                    item: 'mr-2 px-3 py-2 hover:bg-blue-300 rounded-xl cursor-pointer flex items-center gap-7' 
+                } " 
+                class="hover:bg-blue-100"
+                :content="{
+                    align: 'center',
+                    side: 'bottom'
+                }"
+                >
                     <UButton
                         variant="ghost"
                         class="flex items-center gap-2 rounded-xl px-3 py-2 hover:bg-blue-100 cursor-pointer"
                     >
-                        <span class="text-sm font-semibold text-gray-700 max-w-24 truncate">
+                        <span class="text-sm font-semibold text-gray-700 truncate">
                             {{ auth.user.value?.name ?? 'Account' }}
                         </span>
                         <UIcon name="i-lucide-chevron-down" class="text-gray-400" />
                     </UButton>
-
-                    <template #account>
-                        <div class="px-1 py-1.5">
-                            <p class="text-xs font-semibold text-gray-800">{{ auth.user.value?.name }}</p>
-                            <p class="text-xs text-gray-400 truncate">{{ auth.user.value?.email }}</p>
-                        </div>
-                    </template>
                 </UDropdownMenu>
             </template>
 

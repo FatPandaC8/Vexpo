@@ -37,11 +37,13 @@ export class AuthService {
     });
 
     await this.usersService.assignRole(user.id, role);
+
+    const fullUser = await this.usersService.findOneById(user.id);
+
     const payload = {
-      sub: user.id,
-      name: user.name,
-      email: user.email,
-      role,
+      sub:   fullUser!.id,
+      email: fullUser!.email,
+      roles: fullUser!.roles.map((ur) => ur.role.name.toUpperCase()),
     };
 
     console.log('Register payload: ', payload);
@@ -64,6 +66,7 @@ export class AuthService {
 
     const payload = {
       sub: user.id,
+      email: user.email,
       roles: user.roles.map((ur) => ur.role.name.toUpperCase()),
     };
 

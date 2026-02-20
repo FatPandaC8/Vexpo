@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import Unsupported from '~/components/Unsupported.vue'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -63,14 +64,6 @@ async function saveProfile(event: FormSubmitEvent<typeof profileState>) {
   setTimeout(() => { profileSuccess.value = false }, 3000)
 }
 
-// Notification prefs
-const notifPrefs = reactive({
-  expoUpdates:    true,
-  boothApprovals: true,
-  newRegistrants: false,
-  marketing:      false,
-})
-
 // Password form
 const passwordState = reactive({
   currentPassword: '',
@@ -105,23 +98,10 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
   passwordState.confirmPassword = ''
   setTimeout(() => { passwordSuccess.value = false }, 3000)
 }
-
-// ── Delete account ─────────────────────────────────────────────────────────────
-const deleteConfirm = ref('')
-const deleteLoading = ref(false)
-
-const canDelete = computed(() => deleteConfirm.value === auth.user.value?.email)
-
-async function deleteAccount() {
-  if (!canDelete.value) return
-  deleteLoading.value = true
-  await new Promise(r => setTimeout(r, 800))
-  await auth.logout()
-}
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-linear-to-r from-blue-50 to-blue-100">
     <div class="max-w-6xl mx-auto px-8 py-10">
 
       <!-- Breadcrumb -->
@@ -140,7 +120,7 @@ async function deleteAccount() {
         <div class="col-span-1 space-y-4">
 
           <!-- Avatar card -->
-          <UCard class="rounded-2xl border border-gray-300 p-6 text-center">
+          <UCard class="rounded-2xl border border-gray-300 p-6 text-center bg-white">
             <div class="relative inline-block mb-4">
               <!-- Avatar -->
               <div class="w-20 h-20 rounded-full bg-[#3d52d5] text-white text-3xl font-bold flex items-center justify-center select-none shadow-lg shadow-blue-500/20 mx-auto">
@@ -162,7 +142,7 @@ async function deleteAccount() {
           </UCard>
 
           <!-- Section nav -->
-          <UCard class="rounded-2xl border border-gray-300 p-2">
+          <UCard class="rounded-2xl border border-gray-300 p-2 bg-white">
             <nav class="space-y-1">
               <button
                 v-for="s in sections"
@@ -187,7 +167,7 @@ async function deleteAccount() {
 
           <!--  PROFILE  -->
           <template v-if="activeSection === 'profile'">
-            <UCard class="rounded-2xl border border-gray-400 p-8">
+            <UCard class="rounded-2xl border border-gray-400 p-8 bg-white">
 
               <!-- Section heading -->
               <div class="flex items-center gap-3 mb-8">
@@ -265,7 +245,9 @@ async function deleteAccount() {
 
           <!-- SECURITY -->
           <template v-else-if="activeSection === 'security'">
-            <UCard class="rounded-2xl border border-gray-400 p-8">
+            <Unsupported/>
+
+            <UCard class="rounded-2xl border border-gray-400 p-8 bg-white">
 
               <div class="flex items-center gap-3 mb-8">
                 <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">

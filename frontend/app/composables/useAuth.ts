@@ -22,7 +22,6 @@ export const useAuth = () => {
   const isLoggedIn = computed(() => !!token.value)
 
   const role = computed(() => user.value?.roles?.at(0) ?? null)   // e.g. 'VISITOR'
-  console.log("THIS IS THE ROLE", role)
   const isVisitor   = computed(() => role.value === 'VISITOR')
   const isExhibitor = computed(() => role.value === 'EXHIBITOR')
   const isOrganizer = computed(() => role.value === 'ORGANIZER')

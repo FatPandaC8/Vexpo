@@ -10,9 +10,16 @@ export class UsersProfileController {
   constructor(private userService: UsersService) {}
 
   @Get()
-  getMyProfile(@Req() req) {
-    return this.userService.profile(req.user.userId);
-    // console.log("The current user id is: ", req.user.userId);
+  async getMyProfile(@Req() req) {
+    const user = await this.userService.findOneById(req.user.userId);
+    if (!user) return null;
+
+    return {
+      id:    user.id,
+      name:  user.name,
+      email: user.email,
+      roles: user.roles?.map((ur) => ur.role.name.toUpperCase()) ?? [],
+    };
   }
 
   @Patch('change')

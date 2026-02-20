@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', 'nuxt-svgo', '@nuxt/image'],
   runtimeConfig: {
     public: {
-      apiBase: 'http://localhost:3000'
+      apiBase: 'http://localhost:3001'
     }
   }
 });

@@ -51,9 +51,6 @@ const signUpSchema = z.object({
   path: ['confirmPassword']
 })
 
-const config = useRuntimeConfig()
-const router = useRouter()
-
 async function onSignIn(event: FormSubmitEvent<typeof signInState>) {
   try {
     await auth.login(event.data.email, event.data.password);
@@ -315,7 +312,7 @@ function googleLogin() {
                                             v-model="signUpState.role"
                                             variant="soft"
                                             :items="roles"
-                                            placeholder="Select your role"
+                                            placeholder="Select a role"
                                             :content="{
                                                 align: 'center',
                                                 side: 'bottom',

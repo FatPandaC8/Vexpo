@@ -2,9 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
-  IsEmail,
   IsOptional,
-  IsUrl,
 } from 'class-validator';
 
 export class RegisterCompanyDTO {
@@ -15,29 +13,28 @@ export class RegisterCompanyDTO {
 
   @ApiProperty({ example: 'Vietnam' })
   @IsString()
-  @IsNotEmpty()
+  industry: string;
+
+  @ApiProperty({ example: 'Vietnam' })
+  @IsString()
+  @IsOptional()
   country: string;
 
   @ApiProperty({ example: 'Hanoi' })
   @IsString()
-  @IsNotEmpty()
-  city: string;
+  @IsOptional()
+  city?: string;
 
   @ApiProperty({ example: 'contact@techcorp.com' })
-  @IsEmail()
-  email: string;
-
-  @ApiProperty({ example: '1234567890', required: false })
   @IsOptional()
-  phone?: string;
+  email?: string;
 
   @ApiProperty({ example: 'https://techcorp.com', required: false })
   @IsOptional()
-  @IsUrl()
   website?: string;
 
   @ApiProperty({ example: 'Leading tech company' })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 }

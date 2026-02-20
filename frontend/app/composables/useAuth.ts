@@ -5,6 +5,7 @@ interface AuthUser {
   roles: string[]
 }
 
+// composable: a common function for stateful logic
 export const useAuth = () => {
   const config = useRuntimeConfig()
   const BASE = config.public.apiBase

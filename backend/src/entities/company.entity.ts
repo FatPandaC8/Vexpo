@@ -20,6 +20,9 @@ export class Company {
   exhibitorId: number;
 
   @Column()
+  industry: string;
+
+  @Column()
   country: string;
 
   @Column()
@@ -29,12 +32,9 @@ export class Company {
   email: string;
 
   @Column({ nullable: true })
-  phone: string;
-
-  @Column({ nullable: true })
   website: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @OneToMany(() => Booth, (booth) => booth.company)

@@ -15,8 +15,8 @@ export class UsersProfileController {
     if (!user) return null;
 
     return {
-      id:    user.id,
-      name:  user.name,
+      id: user.id,
+      name: user.name,
       email: user.email,
       roles: user.roles?.map((ur) => ur.role.name.toUpperCase()) ?? [],
     };

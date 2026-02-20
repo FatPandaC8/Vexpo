@@ -74,6 +74,11 @@ function onExpoUpdated(expo: any) {
   activeData.value = expo
 }
 
+function onBoothReviewed(booth: any) {
+  activeData.value = booth
+  organizerSidebar.value?.refreshBooths()
+}
+
 // ADMIN events
 function onAdminSaved() {
   adminSidebar.value?.refresh()
@@ -271,8 +276,10 @@ const welcomeConfig = computed(() => {
         />
 
         <!-- Manage booths -->
-        <DashboardPanelsBoothManage
-          v-else-if="activeView === 'booth-manage'"
+        <DashboardPanelsBoothReview
+          v-else-if="activeView === 'booth-review' && activeData"
+          :booth="activeData"
+          @updated="onBoothReviewed"
         />
 
         <!-- ADMIN PANELS -->

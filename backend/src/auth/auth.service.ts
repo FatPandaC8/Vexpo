@@ -41,7 +41,7 @@ export class AuthService {
     const fullUser = await this.usersService.findOneById(user.id);
 
     const payload = {
-      sub:   fullUser!.id,
+      sub: fullUser!.id,
       email: fullUser!.email,
       roles: fullUser!.roles.map((ur) => ur.role.name.toUpperCase()),
     };

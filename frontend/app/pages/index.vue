@@ -1,11 +1,8 @@
 <script>
-import Footer from '~/components/Footer.vue';
-import Header from '~/components/Header.vue';
 
 </script>
 
 <template>
-    <Header/>
     <main class="bg-white">
         <!--Intro-->
         <section class="min-h-screen flex items-center">
@@ -154,5 +151,4 @@ import Header from '~/components/Header.vue';
         </section>
         <!--Motto-->
     </main>
-    <Footer/>
 </template>

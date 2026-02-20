@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Footer from '~/components/Footer.vue'
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import Logo from '~/components/Logo.vue'
@@ -353,7 +352,6 @@ function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
                 <!--Auth-->
             </div>
         </div>
-        <Footer/>
     </div>
 </template>
 

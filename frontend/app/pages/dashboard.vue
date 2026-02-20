@@ -109,7 +109,9 @@ const welcomeConfig = computed(() => {
         <div class="flex items-center gap-3">
           <!-- Logo mark -->
           <Logo class="w-6 h-6"/>
-          <span class="font-bold text-gray-900">ExpoVerse</span>
+          <NuxtLink to="/">
+            <span class="font-bold text-gray-900">ExpoVerse</span>
+          </NuxtLink>
           <span class="text-gray-300">/</span>
           <h1 class="text-sm text-gray-600">
             {{ greeting }}, <strong class="text-gray-900">{{ auth.user.value?.name?.split(' ')[0] }}</strong>
@@ -263,9 +265,14 @@ const welcomeConfig = computed(() => {
         />
 
         <!-- Create new expo -->
-        <DashboardPanelsCreateExpo
+        <DashboardPanelsExpoForm
           v-else-if="activeView === 'create-expo'"
           @created="onExpoCreated"
+        />
+
+        <!-- Manage booths -->
+        <DashboardPanelsBoothManage
+          v-else-if="activeView === 'booth-manage'"
         />
 
         <!-- ADMIN PANELS -->

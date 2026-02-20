@@ -20,15 +20,17 @@ export class CreateExpoDTO {
 
   @ApiProperty({ example: '2024-06-01' })
   @IsDateString()
+  @IsNotEmpty()
   startDate: string;
 
   @ApiProperty({ example: '2024-06-05' })
   @IsDateString()
+  @IsNotEmpty()
   endDate: string;
 
   @ApiProperty({ example: 'The biggest tech expo of the year' })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 
   @ApiProperty({ example: 'https://techexpo2024.com', required: false })

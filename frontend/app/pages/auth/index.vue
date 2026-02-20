@@ -380,6 +380,7 @@ function googleLogin() {
                                     
                                     <div class="flex items-center justify-center">
                                         <UButton
+                                        @click="googleLogin"
                                         variant="outline"
                                         block 
                                         class="border border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-blue-500 hover:cursor-pointer h-8 rounded-xl"

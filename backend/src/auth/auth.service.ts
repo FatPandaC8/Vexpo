@@ -39,6 +39,7 @@ export class AuthService {
     await this.usersService.assignRole(user.id, role);
     const payload = {
       sub: user.id,
+      name: user.name,
       email: user.email,
       role,
     };

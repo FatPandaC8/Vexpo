@@ -28,7 +28,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
 
   app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({origin: 'http://localhost:3000'});
+  app.enableCors({origin: 'http://localhost:3001'});
   await app.listen(3000);
 }
 bootstrap();

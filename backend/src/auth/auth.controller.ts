@@ -51,9 +51,10 @@ export class AuthController {
       return res.redirect(
         `http://localhost:3001/auth/select-role?token=${result.access_token}`
       );
-    } 
+    }
+
     return res.redirect(
-      `http://localhost:3001/dashboard?token=${result.access_token}`
+      `http://localhost:3001/auth/success?token=${result.access_token}`
     );
   }
 

@@ -13,7 +13,9 @@ import Header from '~/components/Header.vue';
                 <!--Intro info-->
                 <div class="p-40">
                     <div>
-                        <h1 class="text-5xl text-[#3d52d5] font-bold mb-6">Experience Virtual Expos Like Never Before</h1>
+                        <h1 class="text-5xl text-[#3d52d5] font-bold mb-6">
+                            Experience Virtual Expos Like Never Before
+                        </h1>
                         <p class="text-gray-500 mb-8">Connect with global exhibitors, explore interactive booths, and network with 
                             thousands of professionals from the comfort of your screen.
                         </p>
@@ -22,9 +24,10 @@ import Header from '~/components/Header.vue';
                     <div class="flex gap-5">
                         <UButton 
                             block 
-                            class="bg-linear-to-r from-[#3d52d5] to-[#090c9b] hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/30 text-white cursor-pointer h-10 w-40 rounded-xl"
+                            class="bg-linear-to-r from-[#3d52d5] to-[#090c9b] hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/30 text-white cursor-pointer h-10 w-40 rounded-xl items-center flex"
                             size="lg">
-                            Explore Expo
+                            <span class="mt-1">Explore Expo</span>
+                            <UIcon name="i-lucide-arrow-right"/>
                         </UButton>
         
                         <UButton 
@@ -34,7 +37,21 @@ import Header from '~/components/Header.vue';
                             Watch Demo
                         </UButton>
                     </div>
-                    <USeparator class="mt-12 max-w-sm"/>
+                    <USeparator class="mt-12 max-w-lg text-gray-300"/>
+                    <div className="flex items-center gap-8 mt-10 ">
+                        <div>
+                            <div className="text-3xl font-bold text-[#3d52d5]">500+</div>
+                            <div className="text-sm text-gray-500/75">Active Expos</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-bold text-[#3d52d5]">50K+</div>
+                            <div className="text-sm text-gray-500/75">Exhibitors</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-bold text-[#3d52d5]">2M+</div>
+                            <div className="text-sm text-gray-500/75">Visitors</div>
+                        </div>
+                    </div>
                 </div>
                 <!--Intro info-->
     
@@ -48,9 +65,20 @@ import Header from '~/components/Header.vue';
         <!--Intro-->
 
         <!--Trending-->
-        <div>
+        <section>
+            <div class="flex flex-col items-center text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">
+                    Trending Virtual Expos
+                </h1>
+                <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+                    Join thousands of professionals at these upcoming and live virtual exhibitions
+                </p>
+            </div>
 
-        </div>
+            <div>
+                <!--Generate from the server instead-->
+            </div>
+        </section>
         <!--Trending-->
 
         <!--Why-->
@@ -104,7 +132,7 @@ import Header from '~/components/Header.vue';
         <section class="max-w-4xl mx-auto">
             <UCard class="flex justify-center text-center border-blue-200 bg-linear-to-br from-blue-600 to-blue-500 text-white shadow-2xl shadow-blue-500/40 rounded-2xl h-70">
                 <div class="mb-8">
-                    <h1 class="text-4xl mt-8">Ready to Transform Your Events?</h1>
+                    <h1 class="text-4xl mt-8 font-bold">Ready to Transform Your Events?</h1>
                     <p class="text-lg text-blue-200 mt-6 pl-30 pr-30">Join leading organizations using ExpoVerse to host world-class virtual exhibitions</p>
                 </div>
                 <div class="flex gap-5 justify-center">

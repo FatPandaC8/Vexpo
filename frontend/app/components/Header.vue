@@ -36,7 +36,7 @@ const selectedTab = ref('Home')
         <nav class="flex gap-3">
             <NuxtLink
                 to="/"
-                class="gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-[#b4c5e4] hover:bg-gray-200 hover:text-blue-400 transition flex items-center"
+                class="gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-200 hover:text-blue-400 transition flex items-center"
                 active-class="bg-[#3d52d5] text-white"
             >
                 <UIcon name="i-lucide-house"/>
@@ -45,7 +45,7 @@ const selectedTab = ref('Home')
 
             <NuxtLink
                 to="/expos"
-                class="px-5 py-2 rounded-xl text-sm font-semibold text-[#b4c5e4] hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
+                class="px-5 py-2 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
                 active-class="bg-[#3d52d5] text-white"
             >
                 <UIcon name="i-lucide-calendar"/>
@@ -54,7 +54,7 @@ const selectedTab = ref('Home')
 
             <NuxtLink
                 to="/companies"
-                class="px-5 py-2 rounded-xl text-sm font-semibold text-[#b4c5e4] hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
+                class="px-5 py-2 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
                 active-class="bg-[#3d52d5] text-white"
             >
                 <UIcon name="i-lucide-building"/>
@@ -63,7 +63,7 @@ const selectedTab = ref('Home')
 
             <NuxtLink
                 to="/dashboard"
-                class="px-5 py-2 rounded-xl text-sm font-semibold text-[#b4c5e4] hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
+                class="px-5 py-2 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-200 hover:text-blue-400 transition gap-2 flex items-center"
                 active-class="bg-[#3d52d5] text-white"
             >
                 <UIcon name="i-lucide-layout-dashboard"/>

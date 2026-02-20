@@ -4,6 +4,7 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 import Logo from '~/components/Logo.vue'
 import Footer from '~/components/Footer.vue'
 
+const auth = useAuth()
 const activeTab = ref('signin')
 const rememberMe = ref(true)
 const showPassword = ref(false)
@@ -18,6 +19,9 @@ const items = [
 const roles = ['Visitor', 'Exhibitor', 'Organizer']
 
 // Separate form states
+// The reactive state might seem like a computed, but no
+// reactive: crate state from an object + no cache
+// computed: takes existing data and performs a calculations on it to produce a new value + cache
 const signInState = reactive({
   email: '',
   password: ''
@@ -52,18 +56,8 @@ const router = useRouter()
 
 async function onSignIn(event: FormSubmitEvent<typeof signInState>) {
   try {
-    const res: any = await $fetch(
-      `${config.public.apiBase}/auth/login`,
-      {
-        method: 'POST',
-        body: event.data
-      }
-    )
-
-    // Save JWT
-    localStorage.setItem('token', res.access_token)
-
-    router.push('/dashboard')
+    await auth.login(event.data.email, event.data.password);
+    await navigateTo('/')
   } catch (err: any) {
     alert(err?.data?.message || 'Login failed')
   }
@@ -71,22 +65,14 @@ async function onSignIn(event: FormSubmitEvent<typeof signInState>) {
 
 async function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
   try {
-    const res: any = await $fetch(
-      `${config.public.apiBase}/auth/register`,
-      {
-        method: 'POST',
-        body: {
-          name: event.data.name,
-          email: event.data.email,
-          password: event.data.password,
-          role: event.data.role.toLowerCase()
-        }
-      }
-    )
-
-    localStorage.setItem('token', res.access_token)
-
-    router.push('/dashboard')
+    const payload = {
+        name: event.data.name,
+        email: event.data.email,
+        password: event.data.confirmPassword,
+        role: event.data.role
+    }
+    await auth.register(payload);
+    await navigateTo('/')
   } catch (err: any) {
     alert(err?.data?.message || 'Registration failed')
   }

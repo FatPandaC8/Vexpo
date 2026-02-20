@@ -175,7 +175,7 @@ function googleLogin() {
                                             :ui="{
                                                 base: 'border border-blue-300 focus:border-blue-600 px-2 h-10 rounded',
                                             }"
-                                            
+                                            class="w-full"
                                         />
                                     </UFormField>
     
@@ -189,6 +189,7 @@ function googleLogin() {
                                             :ui="{
                                                 base: 'border border-blue-300 focus:border-blue-600 px-2 h-10 rounded'
                                             }"
+                                            class="w-full"
                                         />
                                     </UFormField>
     
@@ -260,6 +261,7 @@ function googleLogin() {
                                             :ui="{
                                                 base: 'border border-blue-300 focus:border-blue-600 px-2 h-10 rounded'
                                             }"
+                                            class="w-full"
                                         />
                                     </UFormField>
     
@@ -273,6 +275,7 @@ function googleLogin() {
                                             :ui="{
                                                 base: 'border border-blue-300 focus:border-blue-600 px-2 h-10 rounded'
                                             }"
+                                            class="w-full"
                                         />
                                     </UFormField>
     
@@ -286,6 +289,7 @@ function googleLogin() {
                                             :ui="{
                                                 base: 'border border-blue-300 focus:border-blue-600 px-2 h-10 rounded'
                                             }"
+                                            class="w-full"
                                         />
                                     </UFormField>
     
@@ -299,6 +303,7 @@ function googleLogin() {
                                             :ui="{
                                                 base: 'border border-blue-300 focus:border-blue-600 px-2 h-10 rounded'
                                             }"
+                                            class="w-full"
                                         >
                                         </UInput>
                                     </UFormField>

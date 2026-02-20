@@ -47,7 +47,7 @@ const cat_items = ref<TabsItem[]>([
             <!-- Categories -->
             <UCard
                 class="rounded-2xl border border-blue-100 bg-blue-50/60
-                    shadow-sm p-5"
+                    shadow-sm p-2"
             >
                 <div class="flex items-center gap-2 mb-4">
                     <UIcon name="i-lucide-funnel" class="text-blue-600 w-4 h-4"/>

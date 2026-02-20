@@ -1,3 +1,10 @@
+interface AuthUser {
+  id: number
+  name: string
+  email: string
+  roles: string[]
+}
+
 export const useAuth = () => {
   const config = useRuntimeConfig()
   const BASE = config.public.apiBase
@@ -10,9 +17,17 @@ export const useAuth = () => {
   })
 
   // User profile — reactive, shared across all callers via useState
-  const user = useState<{ name: string; email: string } | null>('auth_user', () => null)
+  const user = useState<AuthUser | null>('auth_user', () => null)
 
-  const isLoggedIn = computed(() => !!token.value && !!user.value)
+  const isLoggedIn = computed(() => !!token.value)
+
+  const role = computed(() => user.value?.roles?.at(0) ?? null)   // e.g. 'VISITOR'
+  console.log("THIS IS THE ROLE", role)
+  const isVisitor   = computed(() => role.value === 'VISITOR')
+  const isExhibitor = computed(() => role.value === 'EXHIBITOR')
+  const isOrganizer = computed(() => role.value === 'ORGANIZER')
+  const isAdmin     = computed(() => role.value === 'ADMIN')
+
 
   function authHeaders(): Record<string, string> {
     return token.value ? { Authorization: `Bearer ${token.value}` } : {}
@@ -26,7 +41,7 @@ export const useAuth = () => {
   async function fetchProfile() {
     if (!token.value) return
     try {
-      user.value = await $fetch<{ name: string; email: string }>('/me', {
+      user.value = await $fetch<AuthUser>('/me', {
         baseURL: BASE,
         headers: authHeaders(),
       })
@@ -93,10 +108,15 @@ export const useAuth = () => {
     }
   }
 
-  return {
+return {
     token,
     user,
     isLoggedIn,
+    role,
+    isVisitor,
+    isExhibitor,
+    isOrganizer,
+    isAdmin,
     setToken,
     login,
     register,

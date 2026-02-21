@@ -127,7 +127,7 @@ async function deleteCompany() {
     </UForm>
 
     <div class="mt-10 pt-8 border-t border-gray-100">
-      <button class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2" @click="showDelete = !showDelete">
+      <button class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2 cursor-pointer" @click="showDelete = !showDelete">
         <UIcon name="i-lucide-trash-2" class="w-4 h-4" />Delete this company
       </button>
       <Transition name="fade">

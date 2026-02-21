@@ -83,9 +83,9 @@ const roleBadge: Record<string, string> = {
             v-for="role in user.roles"
             :key="role"
             class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
-            :class="roleBadge[role] ?? 'bg-gray-100 text-gray-600'"
+            :class="roleBadge[role.role.name.toUpperCase()] ?? 'bg-gray-100 text-gray-600'"
           >
-            {{ role }}
+            {{ role.role.name.toUpperCase() }}
           </span>
         </div>
       </div>
@@ -117,7 +117,7 @@ const roleBadge: Record<string, string> = {
     </Transition>
 
     <!-- Role change form -->
-    <UCard class="rounded-2xl border border-gray-100 p-6 mb-6">
+    <UCard class="rounded-2xl border border-gray-300 p-6 mb-6">
       <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
         <UIcon name="i-lucide-shield" class="w-4 h-4 text-gray-400" />
         Change Role
@@ -126,7 +126,7 @@ const roleBadge: Record<string, string> = {
         <UFormField name="role" label="Role" class="flex-1" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
           <USelect
             v-model="state.role"
-            :options="ROLES.map(r => ({ label: r.charAt(0).toUpperCase() + r.slice(1), value: r }))"
+            :options="ROLES"
             :disabled="saving"
             class="w-full"
             :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }"

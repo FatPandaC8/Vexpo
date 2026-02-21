@@ -16,6 +16,7 @@ const section = ref<'booths' | 'expos' | 'company'>('booths')
 // My Booths (GET /me/booths)
 const booths        = ref<any[]>([])
 const loadingBooths = ref(false)
+
 async function loadBooths() {
   loadingBooths.value = true
   try { booths.value = await api.get<any[]>('/me/booths') }
@@ -26,6 +27,7 @@ async function loadBooths() {
 // Browse expos (GET /expos)
 const expos        = ref<any[]>([])
 const loadingExpos = ref(false)
+
 async function loadExpos() {
   loadingExpos.value = true
   try { expos.value = await api.get<any[]>('/expos') }
@@ -35,15 +37,15 @@ async function loadExpos() {
 
 // My Company – stored as single item (POST /companies, PATCH /companies/:id) ─
 // There's no GET /me/company in the spec so we persist locally after create/load
-const myCompany        = ref<any>(null)
+const company        = ref<any>(null)
 const loadingCompany   = ref(false)
 
 // We try fetching from a reasonable endpoint; if backend doesn't have it yet,
 // we show the create form.
 async function loadCompany() {
   loadingCompany.value = true
-  try { myCompany.value = await api.get<any>('/me/company') }
-  catch { myCompany.value = null }
+  try { company.value = await api.get<any>('/me/company') }
+  catch { company.value = null }
   finally { loadingCompany.value = false }
 }
 
@@ -137,6 +139,7 @@ const statusColor: Record<string, string> = {
         <UIcon name="i-lucide-calendar-x" class="w-8 h-8 text-gray-300 mb-2" />
         <p class="text-xs text-gray-400">No expos available</p>
       </div>
+
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
         <button
           v-for="expo in expos"
@@ -147,8 +150,10 @@ const statusColor: Record<string, string> = {
             : 'border-gray-100 bg-white hover:border-violet-200 hover:bg-violet-50/30'"
           @click="emit('select', { view: 'register-booth', data: expo })"
         >
-          <p class="text-sm font-semibold text-gray-800 truncate">{{ expo.title }}</p>
-          <p class="text-xs text-gray-400 mt-0.5 truncate">{{ expo.location ?? '—' }}</p>
+          <p class="text-sm font-semibold text-gray-800 truncate">{{ expo.name }}</p>
+          <p class="text-xs text-gray-400 mt-0.5 truncate">{{ expo.type ?? '—' }}</p>
+          <!--NOTE: For now haven't validate the date so that in some case, exhibitor may register an old expo-->
+          
           <span class="inline-flex items-center gap-1 mt-1.5 text-xs text-violet-600 font-medium">
             <UIcon name="i-lucide-store" class="w-3 h-3" />
             Register booth →
@@ -166,7 +171,7 @@ const statusColor: Record<string, string> = {
         </button>
       </div>
 
-      <div v-if="!myCompany" class="flex flex-col items-center justify-center flex-1 text-center py-8">
+      <div v-if="!company" class="flex flex-col items-center justify-center flex-1 text-center py-8">
         <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mb-3">
           <UIcon name="i-lucide-building-2" class="w-6 h-6 text-violet-400" />
         </div>
@@ -179,6 +184,26 @@ const statusColor: Record<string, string> = {
           + Register Company
         </button>
       </div>
+
+      <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
+        <button
+          v-if="company"
+          :key="company.id"
+          class="w-full text-left rounded-xl border p-3 transition-all"
+          :class="activeView === 'register-booth' && activeId === company.id
+            ? 'border-[#3d52d5]/40 bg-blue-50'
+            : 'border-gray-100 bg-white hover:border-violet-200 hover:bg-violet-50/30'"
+          @click="emit('select', { view: 'company-edit', data: company })"
+        >
+          <p class="text-sm font-semibold text-gray-800 truncate">
+            {{ company.name }}
+          </p>
+
+          <p class="text-xs text-gray-400 mt-0.5 truncate">
+            {{ company.industry ?? 'Company' }}
+          </p>
+        </button>
+    </div>
     </template>
 
   </aside>

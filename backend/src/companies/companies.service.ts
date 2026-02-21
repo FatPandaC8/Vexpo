@@ -30,6 +30,12 @@ export class CompaniesService {
     };
   }
 
+  async getCompanyByExhibitor(exhibitorId: number) {
+    return await this.companyRepository.findOneBy({
+      exhibitorId: exhibitorId
+    });
+  }
+
   async findById(id: number) {
     const company = await this.companyRepository.findOne({
       where: { id },

@@ -56,7 +56,12 @@ function onBoothRegistered() {
 
 function onCompanyUpdated(company: any) {
   // Switch to edit mode with the newly saved company
-  select({ view: 'company-edit', data: company })
+  activeData.value = company;
+}
+
+function onCompanyDeleted() {
+  select({ view: 'welcome' })
+  exhibitorSidebar.value?.refresh()
 }
 
 // ORGANIZER events
@@ -232,14 +237,14 @@ const welcomeConfig = computed(() => {
         <!-- EXHIBITOR PANELS -->
 
         <!-- Edit booth -->
-        <DashboardPanelsBoothEdit
+        <DashboardPanelsBoothForm
           v-else-if="activeView === 'booth-edit' && activeData"
           :booth="activeData"
           @updated="activeData = $event"
         />
 
         <!-- Register booth for an expo -->
-        <DashboardPanelsRegisterBooth
+        <DashboardPanelsBoothForm
           v-else-if="activeView === 'register-booth' && activeData"
           :expo="activeData"
           @registered="onBoothRegistered"
@@ -255,8 +260,8 @@ const welcomeConfig = computed(() => {
         <DashboardPanelsCompanyForm
           v-else-if="activeView === 'company-edit' && activeData"
           :company="activeData"
-          @saved="activeData = $event"
-          @deleted="select({ view: 'welcome' })"
+          @saved="onCompanyUpdated"
+          @deleted="onCompanyDeleted"
         />
 
         <!-- ORGANIZER PANELS -->

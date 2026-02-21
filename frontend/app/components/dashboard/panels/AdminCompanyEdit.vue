@@ -2,7 +2,6 @@
 // Admin: edit or delete any company
 
 import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
 
 const props = defineProps<{ company: any }>()
 const emit  = defineEmits<{ updated: [company: any]; deleted: [] }>()
@@ -13,11 +12,12 @@ const schema = z.object({
   name:        z.string().min(2, 'Name must be at least 2 characters'),
   description: z.string().optional(),
   industry:    z.string().optional(),
-  website:     z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  website:     z.url('Must be a valid URL').optional().or(z.literal('')),
 })
 
 const state = reactive({
   name:        props.company.name        ?? '',
+  exhibitorId: props.company.exhibitorId ?? '',
   description: props.company.description ?? '',
   industry:    props.company.industry    ?? '',
   website:     props.company.website     ?? '',
@@ -25,6 +25,7 @@ const state = reactive({
 
 watch(() => props.company, (c) => {
   state.name        = c.name        ?? ''
+  state.exhibitorId = c.exhibitorId ?? ''
   state.description = c.description ?? ''
   state.industry    = c.industry    ?? ''
   state.website     = c.website     ?? ''
@@ -94,17 +95,30 @@ async function deleteCompany() {
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <UFormField name="name" label="Company Name" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <UInput v-model="state.name" :disabled="saving" class="w-full" :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }" />
+        <UInput v-model="state.name" :disabled="saving" class="w-full" 
+        :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }" />
       </UFormField>
+
+      <UFormField name="exhibitor" label="Exhibitor ID" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
+        <UInput v-model="state.exhibitorId" :disabled="saving" class="w-full" 
+        :ui="{ base: 'border border-gray-300 px-3 h-10 rounded-xl cursor-not-allowed bg-gray-200' }" />
+      </UFormField>
+
       <UFormField name="industry" label="Industry" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <UInput v-model="state.industry" placeholder="Technology, Healthcare…" :disabled="saving" class="w-full" :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }" />
+        <UInput v-model="state.industry" placeholder="Technology, Healthcare…" :disabled="saving" class="w-full" 
+        :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }" />
       </UFormField>
+
       <UFormField name="website" label="Website" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <UInput v-model="state.website" placeholder="https://…" :disabled="saving" class="w-full" :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }" />
+        <UInput v-model="state.website" placeholder="https://…" :disabled="saving" class="w-full" 
+        :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }" />
       </UFormField>
+
       <UFormField name="description" label="Description" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <UTextarea v-model="state.description" :rows="4" :disabled="saving" class="w-full" :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 py-2 rounded-xl' }" />
+        <UTextarea v-model="state.description" :rows="4" :disabled="saving" class="w-full" 
+        :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 py-2 rounded-xl' }" />
       </UFormField>
+
       <div class="pt-2">
         <UButton type="submit" :loading="saving" :disabled="saving" class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-6" size="md">
           {{ saving ? 'Saving…' : 'Save Changes' }}

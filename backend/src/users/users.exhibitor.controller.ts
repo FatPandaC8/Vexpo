@@ -47,6 +47,12 @@ export class UserExhibitorController {
     return this.boothsService.getBoothsByExhibitor(req.user.userId);
   }
 
+  @Get('me/company')
+  @ApiOperation({ summary: 'Get the company of current exhibitor' })
+  async getMyCompany(@Request() req) {
+    return this.companyService.getCompanyByExhibitor(req.user.userId);
+  }
+
   @Patch('booths/:boothId')
   @ApiOperation({ summary: 'Update booth information' })
   async updateBooth(

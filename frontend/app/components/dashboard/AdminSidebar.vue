@@ -33,13 +33,6 @@ const endpointMap: Record<Section, string> = {
   companies: '/admin/companies',
 }
 
-const createViewMap: Record<Section, string> = {
-  users:     'admin-user-edit',
-  expos:     'admin-expo-create',
-  booths:    '',          // Admin doesn't create booths directly
-  companies: '',
-}
-
 const editViewMap: Record<Section, string> = {
   users:     'admin-user-edit',
   expos:     'admin-expo-edit',
@@ -72,7 +65,7 @@ defineExpose({ refresh: () => loadSection(section.value) })
 
 function itemLabel(item: any, s: Section) {
   if (s === 'users')     return item.name ?? item.email ?? `User #${item.id}`
-  if (s === 'expos')     return item.title ?? `Expo #${item.id}`
+  if (s === 'expos')     return item.name ?? `Expo #${item.id}`
   if (s === 'booths')    return item.name  ?? `Booth #${item.id}`
   if (s === 'companies') return item.name  ?? `Company #${item.id}`
   return `#${item.id}`
@@ -80,9 +73,9 @@ function itemLabel(item: any, s: Section) {
 
 function itemSub(item: any, s: Section) {
   if (s === 'users')     return item.email ?? item.roles?.join(', ')
-  if (s === 'expos')     return item.name ?? item.status ?? '—'
+  if (s === 'expos')     return item.type ?? '—'
   if (s === 'booths')    return item.status ?? '—'
-  if (s === 'companies') return item.name ?? item.industry ?? '—'
+  if (s === 'companies') return item.industry ?? '—'
   return ''
 }
 
@@ -110,20 +103,14 @@ const activeSection = computed(() => sections.find(s => s.key === section.value)
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-3">
+
       <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
         {{ activeSection.label }}
       </span>
+
       <div class="flex items-center gap-2">
         <button class="transition" :class="activeSection.color" @click="loadSection(section)">
           <UIcon name="i-lucide-refresh-cw" class="w-3.5 h-3.5" :class="{ 'animate-spin': loading }" />
-        </button>
-        <!-- Create button for users and expos -->
-        <button
-          class="flex items-center gap-1 bg-[#3d52d5] text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg hover:bg-blue-700 transition shadow-sm shadow-blue-500/20"
-          @click="emit('select', { view: createViewMap[section] })"
-        >
-          <UIcon name="i-lucide-plus" class="w-3 h-3" />
-          New
         </button>
       </div>
     </div>

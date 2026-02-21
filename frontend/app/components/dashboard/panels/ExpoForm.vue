@@ -1,6 +1,8 @@
 <script setup lang="ts">
+
 import * as z from 'zod'
 
+// Reminder: defineProps is for falling through attribute from parent to child
 const props = defineProps<{
   expo?: any
 }>()

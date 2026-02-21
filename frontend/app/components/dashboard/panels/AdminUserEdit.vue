@@ -1,8 +1,7 @@
 <script setup lang="ts">
 // Admin: view user details, change role, delete
-
+// IMPORTANT: Must be able to change: name, email, role
 import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
 
 const props = defineProps<{ user: any }>()
 const emit  = defineEmits<{ updated: [user: any]; deleted: [] }>()
@@ -12,30 +11,42 @@ const api = useApi()
 const ROLES = ['visitor', 'exhibitor', 'organizer', 'admin']
 
 const schema = z.object({
+  name: z.string().min(4, 'Min name length is 4'),
+  email: z.email(),
   role: z.string().min(1, 'Select a role'),
 })
 
 const state = reactive({
+  name: (props.user.name ?? ''),
+  userId: (props.user.id ?? ''),
+  email: (props.user.email ?? ''),
   role: (props.user?.roles?.[0] ?? '')
 })
 
 watch(() => props.user, (u) => {
-  state.role = (u?.roles?.[0] ?? '').toLowerCase()
+  state.name = (u?.name)
+  state.email = (u?.email)
+  state.role = (u?.roles?.[0] ?? '')
 })
 
 const saving  = ref(false)
 const success = ref(false)
 const error   = ref<string | null>(null)
 
-async function save(event: FormSubmitEvent<typeof state>) {
+async function save(event: any) {
   saving.value  = true
   error.value   = null
   success.value = false
   try {
-    const updated = await api.patch<any>(`/admin/users/${props.user.id}/role`, { role: event.data.role })
+    const updated = await api.patch(`/admin/users/${props.user.id}`, {
+      name: event.data.name,
+      email: event.data.email,
+      role: event.data.role
+    })
+
     success.value = true
 
-    emit('updated', { ...props.user, roles: [event.data.role.toUpperCase()] })
+    emit('updated', { ...props.user, updated })
 
     setTimeout(() => { success.value = false }, 3000)
 
@@ -91,18 +102,6 @@ const roleBadge: Record<string, string> = {
       </div>
     </div>
 
-    <!-- User info cards -->
-    <div class="grid grid-cols-2 gap-4 mb-8">
-      <div class="p-4 rounded-xl border border-gray-100 bg-white">
-        <p class="text-xs text-gray-400 mb-1">User ID</p>
-        <p class="text-sm font-semibold text-gray-800">#{{ user.id }}</p>
-      </div>
-      <div class="p-4 rounded-xl border border-gray-100 bg-white">
-        <p class="text-xs text-gray-400 mb-1">Email</p>
-        <p class="text-sm font-semibold text-gray-800 truncate">{{ user.email }}</p>
-      </div>
-    </div>
-
     <Transition name="fade">
       <div v-if="success" class="mb-5 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
         <UIcon name="i-lucide-circle-check" class="shrink-0 text-emerald-500" />
@@ -118,29 +117,68 @@ const roleBadge: Record<string, string> = {
 
     <!-- Role change form -->
     <UCard class="rounded-2xl border border-gray-300 p-6 mb-6">
-      <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <UIcon name="i-lucide-shield" class="w-4 h-4 text-gray-400" />
-        Change Role
-      </h3>
-      <UForm :state="state" :schema="schema" class="flex items-end gap-3" @submit="save">
-        <UFormField name="role" label="Role" class="flex-1" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-          <USelect
-            v-model="state.role"
-            :options="ROLES"
+      <UForm :state="state" :schema="schema" class="space-y-4" @submit="save">
+        <UFormField name="name" label="Name">
+          <UInput type="text"
+            v-model="state.name"
             :disabled="saving"
             class="w-full"
             :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }"
           />
         </UFormField>
+
+        <UFormField name="user" label="User ID">
+          <UInput
+            readonly 
+            type="text"
+            v-model="state.userId"
+            :disabled="saving"
+            class="w-full"
+            :ui="{ base: 'border border-gray-300 px-3 h-10 rounded-xl cursor-not-allowed bg-gray-200' }"
+          />
+        </UFormField>
+
+        <UFormField name="email" label="Email">
+          <UInput type="text"
+            v-model="state.email"
+            :disabled="saving"
+            class="w-full"
+            :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }"
+          />
+        </UFormField>
+
+
+        <UFormField name="role" label="Role">
+          <USelect
+              v-model="state.role"
+              variant="soft"
+              :items="ROLES"
+              placeholder="Select a role"
+              :content="{
+                  align: 'center',
+                  side: 'bottom',
+              }"
+              :ui="{
+                  base: 'w-full border border-blue-300 h-10 rounded bg-blue-50 ',
+                  content: 'bg-white rounded-xl shadow-lg border border-blue-100',
+                  item: 'px-3 py-2 text-sm hover:bg-blue-50 cursor-pointer w-100 rounded-xl',
+                  itemLabel: 'text-gray-700',
+                  itemTrailingIcon: 'text-blue-500',
+              }"
+              trailing-icon="null"
+              
+          />
+        </UFormField>
+
         <UButton
           type="submit"
           :loading="saving"
           :disabled="saving"
-          class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-5 mb-px"
-          size="md"
+          class="bg-[#3d52d5] text-white rounded-xl"
         >
-          {{ saving ? 'Saving…' : 'Update Role' }}
+          Save Changes
         </UButton>
+
       </UForm>
     </UCard>
 

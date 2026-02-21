@@ -93,6 +93,40 @@ export class UsersService {
     return this.assignRole(userId, roleName);
   }
 
+  async updateUser(
+    id: number,
+    data: {
+      name?: string
+      email?: string
+      role?: string
+    },
+  ) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['roles', 'roles.role'],
+    })
+
+    if (!user) throw new NotFoundException('User not found')
+
+    // update basic fields
+    if (data.name !== undefined) {
+      user.name = data.name
+    }
+
+    if (data.email !== undefined) {
+      user.email = data.email
+    }
+
+    await this.userRepository.save(user)
+
+    // update role if provided
+    if (data.role) {
+      await this.setRole(id, data.role)
+    }
+
+    return this.findOneById(id)
+  }
+
   async deleteUser(id: number) {
     const result = await this.userRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException('User not found');

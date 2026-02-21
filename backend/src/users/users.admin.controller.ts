@@ -25,7 +25,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { UpdateUserRoleDTO } from './dto/update-user-role.dto';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @ApiTags('Admin - Users')
 @ApiBearerAuth()
@@ -51,12 +51,12 @@ export class UserAdminController {
   }
 
   @ApiOperation({ description: "Edit the user's role." })
-  @Patch(':id/role')
-  editUserRole(
+  @Patch(':id')
+  updateUser(
     @Param('id', ParseIntPipe) userId: number,
-    @Body() dto: UpdateUserRoleDTO,
+    @Body() dto: UpdateUserDTO,
   ) {
-    return this.userService.setRole(userId, dto.role);
+    return this.userService.updateUser(userId, dto);
   }
 
   @ApiOperation({ description: 'Delete the user.' })

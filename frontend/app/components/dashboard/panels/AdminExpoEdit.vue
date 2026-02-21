@@ -111,7 +111,7 @@ async function deleteExpo() {
       </UFormField>
 
       <UFormField name="organizerId" label="Organizer ID" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <UInput v-model="state.organizerId" placeholder="Expo name" :disabled="saving" class="w-full" 
+        <UInput readonly v-model="state.organizerId" placeholder="Expo name" :disabled="saving" class="w-full" 
         :ui="{ base: 'border border-gray-300 px-3 h-10 rounded-xl cursor-not-allowed bg-gray-200' }" />
       </UFormField>
 

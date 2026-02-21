@@ -100,7 +100,7 @@ async function deleteCompany() {
       </UFormField>
 
       <UFormField name="exhibitor" label="Exhibitor ID" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <UInput v-model="state.exhibitorId" :disabled="saving" class="w-full" 
+        <UInput readonly v-model="state.exhibitorId" :disabled="saving" class="w-full" 
         :ui="{ base: 'border border-gray-300 px-3 h-10 rounded-xl cursor-not-allowed bg-gray-200' }" />
       </UFormField>
 

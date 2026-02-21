@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // Left panel for ADMIN role — navigate between resource types.
+// IMPORTANT: Add search bar for each sections 
 
 const emit = defineEmits<{
   select: [payload: { view: string; data?: any }]

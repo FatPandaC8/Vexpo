@@ -1,4 +1,15 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateBoothContentDTO } from './create-booth-content.dto';
+import { IsEnum, IsOptional, IsString } from "class-validator"
 
-export class UpdateBoothContentDTO extends PartialType(CreateBoothContentDTO) {}
+export class UpdateBoothDTO {
+  @IsOptional()
+  @IsString()
+  name?: string
+
+  @IsOptional()
+  @IsString()
+  description?: string
+
+  @IsOptional()
+  @IsEnum(['pending', 'approved', 'rejected'])
+  status?: string
+}

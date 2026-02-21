@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsNumber,
-  IsObject,
 } from 'class-validator';
 
 export class CreateBoothContentDTO {
@@ -13,7 +12,7 @@ export class CreateBoothContentDTO {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: 'We showcase innovative tech solutions' })
+  @ApiProperty({ example: 'We showcase innovative tech solutions', required: false })
   @IsString()
   @IsOptional()
   description?: string;
@@ -23,14 +22,12 @@ export class CreateBoothContentDTO {
   @IsOptional()
   companyId?: number;
 
-  @ApiProperty({ required: false })
-  @IsObject()
+  @ApiProperty({
+    example: 'C:/Users/john/models/booth.glb',
+    description: 'Absolute path to the 3D model file saved on the exhibitor\'s local machine',
+    required: false,
+  })
+  @IsString()
   @IsOptional()
-  content?: {
-    logo?: string;
-    bannerImage?: string;
-    videos?: string[];
-    documents?: string[];
-    products?: any[];
-  };
+  modelPath?: string;
 }

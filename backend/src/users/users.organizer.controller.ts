@@ -20,7 +20,6 @@ import { ExposService } from 'src/expos/expos.service';
 import { BoothsService } from 'src/booths/booths.service';
 import { CreateExpoDTO } from 'src/expos/dto/create-expo.dto';
 import { UpdateExpoDTO } from 'src/expos/dto/update-expo.dto';
-import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
 import { UpdateBoothStatusDTO } from 'src/booths/dto/update-booth-status.dto';
 
 @ApiTags('Organizer')

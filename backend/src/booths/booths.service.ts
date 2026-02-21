@@ -7,9 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booth } from 'src/entities/booth.entity';
 import { Repository } from 'typeorm';
-import { UpdateBoothContentDTO } from './dto/update-booth.dto';
+import { UpdateBoothDTO } from './dto/update-booth.dto';
 import { CreateBoothContentDTO } from './dto/create-booth-content.dto';
-import { UpdateBoothStatusDTO } from './dto/update-booth-status.dto';
 
 @Injectable()
 export class BoothsService {
@@ -23,14 +22,18 @@ export class BoothsService {
       where: { id: boothId },
       relations: ['expo', 'company'],
     });
-
     if (!booth) {
       throw new NotFoundException(`Booth with ID ${boothId} not found`);
     }
-
-    await this.boothRepository.save(booth);
-
     return booth;
+  }
+
+  async getBoothsByExpo(expoId: number) {
+    return this.boothRepository.find({
+      where: { expoId },
+      relations: ['company'],
+      order: { createdAt: 'ASC' },
+    });
   }
 
   async createBooth(
@@ -38,12 +41,11 @@ export class BoothsService {
     exhibitorId: number,
     dto: CreateBoothContentDTO,
   ) {
-    // Check if user already has a booth for this expo
-    const existingBooth = await this.boothRepository.findOne({
+    // One booth per exhibitor per expo
+    const existing = await this.boothRepository.findOne({
       where: { expoId, exhibitorId },
     });
-
-    if (existingBooth) {
+    if (existing) {
       throw new ConflictException('You already have a booth for this expo');
     }
 
@@ -53,7 +55,6 @@ export class BoothsService {
       exhibitorId,
       status: 'pending',
     });
-
     return this.boothRepository.save(booth);
   }
 
@@ -68,22 +69,29 @@ export class BoothsService {
   async updateBoothByExhibitor(
     boothId: number,
     exhibitorId: number,
-    dto: UpdateBoothContentDTO,
+    dto: UpdateBoothDTO,
   ) {
     const booth = await this.boothRepository.findOne({
       where: { id: boothId },
     });
-
-    if (!booth) {
-      throw new NotFoundException('Booth not found');
-    }
-
+    if (!booth) throw new NotFoundException('Booth not found');
     if (booth.exhibitorId !== exhibitorId) {
       throw new ForbiddenException('You can only update your own booths');
     }
-
     Object.assign(booth, dto);
     return this.boothRepository.save(booth);
+  }
+
+  async deleteBoothByExhibitor(boothId: number, exhibitorId: number) {
+    const booth = await this.boothRepository.findOne({
+      where: { id: boothId },
+    });
+    if (!booth) throw new NotFoundException('Booth not found');
+    if (booth.exhibitorId !== exhibitorId) {
+      throw new ForbiddenException('You can only delete your own booths');
+    }
+    await this.boothRepository.remove(booth);
+    return { message: 'Booth deleted successfully' };
   }
 
   async updateBoothStatus(
@@ -95,30 +103,23 @@ export class BoothsService {
       where: { id: boothId },
       relations: ['expo'],
     });
-
-    if (!booth) {
-      throw new NotFoundException('Booth not found');
-    }
-
+    if (!booth) throw new NotFoundException('Booth not found');
     if (booth.expo.organizerId !== organizerId) {
       throw new ForbiddenException(
-        'You can only approve booths for your own expos',
+        'You can only update booth status for your own expos',
       );
     }
-
     booth.status = status;
     return this.boothRepository.save(booth);
   }
 
   async findAllPaginated(page: number = 1, limit: number = 20) {
-    // not optimized, use index instead, for now this should work :)
     const [items, total] = await this.boothRepository.findAndCount({
       relations: ['expo', 'company'],
       skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'DESC' },
     });
-
     return {
       items,
       meta: {
@@ -130,7 +131,7 @@ export class BoothsService {
     };
   }
 
-  async updateBooth(id: number, dto: UpdateBoothContentDTO) {
+  async updateBooth(id: number, dto: UpdateBoothDTO) {
     const booth = await this.getBoothById(id);
     Object.assign(booth, dto);
     return this.boothRepository.save(booth);

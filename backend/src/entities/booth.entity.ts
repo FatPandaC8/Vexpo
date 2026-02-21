@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  JoinColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -20,13 +21,27 @@ export class Booth {
   @Column()
   exhibitorId: number;
 
-  @Column()
+  @Column({ nullable: true })
+  companyId: number | null;
+
+  @Column({ default: 'pending' })
   status: 'pending' | 'approved' | 'rejected';
 
+  @Column({ nullable: true })
+  name: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  modelPath: string;
+
   @ManyToOne(() => Expo, (expo) => expo.booths)
+  @JoinColumn({ name: 'expoId' })
   expo: Expo;
 
-  @ManyToOne(() => Company, (company) => company.booths)
+  @ManyToOne(() => Company, (company) => company.booths, { nullable: true })
+  @JoinColumn({ name: 'companyId' })
   company: Company;
 
   @CreateDateColumn()

@@ -33,7 +33,8 @@ const loadingBooths = ref(false)
 async function loadBooths() {
   loadingBooths.value = true
   try {
-    booths.value = await api.get('/me/booth-requests')
+    const res = await api.getPaginated<any>(`/booths`, { page: 1, limit: 20 })
+    booths.value = res.items
   } catch {
     booths.value = []
   } finally {
@@ -47,6 +48,12 @@ onMounted(() => {
 
 watch(section, (s) => {
   if (s === 'booths') loadBooths()
+})
+
+watch(() => props.activeId, () => {
+  if (section.value === 'booths') {
+    loadBooths()
+  }
 })
 
 defineExpose({
@@ -167,11 +174,11 @@ const statusColor: Record<string, string> = {
           @click="emit('select', { view: 'booth-review', data: booth })"
         >
           <p class="text-sm font-semibold text-gray-800 truncate">
-            {{ booth.company?.name ?? 'Booth #' + booth.id }}
+            {{ booth.name ?? 'Booth #' + booth.id }}
           </p>
 
           <p class="text-xs text-gray-400 mt-0.5 truncate">
-            {{ booth.expo?.title ?? 'Expo' }}
+            {{ booth.description === 0 ? booth.description : 'Null'}}
           </p>
 
           <span

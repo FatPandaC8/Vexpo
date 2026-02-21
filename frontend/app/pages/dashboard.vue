@@ -281,7 +281,7 @@ const welcomeConfig = computed(() => {
         />
 
         <!-- Manage booths -->
-        <DashboardPanelsBoothReview
+        <DashboardPanelsBoothForm
           v-else-if="activeView === 'booth-review' && activeData"
           :booth="activeData"
           @updated="onBoothReviewed"

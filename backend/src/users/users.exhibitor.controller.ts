@@ -15,7 +15,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { BoothsService } from 'src/booths/booths.service';
 import { CreateBoothContentDTO } from 'src/booths/dto/create-booth-content.dto';
-import { UpdateBoothContentDTO } from 'src/booths/dto/update-booth.dto';
+import { UpdateBoothDTO } from 'src/booths/dto/update-booth.dto';
 import { UpdateCompanyDto } from 'src/companies/dto/update-company.dto';
 import { CompaniesService } from 'src/companies/companies.service';
 import { RegisterCompanyDTO } from 'src/companies/dto/create-company.dto';
@@ -57,7 +57,7 @@ export class UserExhibitorController {
   @ApiOperation({ summary: 'Update booth information' })
   async updateBooth(
     @Param('boothId', ParseIntPipe) boothId: number,
-    @Body() dto: UpdateBoothContentDTO,
+    @Body() dto: UpdateBoothDTO,
     @Request() req,
   ) {
     return this.boothsService.updateBoothByExhibitor(

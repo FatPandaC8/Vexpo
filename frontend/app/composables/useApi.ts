@@ -13,6 +13,14 @@ export const useApi = () => {
         return $fetch<T>(path, { baseURL: BASE, headers: headers() })
     }
 
+    async function getPaginated<T>(path: string, params?: Record<string, any>): Promise<T> {
+        return $fetch<T>(path, {
+            baseURL: BASE,
+            headers: headers(),
+            query: params
+        })
+    }
+
     async function post<T>(path: string, body?: any): Promise<T> {
         return $fetch<T>(path, { method: 'POST', baseURL: BASE, headers: headers(), body })
     }
@@ -25,5 +33,5 @@ export const useApi = () => {
         return $fetch<T>(path, { method: 'DELETE', baseURL: BASE, headers: headers() })
     }
 
-    return { get, post, patch, del }
+    return { get, post, patch, del, getPaginated }
 }

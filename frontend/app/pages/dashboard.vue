@@ -288,6 +288,7 @@ const welcomeConfig = computed(() => {
         <DashboardPanelsAdminUserEdit
           v-else-if="activeView === 'admin-user-edit' && activeData"
           :user="activeData"
+          :key="activeData.id"
           @updated="onAdminUpdated"
           @deleted="onAdminDeleted"
         />

@@ -28,6 +28,12 @@ import { CreateExpoDTO } from './dto/create-expo.dto';
 export class ExposAdminController {
   constructor(private exposService: ExposService) {}
 
+  @Get()
+  @ApiOperation({ summary: 'Get all expos' })
+  async getExpos() {
+    return this.exposService.findAll();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get expo by ID' })
   async getExpo(@Param('id', ParseIntPipe) id: number) {

@@ -16,7 +16,7 @@ const schema = z.object({
 })
 
 const state = reactive({
-  role: (props.user?.roles?.[0] ?? '').toLowerCase(),
+  role: (props.user?.roles?.[0] ?? '')
 })
 
 watch(() => props.user, (u) => {
@@ -34,24 +34,24 @@ async function save(event: FormSubmitEvent<typeof state>) {
   try {
     const updated = await api.patch<any>(`/admin/users/${props.user.id}/role`, { role: event.data.role })
     success.value = true
+
     emit('updated', { ...props.user, roles: [event.data.role.toUpperCase()] })
+
     setTimeout(() => { success.value = false }, 3000)
+
   } catch (e: any) {
     const msg = e?.data?.message ?? e?.message
     error.value = Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Update failed')
+
   } finally {
     saving.value = false
   }
 }
 
 // Delete
-const deleteConfirm = ref('')
 const deleteLoading = ref(false)
-const showDelete    = ref(false)
-const canDelete     = computed(() => deleteConfirm.value === props.user?.email)
 
 async function deleteUser() {
-  if (!canDelete.value) return
   deleteLoading.value = true
   try {
     await api.del(`/admin/users/${props.user.id}`)
@@ -75,9 +75,6 @@ const roleBadge: Record<string, string> = {
   <div>
     <!-- Header -->
     <div class="flex items-start gap-4 mb-8">
-      <div class="w-14 h-14 rounded-full bg-[#3d52d5] text-white text-2xl font-bold flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
-        {{ user.name?.charAt(0).toUpperCase() ?? '?' }}
-      </div>
       <div>
         <h2 class="text-2xl font-bold text-gray-900">{{ user.name }}</h2>
         <p class="text-sm text-gray-400 mt-0.5">{{ user.email }}</p>
@@ -149,36 +146,16 @@ const roleBadge: Record<string, string> = {
 
     <!-- Delete user -->
     <div class="pt-2">
-      <button
-        class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2"
-        @click="showDelete = !showDelete"
+      <UButton
+        :disabled="deleteLoading"
+        :loading="deleteLoading"
+        size="sm"
+        class="rounded-xl cursor-pointer px-5"
+        :class="'bg-red-600 text-white'"
+        @click="deleteUser"
       >
-        <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
-        Delete user
-      </button>
-      <Transition name="fade">
-        <div v-if="showDelete" class="mt-4 p-5 rounded-xl border border-red-200 bg-red-50/30">
-          <p class="text-sm text-red-700 mb-3">
-            Type <strong>{{ user.email }}</strong> to confirm deletion:
-          </p>
-          <UInput
-            v-model="deleteConfirm"
-            placeholder="User email"
-            class="mb-4 w-full max-w-xs"
-            :ui="{ base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl' }"
-          />
-          <UButton
-            :disabled="!canDelete || deleteLoading"
-            :loading="deleteLoading"
-            size="sm"
-            class="rounded-xl cursor-pointer px-5"
-            :class="canDelete ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
-            @click="deleteUser"
-          >
-            {{ deleteLoading ? 'Deleting…' : 'Delete User' }}
-          </UButton>
-        </div>
-      </Transition>
+        {{ deleteLoading ? 'Deleting…' : 'Delete User' }}
+      </UButton>
     </div>
   </div>
 </template>

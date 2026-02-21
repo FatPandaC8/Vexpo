@@ -28,9 +28,9 @@ const loading = ref(false)
 
 const endpointMap: Record<Section, string> = {
   users:     '/admin/users',
-  expos:     '/expos',
-  booths:    '/booths',
-  companies: '/companies',
+  expos:     '/admin/expos',
+  booths:    '/admin/booths',
+  companies: '/admin/companies',
 }
 
 const createViewMap: Record<Section, string> = {
@@ -49,9 +49,21 @@ const editViewMap: Record<Section, string> = {
 
 async function loadSection(s: Section) {
   loading.value = true
-  try { items.value = await api.get<any[]>(endpointMap[s]) }
-  catch { items.value = [] }
-  finally { loading.value = false }
+  try {
+    const res = await api.getPaginated(endpointMap[s], {
+      page: 1,
+      limit: 20
+    });
+    console.log('Loaded:', s, res)
+    items.value = (res as any).items ?? res
+  }
+  catch (e) {
+    console.log('Error:', e)
+    items.value = []
+  }
+  finally {
+    loading.value = false
+  }
 }
 
 watch(section, (v) => loadSection(v), { immediate: true })
@@ -68,9 +80,9 @@ function itemLabel(item: any, s: Section) {
 
 function itemSub(item: any, s: Section) {
   if (s === 'users')     return item.email ?? item.roles?.join(', ')
-  if (s === 'expos')     return item.location ?? item.status ?? '—'
+  if (s === 'expos')     return item.name ?? item.status ?? '—'
   if (s === 'booths')    return item.status ?? '—'
-  if (s === 'companies') return item.industry ?? '—'
+  if (s === 'companies') return item.name ?? item.industry ?? '—'
   return ''
 }
 
@@ -107,7 +119,6 @@ const activeSection = computed(() => sections.find(s => s.key === section.value)
         </button>
         <!-- Create button for users and expos -->
         <button
-          v-if="section === 'users' || section === 'expos'"
           class="flex items-center gap-1 bg-[#3d52d5] text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg hover:bg-blue-700 transition shadow-sm shadow-blue-500/20"
           @click="emit('select', { view: createViewMap[section] })"
         >

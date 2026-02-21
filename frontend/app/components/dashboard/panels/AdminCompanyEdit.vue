@@ -34,7 +34,7 @@ const saving  = ref(false)
 const success = ref(false)
 const error   = ref<string | null>(null)
 
-async function submit(event: FormSubmitEvent<typeof state>) {
+async function submit(event: any) {
   saving.value  = true
   error.value   = null
   try {

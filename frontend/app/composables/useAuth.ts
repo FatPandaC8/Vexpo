@@ -5,35 +5,30 @@ interface AuthUser {
   roles: string[]
 }
 
-// composable: a common function for stateful logic
 export const useAuth = () => {
   const config = useRuntimeConfig()
   const BASE = config.public.apiBase
 
-  // Cookie persists the JWT across refreshes (7 days matches backend)
   const token = useCookie<string | null>('auth_token', {
     maxAge: 60 * 60 * 24 * 7,
     sameSite: 'lax',
     path: '/',
   })
 
-  // User profile — reactive, shared across all callers via useState
   const user = useState<AuthUser | null>('auth_user', () => null)
 
   const isLoggedIn = computed(() => !!token.value)
 
-  const role = computed(() => user.value?.roles?.at(0) ?? null)   // e.g. 'VISITOR'
-  const isVisitor   = computed(() => role.value === 'VISITOR')
-  const isExhibitor = computed(() => role.value === 'EXHIBITOR')
-  const isOrganizer = computed(() => role.value === 'ORGANIZER')
-  const isAdmin     = computed(() => role.value === 'ADMIN')
-
+  const role = computed(() => user.value?.roles?.at(0) ?? null)
+  const isVisitor   = computed(() => role.value === 'visitor')
+  const isExhibitor = computed(() => role.value === 'exhibitor')
+  const isOrganizer = computed(() => role.value === 'organizer')
+  const isAdmin     = computed(() => role.value === 'admin')
 
   function authHeaders(): Record<string, string> {
     return token.value ? { Authorization: `Bearer ${token.value}` } : {}
   }
 
-  // Save token from URL query (used after OAuth redirect)
   function setToken(raw: string) {
     token.value = raw
   }
@@ -46,7 +41,6 @@ export const useAuth = () => {
         headers: authHeaders(),
       })
     } catch {
-      // Token invalid/expired — wipe it
       token.value = null
       user.value = null
     }
@@ -77,7 +71,6 @@ export const useAuth = () => {
     await fetchProfile()
   }
 
-  // Called from select-role page after Google OAuth for new users
   async function completeOAuth(role: 'visitor' | 'exhibitor' | 'organizer') {
     const res = await $fetch<{ access_token: string }>('/auth/oauth/complete', {
       method: 'POST',
@@ -85,7 +78,6 @@ export const useAuth = () => {
       headers: authHeaders(),
       body: { role },
     })
-    // Replace the temp token with the full one
     token.value = res.access_token
     await fetchProfile()
   }
@@ -101,14 +93,13 @@ export const useAuth = () => {
     await navigateTo('/auth')
   }
 
-  // Call on app boot to restore user from existing cookie
   async function init() {
     if (token.value && !user.value) {
       await fetchProfile()
     }
   }
 
-return {
+  return {
     token,
     user,
     isLoggedIn,

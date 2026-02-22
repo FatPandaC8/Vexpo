@@ -23,7 +23,7 @@ import { RegisterCompanyDTO } from 'src/companies/dto/create-company.dto';
 @ApiTags('Exhibitor')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('EXHIBITOR')
+@Roles('exhibitor')
 @Controller()
 export class UserExhibitorController {
   constructor(
@@ -51,20 +51,6 @@ export class UserExhibitorController {
   @ApiOperation({ summary: 'Get the company of current exhibitor' })
   async getMyCompany(@Request() req) {
     return this.companyService.getCompanyByExhibitor(req.user.userId);
-  }
-
-  @Patch('booths/:boothId')
-  @ApiOperation({ summary: 'Update booth information' })
-  async updateBooth(
-    @Param('boothId', ParseIntPipe) boothId: number,
-    @Body() dto: UpdateBoothDTO,
-    @Request() req,
-  ) {
-    return this.boothsService.updateBoothByExhibitor(
-      boothId,
-      req.user.userId,
-      dto,
-    );
   }
 
   @Post('companies')

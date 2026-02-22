@@ -1,21 +1,22 @@
 <script setup lang="ts">
+const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>()
+const props = defineProps<{ activeView: string; activeId?: number }>()
 
-const emit = defineEmits<{
-  select: [payload: { view: string; data?: any }]
-}>()
-
-const props = defineProps<{
-  activeView: string
-  activeId?:  number
-}>()
-
-const api = useApi()
-
+const api     = useApi()
 const section = ref<'booths' | 'expos' | 'company'>('booths')
 
-// My Booths (GET /me/booths)
+const TABS = [
+  { key: 'booths',  label: 'Booths',    icon: 'i-lucide-store'      },
+  { key: 'expos',   label: 'Find Expo', icon: 'i-lucide-search'     },
+  { key: 'company', label: 'Company',   icon: 'i-lucide-building-2' },
+]
+
 const booths        = ref<any[]>([])
+const expos         = ref<any[]>([])
+const company       = ref<any>(null)
 const loadingBooths = ref(false)
+const loadingExpos  = ref(false)
+const loadingCompany = ref(false)
 
 async function loadBooths() {
   loadingBooths.value = true
@@ -23,25 +24,12 @@ async function loadBooths() {
   catch { booths.value = [] }
   finally { loadingBooths.value = false }
 }
-
-// Browse expos (GET /expos)
-const expos        = ref<any[]>([])
-const loadingExpos = ref(false)
-
 async function loadExpos() {
   loadingExpos.value = true
   try { expos.value = await api.get<any[]>('/expos') }
   catch { expos.value = [] }
   finally { loadingExpos.value = false }
 }
-
-// My Company – stored as single item (POST /companies, PATCH /companies/:id) ─
-// There's no GET /me/company in the spec so we persist locally after create/load
-const company        = ref<any>(null)
-const loadingCompany   = ref(false)
-
-// We try fetching from a reasonable endpoint; if backend doesn't have it yet,
-// we show the create form.
 async function loadCompany() {
   loadingCompany.value = true
   try { company.value = await api.get<any>('/me/company') }
@@ -50,161 +38,95 @@ async function loadCompany() {
 }
 
 watch(section, (v) => {
-  if (v === 'booths')   loadBooths()
+  if (v === 'booths') loadBooths()
   else if (v === 'expos') loadExpos()
-  else                    loadCompany()
+  else loadCompany()
 }, { immediate: true })
 
-// Called by parent after booth register so My Booths refreshes
 defineExpose({ refreshBooths: loadBooths })
-
-const statusColor: Record<string, string> = {
-  approved: 'bg-emerald-100 text-emerald-700',
-  pending:  'bg-amber-100 text-amber-700',
-  rejected: 'bg-red-100 text-red-700',
-}
 </script>
 
 <template>
   <aside class="flex flex-col h-full">
-
-    <!-- Tabs -->
-    <div class="grid grid-cols-3 gap-0.5 p-1 mb-4 bg-gray-100 rounded-xl">
-      <button
-        v-for="tab in [
-          { key: 'booths',   label: 'Booths',   icon: 'i-lucide-store'       },
-          { key: 'expos',    label: 'Find Expo', icon: 'i-lucide-search'      },
-          { key: 'company',  label: 'Company',   icon: 'i-lucide-building-2'  },
-        ]"
-        :key="tab.key"
-        class="flex flex-col items-center gap-0.5 py-2 rounded-lg text-xs font-semibold transition-all"
-        :class="section === tab.key
-          ? 'bg-white text-[#3d52d5] shadow-sm'
-          : 'text-gray-500 hover:text-gray-700'"
-        @click="section = tab.key as any"
-      >
-        <UIcon :name="tab.icon" class="w-3.5 h-3.5" />
-        {{ tab.label }}
-      </button>
-    </div>
+    <SidebarTabs v-model="section" :tabs="TABS" :cols="3" />
 
     <!-- My Booths -->
     <template v-if="section === 'booths'">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">My Booths</span>
-        <button class="text-[#3d52d5] hover:text-blue-800 transition" @click="loadBooths">
-          <UIcon name="i-lucide-refresh-cw" class="w-3.5 h-3.5" :class="{ 'animate-spin': loadingBooths }" />
-        </button>
-      </div>
+      <SidebarSection label="My Booths" :loading="loadingBooths" @refresh="loadBooths" />
 
-      <div v-if="booths.length === 0" class="flex flex-col items-center justify-center flex-1 text-center py-8">
-        <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mb-3">
-          <UIcon name="i-lucide-store" class="w-6 h-6 text-violet-400" />
-        </div>
-        <p class="text-xs font-semibold text-gray-500 mb-1">No booths yet</p>
-        <p class="text-xs text-gray-400">Use "Find Expo" to register a booth</p>
-      </div>
+      <SidebarEmptyState
+        v-if="booths.length === 0"
+        icon="i-lucide-store"
+        title="No booths yet"
+        subtitle='Use "Find Expo" to register a booth'
+      />
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
-        <button
+        <SidebarItem
           v-for="booth in booths"
           :key="booth.id"
-          class="w-full text-left rounded-xl border p-3 transition-all"
-          :class="activeView === 'booth-edit' && activeId === booth.id
-            ? 'border-[#3d52d5]/40 bg-blue-50'
-            : 'border-gray-100 bg-white hover:border-violet-200 hover:bg-violet-50/30'"
+          :title="booth.name ?? 'Booth #' + booth.id"
+          :subtitle="`Expo #${booth.expoId}`"
+          :active="activeView === 'booth-edit' && activeId === booth.id"
+          active-color="border-[#3d52d5]/40 bg-blue-50"
           @click="emit('select', { view: 'booth-edit', data: booth })"
         >
-          <p class="text-sm font-semibold text-gray-800 truncate">{{ booth.name ?? 'Booth #' + booth.id }}</p>
-          <p class="text-xs text-gray-400 mt-0.5 truncate">Expo #{{ booth.expoId }}</p>
-          <span
-            class="inline-flex items-center text-xs font-medium px-1.5 py-0.5 rounded-md mt-1.5"
-            :class="statusColor[booth.status] ?? 'bg-gray-100 text-gray-600'"
-          >
-            {{ booth.status ?? 'pending' }}
-          </span>
-        </button>
+          <StatusBadge :status="booth.status ?? 'pending'" class="mt-1.5" />
+        </SidebarItem>
       </div>
     </template>
 
     <!-- Find Expo -->
     <template v-else-if="section === 'expos'">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Available Expos</span>
-        <button class="text-[#3d52d5] hover:text-blue-800 transition" @click="loadExpos">
-          <UIcon name="i-lucide-refresh-cw" class="w-3.5 h-3.5" :class="{ 'animate-spin': loadingExpos }" />
-        </button>
-      </div>
+      <SidebarSection label="Available Expos" :loading="loadingExpos" @refresh="loadExpos" />
 
-      <div v-if="expos.length === 0" class="flex flex-col items-center justify-center flex-1 py-8 text-center">
-        <UIcon name="i-lucide-calendar-x" class="w-8 h-8 text-gray-300 mb-2" />
-        <p class="text-xs text-gray-400">No expos available</p>
-      </div>
-
+      <SidebarEmptyState
+        v-if="expos.length === 0"
+        icon="i-lucide-calendar-x"
+        title="No expos available"
+      />
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
-        <button
+        <SidebarItem
           v-for="expo in expos"
           :key="expo.id"
-          class="w-full text-left rounded-xl border p-3 transition-all"
-          :class="activeView === 'register-booth' && activeId === expo.id
-            ? 'border-[#3d52d5]/40 bg-blue-50'
-            : 'border-gray-100 bg-white hover:border-violet-200 hover:bg-violet-50/30'"
+          :title="expo.name"
+          :subtitle="expo.type ?? '—'"
+          :active="activeView === 'register-booth' && activeId === expo.id"
+          active-color="border-[#3d52d5]/40 bg-blue-50"
           @click="emit('select', { view: 'register-booth', data: expo })"
         >
-          <p class="text-sm font-semibold text-gray-800 truncate">{{ expo.name }}</p>
-          <p class="text-xs text-gray-400 mt-0.5 truncate">{{ expo.type ?? '—' }}</p>
-          <!--NOTE: For now haven't validate the date so that in some case, exhibitor may register an old expo-->
-          
           <span class="inline-flex items-center gap-1 mt-1.5 text-xs text-violet-600 font-medium">
             <UIcon name="i-lucide-store" class="w-3 h-3" />
             Register booth →
           </span>
-        </button>
+        </SidebarItem>
       </div>
     </template>
 
     <!-- My Company -->
     <template v-else>
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">My Company</span>
-        <button class="text-[#3d52d5] hover:text-blue-800 transition" @click="loadCompany">
-          <UIcon name="i-lucide-refresh-cw" class="w-3.5 h-3.5" :class="{ 'animate-spin': loadingCompany }" />
-        </button>
-      </div>
+      <SidebarSection label="My Company" :loading="loadingCompany" @refresh="loadCompany" />
 
-      <div v-if="!company" class="flex flex-col items-center justify-center flex-1 text-center py-8">
-        <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mb-3">
-          <UIcon name="i-lucide-building-2" class="w-6 h-6 text-violet-400" />
-        </div>
-          <p class="text-xs font-semibold text-gray-500 mb-1">No company yet</p>
-          <p class="text-xs text-gray-400 mb-3">Register your company to start exhibiting</p>
+      <SidebarEmptyState
+        v-if="!company"
+        icon="i-lucide-building-2"
+        title="No company yet"
+        subtitle="Register your company to start exhibiting"
+      >
         <button
-          class="text-xs font-semibold text-[#3d52d5] hover:underline cursor-pointer"
+          class="mt-3 text-xs font-semibold text-[#3d52d5] hover:underline"
           @click="emit('select', { view: 'company-create' })"
-        >
-          + Register Company
-        </button>
-      </div>
+        >+ Register Company</button>
+      </SidebarEmptyState>
 
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
-        <button
-          v-if="company"
-          :key="company.id"
-          class="w-full text-left rounded-xl border p-3 transition-all"
-          :class="activeView === 'register-booth' && activeId === company.id
-            ? 'border-[#3d52d5]/40 bg-blue-50'
-            : 'border-gray-100 bg-white hover:border-violet-200 hover:bg-violet-50/30'"
+        <SidebarItem
+          :title="company.name"
+          :subtitle="company.industry ?? 'Company'"
+          :active="activeView === 'company-edit'"
+          active-color="border-[#3d52d5]/40 bg-blue-50"
           @click="emit('select', { view: 'company-edit', data: company })"
-        >
-          <p class="text-sm font-semibold text-gray-800 truncate">
-            {{ company.name }}
-          </p>
-
-          <p class="text-xs text-gray-400 mt-0.5 truncate">
-            {{ company.industry ?? 'Company' }}
-          </p>
-        </button>
-    </div>
+        />
+      </div>
     </template>
-
   </aside>
 </template>

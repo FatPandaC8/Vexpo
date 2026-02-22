@@ -9,7 +9,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterDTO } from './dto/register.dto';
 import { LoginDTO } from './dto/login.dto';
-// passport-jwt is for securing RESTful endpoints with JWT
 
 @Injectable()
 export class AuthService {
@@ -19,9 +18,6 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDTO) {
-    // register : assigning role instead of register with role
-    // people can register as a company or as a visitor
-    // the organizer can be assigned
     const { name, email, password, role } = dto;
 
     const existingUser = await this.usersService.findOneByEmail(email);
@@ -43,10 +39,8 @@ export class AuthService {
     const payload = {
       sub: fullUser!.id,
       email: fullUser!.email,
-      roles: fullUser!.roles.map((ur) => ur.role.name.toUpperCase()),
+      roles: fullUser!.roles.map((ur) => ur.role.name),
     };
-
-    console.log('Register payload: ', payload);
 
     return {
       access_token: await this.jwtService.signAsync(payload),
@@ -56,6 +50,7 @@ export class AuthService {
   async login(dto: LoginDTO): Promise<{ access_token: string }> {
     const user = await this.usersService.findOneByEmail(dto.email);
     if (!user) throw new NotFoundException('User not found');
+
     const isMatchPassword = await bcrypt.compare(
       dto.password,
       user.password as string,
@@ -67,7 +62,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      roles: user.roles.map((ur) => ur.role.name.toUpperCase()),
+      roles: user.roles.map((ur) => ur.role.name), // e.g. ['organizer']
     };
 
     return {
@@ -76,9 +71,6 @@ export class AuthService {
   }
 
   async logout() {
-    // for now, the jwt token is deleted only by client => which is not secure
-    // for future, need to add db for token, actual delete token from the db
-    // for ref: https://viblo.asia/p/logout-voi-jwt-gAm5yyak5db
     console.log('LOG OUT');
   }
 
@@ -92,7 +84,7 @@ export class AuthService {
       const payload = {
         sub: user.id,
         email: user.email,
-        roles: user.roles.map((ur) => ur.role.name.toUpperCase()),
+        roles: user.roles.map((ur) => ur.role.name), // lowercase
       };
       return {
         access_token: await this.jwtService.signAsync(payload),
@@ -102,7 +94,7 @@ export class AuthService {
       const newUser = await this.usersService.createUserOnly({
         name: oauthUser.name,
         email: oauthUser.email,
-        password: null, // OAuth users don't have passwords
+        password: null,
       });
 
       const tempPayload = {
@@ -119,6 +111,7 @@ export class AuthService {
       };
     }
   }
+
   async completeOAuthRegistration(
     userId: number,
     role: 'visitor' | 'exhibitor' | 'organizer',
@@ -126,12 +119,12 @@ export class AuthService {
     await this.usersService.assignRole(userId, role);
 
     const user = await this.usersService.findOneById(userId);
-    if (!user) throw new NotFoundException('User if not found');
+    if (!user) throw new NotFoundException('User not found');
 
     const payload = {
       sub: user.id,
       email: user.email,
-      roles: user.roles.map((ur) => ur.role.name.toUpperCase()),
+      roles: user.roles.map((ur) => ur.role.name), // lowercase
     };
 
     return {

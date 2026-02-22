@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import * as z from 'zod'
 
-const auth = useAuth();
+const auth = useAuth()
+
 const canEditStatus = computed(() =>
-  auth.user.value?.roles[0] === 'ADMIN' || auth.user.value?.roles[0] === 'ORGANIZER'
+  auth.user.value?.roles?.includes('admin') ||
+  auth.user.value?.roles?.includes('organizer')
 )
 
 const props = defineProps<{
@@ -24,24 +26,24 @@ const schema = z.object({
   name:        z.string().min(2, 'Booth name must be at least 2 characters'),
   description: z.string().optional(),
   companyId:   z.number().optional(),
-  status: z.enum(['pending', 'approved', 'rejected']).optional()
+  status:      z.enum(['pending', 'approved', 'rejected']).optional(),
 })
 
 const state = reactive({
   name:        props.booth?.name        ?? '',
   description: props.booth?.description ?? '',
   companyId:   props.booth?.companyId   ?? undefined as number | undefined,
-  status: props.booth?.status ?? 'pending'
+  status:      props.booth?.status      ?? 'pending',
 })
 
 watch(() => props.booth, (b) => {
   state.name        = b?.name        ?? ''
   state.description = b?.description ?? ''
   state.companyId   = b?.companyId   ?? undefined
+  state.status      = b?.status      ?? 'pending'
   modelPath.value     = b?.modelPath   ?? null
   modelFileName.value = b?.modelPath ? b.modelPath.split(/[\\/]/).pop() ?? null : null
   sessionUrl.value    = null
-  state.status = b?.status ?? 'pending'
 })
 
 const STATUSES = ['pending', 'approved', 'rejected']
@@ -58,7 +60,7 @@ async function submit(event: any) {
     const payload = {
       ...event.data,
       modelPath: modelPath.value ?? undefined,
-      status: state.status
+      status: state.status,
     }
 
     let result: any
@@ -66,7 +68,7 @@ async function submit(event: any) {
       result = await api.post<any>(`/expos/${props.expo!.id}/booths`, payload)
       emit('registered', result)
     } else {
-      result = await api.patch<any>(`/booths/${props.booth!.id}`, event.data)
+      result = await api.patch<any>(`/booths/${props.booth!.id}`, payload)
       emit('saved', result)
     }
 
@@ -100,10 +102,6 @@ async function deleteBooth() {
 }
 
 // 3D Model file handling
-// modelPath  = the string we store on the backend (absolute local path if FSAPI available)
-// sessionUrl = object URL valid only for this browser session (fallback)
-// modelFileName = display name shown in the UI
-
 const modelPath     = ref<string | null>(props.booth?.modelPath ?? null)
 const sessionUrl    = ref<string | null>(null)
 const modelFileName = ref<string | null>(
@@ -147,11 +145,7 @@ async function processFile(file: File) {
   savingFile.value = true
 
   try {
-    // Strategy 1: File System Access API
-    // Ask the user where to save the file on their disk.
-    // We then know the exact local path and can give it to Three.js later.
     if ('showSaveFilePicker' in window) {
-      const ext = file.name.split('.').pop()!
       const handle = await (window as any).showSaveFilePicker({
         suggestedName: file.name,
         types: [{
@@ -160,36 +154,24 @@ async function processFile(file: File) {
         }],
       })
 
-      // Write the file to the chosen location
       const writable = await handle.createWritable()
       await writable.write(file)
       await writable.close()
 
-      // getFile() gives us back the saved File which has a real path on Chromium
       const saved = await handle.getFile()
-
-      // On Chromium, File.path or File.webkitRelativePath gives a usable path.
-      // We construct a file:// URL as the modelPath for Three.js.
       // @ts-ignore — .path is Chromium-only
       const localPath: string = (saved as any).path ?? saved.name
 
       modelPath.value     = localPath
       modelFileName.value = saved.name
-      // Create an object URL for immediate preview in Booth3DScene
-      sessionUrl.value = URL.createObjectURL(saved)
-
+      sessionUrl.value    = URL.createObjectURL(saved)
     } else {
-      // Strategy 2: Fallback — object URL only (no persistent path)
-      // Safari / Firefox don't support File System Access API.
-      // We can still preview the model this session; the path stored will
-      // just be the filename, and the exhibitor is warned.
       sessionUrl.value    = URL.createObjectURL(file)
-      modelPath.value     = file.name   // best we can do without FSAPI
+      modelPath.value     = file.name
       modelFileName.value = file.name
-      fileError.value     = '⚠ Your browser doesn\'t support local file saving. The model will work this session only — re-upload each visit, or use Chrome/Edge for persistent paths.'
+      fileError.value     = '⚠ Your browser doesn\'t support local file saving. The model will work this session only.'
     }
   } catch (e: any) {
-    // User cancelled the save dialog — treat as no-op
     if (e?.name === 'AbortError') return
     fileError.value = 'Could not save file: ' + (e?.message ?? 'unknown error')
   } finally {
@@ -204,7 +186,6 @@ function removeModel() {
   fileError.value     = null
 }
 
-// Expose the session URL so parent can pass it to Booth3DScene
 defineExpose({ sessionUrl, modelPath })
 
 const hasModel = computed(() => !!modelFileName.value)
@@ -273,23 +254,18 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
 
       <UFormField v-if="canEditStatus" name="status" label="Status" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
         <USelect
-            v-model="state.status"
-            variant="soft"
-            :items="STATUSES"
-            placeholder="Select a role"
-            :content="{
-                align: 'start',
-                side: 'bottom',
-            }"
-            :ui="{
-                base: 'w-full border border-blue-300 h-10 rounded-xl bg-blue-50 ',
-                content: 'bg-white rounded-xl shadow-lg border border-blue-100',
-                item: 'px-3 py-2 text-sm hover:bg-blue-50 cursor-pointer w-100 rounded-xl',
-                itemLabel: 'text-gray-700',
-                itemTrailingIcon: 'text-blue-500',
-            }"
-            trailing-icon="null"
-            
+          trailing-icon="null"
+          v-model="state.status"
+          variant="soft"
+          :items="STATUSES"
+          placeholder="Select a status"
+          :content="{ align: 'start', side: 'bottom' }"
+          :ui="{
+            base: 'w-full border border-blue-300 h-10 rounded-xl bg-blue-50',
+            content: 'bg-white rounded-xl shadow-lg border border-blue-100',
+            item: 'px-3 py-2 text-sm hover:bg-blue-50 cursor-pointer rounded-xl',
+            itemLabel: 'text-gray-700',
+          }"
         />
       </UFormField>
 
@@ -303,30 +279,19 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
           The file is saved to your computer. The path is stored so visitors on your device see your custom 3D booth.
         </p>
 
-        <!-- FSAPI warning if browser doesn't support it -->
         <div v-if="!hasFsApi" class="mb-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
           <UIcon name="i-lucide-triangle-alert" class="w-3.5 h-3.5 shrink-0 mt-0.5" />
           Your browser doesn't support persistent local file access. Use Chrome or Edge for the best experience.
         </div>
 
-        <!-- Active model chip -->
         <Transition name="slide-down">
-          <div
-            v-if="hasModel"
-            class="mb-3 flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3"
-          >
+          <div v-if="hasModel" class="mb-3 flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3">
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-violet-900 truncate">{{ modelFileName }}</p>
               <p class="text-xs text-violet-500 mt-0.5 truncate" :title="modelPath ?? ''">
-                <template v-if="hasFsApi && modelPath && modelPath !== modelFileName">
-                 {{ modelPath }}
-                </template>
-                <template v-else-if="sessionUrl">
-                  Session saved
-                </template>
-                <template v-else>
-                  Saved
-                </template>
+                <template v-if="hasFsApi && modelPath && modelPath !== modelFileName">{{ modelPath }}</template>
+                <template v-else-if="sessionUrl">Session saved</template>
+                <template v-else>Saved</template>
               </p>
             </div>
             <button
@@ -340,14 +305,11 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
           </div>
         </Transition>
 
-        <!-- Drop zone -->
         <div
           class="relative border-2 border-dashed rounded-2xl transition-all duration-200"
-          :class="[
-            dropActive
-              ? 'border-violet-500 bg-violet-50 scale-[1.01]'
-              : 'border-gray-200 bg-gray-50/60 hover:border-violet-400 hover:bg-violet-50/30',
-          ]"
+          :class="dropActive
+            ? 'border-violet-500 bg-violet-50 scale-[1.01]'
+            : 'border-gray-200 bg-gray-50/60 hover:border-violet-400 hover:bg-violet-50/30'"
           @dragover.prevent="dropActive = true"
           @dragleave.prevent="dropActive = false"
           @drop.prevent="handleDrop"
@@ -370,28 +332,21 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
               <p class="text-sm font-semibold text-gray-700">
                 <template v-if="savingFile">Saving file to disk…</template>
                 <template v-else-if="dropActive">Drop to save model</template>
-                <template v-else-if="hasModel">
-                  <span class="text-violet-600">Click to replace</span> or drag a new model
-                </template>
-                <template v-else>
-                  <span class="text-violet-600">Click to browse</span> or drag your 3D model here
-                </template>
+                <template v-else-if="hasModel"><span class="text-violet-600">Click to replace</span> or drag a new model</template>
+                <template v-else><span class="text-violet-600">Click to browse</span> or drag your 3D model here</template>
               </p>
-              <p class="text-xs text-gray-400 mt-1">
-                .glb · .gltf · .obj · max 100 MB
-              </p>
-              <p v-if="hasFsApi" class="text-xs text-gray-400 mt-0.5">
-                You'll be asked where to save the file on your computer
-              </p>
+              <p class="text-xs text-gray-400 mt-1">.glb · .gltf · .obj · max 200 MB</p>
+              <p v-if="hasFsApi" class="text-xs text-gray-400 mt-0.5">You'll be asked where to save the file on your computer</p>
             </div>
           </label>
 
           <div v-if="dropActive" class="absolute inset-0 border-4 border-violet-400 rounded-2xl pointer-events-none animate-pulse" />
         </div>
 
-        <!-- File error / warning -->
         <Transition name="fade">
-          <div v-if="fileError" class="mt-2 flex items-start gap-2 text-xs rounded-xl px-3 py-2"
+          <div
+            v-if="fileError"
+            class="mt-2 flex items-start gap-2 text-xs rounded-xl px-3 py-2"
             :class="fileError.startsWith('⚠') ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-red-600'"
           >
             <UIcon name="i-lucide-circle-alert" class="w-3.5 h-3.5 shrink-0 mt-0.5" />

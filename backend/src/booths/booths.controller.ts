@@ -1,4 +1,3 @@
-// src/booths/booths.controller.ts
 import {
   Body,
   Controller,
@@ -44,18 +43,18 @@ export class BoothsController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ORGANIZER', 'EXHIBITOR', 'ADMIN')
+  @Roles('organizer', 'exhibitor', 'admin', 'ORGANIZER', 'EXHIBITOR', 'ADMIN')
   @Patch(':id')
-  @ApiOperation({ summary: 'Update booth (exhibitor owns it, organizer/admin bypass)' })
+  @ApiOperation({ summary: 'Update booth' })
   async updateBooth(
     @Param('id', ParseIntPipe) boothId: number,
     @Body() dto: UpdateBoothDTO,
     @Req() req: any,
   ) {
-    const roles: string[] = req.user.roles ?? [];
-    const userId: number  = req.user.userId; 
+    const roles: string[] = (req.user.roles ?? []).map((r: string) => r.toLowerCase());
+    const userId: number = req.user.userId;
 
-    if (roles.includes('ADMIN') || roles.includes('ORGANIZER')) {
+    if (roles.includes('admin') || roles.includes('organizer')) {
       return this.boothsService.updateBooth(boothId, dto);
     }
     return this.boothsService.updateBoothByExhibitor(boothId, userId, dto);
@@ -63,18 +62,18 @@ export class BoothsController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ORGANIZER', 'EXHIBITOR', 'ADMIN')
+  @Roles('organizer', 'exhibitor', 'admin', 'ORGANIZER', 'EXHIBITOR', 'ADMIN')
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete booth (exhibitor owns it, admin bypass)' })
+  @ApiOperation({ summary: 'Delete booth' })
   async deleteBooth(
     @Param('id', ParseIntPipe) boothId: number,
     @Req() req: any,
   ) {
-    const roles: string[] = req.user.roles ?? [];
-    const userId: number  = req.user.userId;
+    const roles: string[] = (req.user.roles ?? []).map((r: string) => r.toLowerCase());
+    const userId: number = req.user.userId;
 
-    if (roles.includes('ADMIN')) {
+    if (roles.includes('admin') || roles.includes('organizer')) {
       return this.boothsService.deleteBooth(boothId);
     }
     return this.boothsService.deleteBoothByExhibitor(boothId, userId);

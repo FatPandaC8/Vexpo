@@ -30,7 +30,7 @@ import { UpdateUserDTO } from './dto/update-user.dto';
 @ApiTags('Admin - Users')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
+@Roles('admin')
 @Controller('admin/users')
 export class UserAdminController {
   constructor(private userService: UsersService) {}

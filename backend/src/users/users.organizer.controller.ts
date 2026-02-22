@@ -11,6 +11,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -25,7 +26,7 @@ import { UpdateBoothDTO } from 'src/booths/dto/update-booth.dto';
 @ApiTags('Organizer')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ORGANIZER')
+@Roles('organizer')
 @Controller()
 export class UserOrganizerController {
   constructor(
@@ -83,7 +84,9 @@ export class UserOrganizerController {
   async updateBooth(
     @Param('boothId', ParseIntPipe) boothId: number,
     @Body() dto: UpdateBoothDTO,
+    @Req() req
   ) {
+    console.log('user from token', req.user)
     return this.boothsService.updateBooth(
       boothId,
       dto,

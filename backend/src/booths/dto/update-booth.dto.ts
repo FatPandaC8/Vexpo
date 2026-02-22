@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from "class-validator"
+import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class UpdateBoothDTO {
   @IsOptional()
@@ -8,6 +8,10 @@ export class UpdateBoothDTO {
   @IsOptional()
   @IsString()
   description?: string
+
+  @IsOptional()
+  @IsString()
+  modelPath?: string
 
   @IsOptional()
   @IsEnum(['pending', 'approved', 'rejected'])

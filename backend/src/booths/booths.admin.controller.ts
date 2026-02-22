@@ -22,7 +22,7 @@ import { UpdateBoothDTO } from './dto/update-booth.dto';
 @ApiTags('Admin - Booths')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
+@Roles('admin')
 @Controller('admin/booths')
 export class BoothsAdminController {
   constructor(private boothsService: BoothsService) {}

@@ -18,13 +18,12 @@ export class UsersProfileController {
       id: user.id,
       name: user.name,
       email: user.email,
-      roles: user.roles?.map((ur) => ur.role.name.toUpperCase()) ?? [],
+      roles: user.roles?.map((ur) => ur.role.name) ?? [], 
     };
   }
 
   @Patch('change')
   editMyProfile() {
-    // TODO: think about password reset as well ?
-    // Send the request by email
+    
   }
 }

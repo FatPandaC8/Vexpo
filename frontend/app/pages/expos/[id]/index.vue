@@ -75,7 +75,7 @@ function openBooth(id: number) {
           <div class="flex items-center gap-2 text-sm text-blue-300 mb-8">
             <NuxtLink to="/expos" class="hover:text-white transition">Expos</NuxtLink>
             <span class="text-blue-400">/</span>
-            <span class="text-white truncate max-w-xs">{{ expo.name }}</span>
+            <span class="text-white truncate max-w-xs">{{ expo?.name || 'Unknown' }}</span>
           </div>
 
           <div class="flex flex-col lg:flex-row items-start gap-10">
@@ -100,14 +100,14 @@ function openBooth(id: number) {
                 {{ expoStatus }}
               </div>
 
-              <h1 class="text-4xl lg:text-5xl font-extrabold mb-4 leading-tight">{{ expo.name }}</h1>
+              <h1 class="text-4xl lg:text-5xl font-extrabold mb-4 leading-tight">{{ expo?.name || 'Unknown' }}</h1>
               <p class="text-blue-200 text-base leading-relaxed mb-7 max-w-2xl">
-                {{ expo.description || 'No description provided.' }}
+                {{ expo?.description || 'No description provided.' }}
               </p>
 
               <div class="flex flex-wrap gap-3">
                 <div class="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-2 text-sm">
-                  {{ formatDate(expo.startDate) }} – {{ formatDate(expo.endDate) }}
+                  {{ formatDate(expo?.startDate) }} – {{ formatDate(expo?.endDate) }}
                 </div>
                 <div v-if="expo.type" class="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-2 text-sm">
                   {{ expo.type }}

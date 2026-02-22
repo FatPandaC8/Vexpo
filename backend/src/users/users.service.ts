@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Registration } from 'src/entities/registration.entity';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
 import { UserRole } from 'src/entities/userrole.entity';
@@ -15,8 +14,6 @@ export class UsersService {
     private roleRepository: Repository<Role>,
     @InjectRepository(UserRole)
     private userRoleRepository: Repository<UserRole>,
-    @InjectRepository(Registration)
-    private registrationRepository: Repository<Registration>,
   ) {}
 
   // PUBLIC API
@@ -130,31 +127,6 @@ export class UsersService {
   async deleteUser(id: number) {
     const result = await this.userRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException('User not found');
-  }
-
-  async registerForExpo(expoId: number, userId: number) {
-    const exists = await this.registrationRepository.findOne({
-      where: { expoId, userId },
-    });
-
-    if (exists) {
-      return exists;
-    }
-
-    const registration = this.registrationRepository.create({
-      expoId,
-      userId,
-    });
-
-    return this.registrationRepository.save(registration);
-  }
-
-  async getMyRegistrations(userId: number) {
-    return this.registrationRepository.find({
-      where: { userId },
-      relations: ['expo'],
-      order: { registeredAt: 'DESC' },
-    });
   }
 
   async findAllPaginated(page: number = 1, limit: number = 20) {

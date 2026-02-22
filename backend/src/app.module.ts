@@ -13,7 +13,6 @@ import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
 import { UserRole } from './entities/userrole.entity';
 import { Expo } from './entities/expo.entity';
-import { Registration } from './entities/registration.entity';
 import { Booth } from './entities/booth.entity';
 import { Company } from './entities/company.entity';
 
@@ -32,7 +31,7 @@ import { Company } from './entities/company.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'vexpo',
-      entities: [User, Role, UserRole, Expo, Registration, Booth, Company],
+      entities: [User, Role, UserRole, Expo, Booth, Company],
       autoLoadEntities: true,
       synchronize: true, // for dev only, not for production
     }),

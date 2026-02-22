@@ -173,10 +173,6 @@ const statusDot: Record<string, string> = {
                 <UIcon name="i-lucide-store" class="w-3.5 h-3.5 text-violet-500" />
                 <span><strong class="text-gray-800">{{ expo.booths?.length ?? 0 }}</strong> booths</span>
               </div>
-              <div class="flex items-center gap-1.5 text-xs text-gray-500">
-                <UIcon name="i-lucide-users" class="w-3.5 h-3.5 text-blue-500" />
-                <span><strong class="text-gray-800">{{ expo.registrations?.length ?? 0 }}</strong> registered</span>
-              </div>
               <div class="ml-auto flex items-center gap-1 text-xs font-semibold text-[#3d52d5] group-hover:gap-2 transition-all">
                 Explore <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5" />
               </div>

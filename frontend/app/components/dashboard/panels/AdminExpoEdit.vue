@@ -43,7 +43,7 @@ async function submit(event: any) {
   saving.value  = true
   error.value   = null
   try {
-    const result = await api.patch<any>(`/admin/expos/${props.expo!.id}`, event.data)
+    const result = await api.patch<any>(`expos/${props.expo!.id}`, event.data)
     success.value = true
     emit('saved', result)
 
@@ -65,7 +65,7 @@ async function deleteExpo() {
   if (!canDelete.value) return
   deleteLoading.value = true
   try {
-    await api.del(`/admin/expos/${props.expo!.id}`)
+    await api.del(`expos/${props.expo!.id}`)
     emit('deleted')
   } catch (e: any) {
     error.value = e?.data?.message ?? 'Delete failed'

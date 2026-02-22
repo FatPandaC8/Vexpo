@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Logo from '~/components/Logo.vue'
+import Unsupported from '~/components/Unsupported.vue'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -141,12 +142,8 @@ const welcomeConfig = computed(() => {
         <!-- Scrollable sidebar body -->
         <div class="flex-1 overflow-y-auto p-4 flex flex-col min-h-0">
 
-          <DashboardVisitorSidebar
+          <Unsupported
             v-if="auth.isVisitor.value"
-            ref="visitorSidebar"
-            :active-view="activeView"
-            :active-id="activeId"
-            @select="select"
           />
 
           <DashboardExhibitorSidebar
@@ -218,21 +215,6 @@ const welcomeConfig = computed(() => {
             <p class="text-gray-400 text-sm max-w-sm">{{ welcomeConfig.body }}</p>
           </div>
         </template>
-
-        <!-- VISITOR PANELS -->
-
-        <!-- Expo detail + register -->
-        <DashboardPanelsExpoDetail
-          v-else-if="activeView === 'expo-detail' && activeData"
-          :expo="activeData"
-          @registered="onVisitorRegistered"
-        />
-
-        <!-- Visited booth detail -->
-        <DashboardPanelsVisitedBoothDetail
-          v-else-if="activeView === 'visited-booth' && activeData"
-          :booth="activeData"
-        />
 
         <!-- EXHIBITOR PANELS -->
 

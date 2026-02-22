@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { UserRole } from './userrole.entity';
-import { Registration } from './registration.entity';
 
 @Entity('user')
 export class User {
@@ -18,7 +17,4 @@ export class User {
 
   @OneToMany(() => UserRole, (ur) => ur.user)
   roles: UserRole[];
-
-  @OneToMany(() => Registration, (registration) => registration.user)
-  registrations: Registration[];
 }

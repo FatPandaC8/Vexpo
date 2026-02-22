@@ -27,7 +27,6 @@ export class ExposService {
     }
 
     return query
-      .leftJoinAndSelect('expo.registrations', 'registrations')
       .leftJoinAndSelect('expo.booths', 'booths')
       .orderBy('expo.startDate', 'DESC')
       .getMany();
@@ -36,7 +35,7 @@ export class ExposService {
   async findExpoById(expoId: number) {
     const expo = await this.expoRepository.findOne({
       where: { id: expoId },
-      relations: ['registrations', 'booths'],
+      relations: ['booths'],
     });
     if (!expo) throw new NotFoundException(`Expo with ID ${expoId} not found`);
 
@@ -60,7 +59,7 @@ export class ExposService {
   async getExposByOrganizer(organizerId: number) {
     return this.expoRepository.find({
       where: { organizerId },
-      relations: ['registrations', 'booths'],
+      relations: ['booths'],
       order: { startDate: 'DESC' },
     });
   }

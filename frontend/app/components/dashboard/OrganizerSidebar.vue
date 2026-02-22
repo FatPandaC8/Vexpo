@@ -17,7 +17,7 @@ const loadingBooths = ref(false)
 
 async function loadExpos() {
   loadingExpos.value = true
-  try { expos.value = await api.get('/me/expos') }
+  try { expos.value = await api.get('me/expos') }
   catch { expos.value = [] }
   finally { loadingExpos.value = false }
 }

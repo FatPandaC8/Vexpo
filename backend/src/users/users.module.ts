@@ -7,18 +7,15 @@ import { Role } from 'src/entities/role.entity';
 import { UserRole } from 'src/entities/userrole.entity';
 import { UserAdminController } from './users.admin.controller';
 import { UsersProfileController } from './users.profile.controller';
-import { UserVisitorController } from './users.visitor.controller';
-import { Registration } from 'src/entities/registration.entity';
 import { BoothsModule } from 'src/booths/booths.module';
 import { ExposModule } from 'src/expos/expos.module';
-import { UserExhibitorController } from './users.exhibitor.controller';
-import { UserOrganizerController } from './users.organizer.controller';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { Company } from 'src/entities/company.entity';
+import { UsersMeController } from './users.me.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role, UserRole, Registration, Company]),
+    TypeOrmModule.forFeature([User, Role, UserRole, Company]),
     BoothsModule,
     ExposModule,
     CompaniesModule,
@@ -29,9 +26,7 @@ import { Company } from 'src/entities/company.entity';
     UsersController,
     UserAdminController,
     UsersProfileController,
-    UserVisitorController,
-    UserExhibitorController,
-    UserOrganizerController,
+    UsersMeController
   ],
 })
 export class UsersModule {}

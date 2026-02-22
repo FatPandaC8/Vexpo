@@ -63,7 +63,7 @@ async function submit(event: any) {
   saving.value  = true
   error.value   = null
   try {
-    const updated = await api.patch<any>(`/admin/booths/${props.booth.id}`, {
+    const updated = await api.patch<any>(`/booths/${props.booth.id}`, {
       ...event.data,
       mapRow: mapPosition.value?.row ?? null,
       mapCol: mapPosition.value?.col ?? null,

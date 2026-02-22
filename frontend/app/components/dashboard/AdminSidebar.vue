@@ -15,8 +15,8 @@ const TABS = [
 ]
 
 const ENDPOINT: Record<Section, string> = {
-  users: '/admin/users', expos: '/admin/expos',
-  booths: '/admin/booths', companies: '/admin/companies',
+  users: '/admin/users', expos: '/expos',
+  booths: '/booths', companies: '/companies',
 }
 const EDIT_VIEW: Record<Section, string> = {
   users: 'admin-user-edit', expos: 'admin-expo-edit',

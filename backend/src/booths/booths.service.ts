@@ -94,25 +94,6 @@ export class BoothsService {
     return { message: 'Booth deleted successfully' };
   }
 
-  async updateBoothStatus(
-    boothId: number,
-    organizerId: number,
-    status: 'pending' | 'approved' | 'rejected',
-  ) {
-    const booth = await this.boothRepository.findOne({
-      where: { id: boothId },
-      relations: ['expo'],
-    });
-    if (!booth) throw new NotFoundException('Booth not found');
-    if (booth.expo.organizerId !== organizerId) {
-      throw new ForbiddenException(
-        'You can only update booth status for your own expos',
-      );
-    }
-    booth.status = status;
-    return this.boothRepository.save(booth);
-  }
-
   async findAllPaginated(page: number = 1, limit: number = 20) {
     const [items, total] = await this.boothRepository.findAndCount({
       relations: ['expo', 'company'],

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import * as z from 'zod'
 
+const auth = useAuth();
+const canEditStatus = computed(() =>
+  auth.user.value?.roles[0] === 'ADMIN' || auth.user.value?.roles[0] === 'ORGANIZER'
+)
+
 const props = defineProps<{
   expo?:  any
   booth?: any
@@ -39,6 +44,8 @@ watch(() => props.booth, (b) => {
   state.status = b?.status ?? 'pending'
 })
 
+const STATUSES = ['pending', 'approved', 'rejected']
+
 const saving  = ref(false)
 const success = ref(false)
 const error   = ref<string | null>(null)
@@ -54,17 +61,12 @@ async function submit(event: any) {
       status: state.status
     }
 
-    const anotherPayload = {
-      ...event.data,
-      status: state.status
-    }
-
     let result: any
     if (mode.value === 'create') {
       result = await api.post<any>(`/expos/${props.expo!.id}/booths`, payload)
       emit('registered', result)
     } else {
-      result = await api.patch<any>(`/booths/${props.booth!.id}`, anotherPayload)
+      result = await api.patch<any>(`/booths/${props.booth!.id}`, event.data)
       emit('saved', result)
     }
 
@@ -97,7 +99,7 @@ async function deleteBooth() {
   }
 }
 
-// ── 3D Model file handling ────────────────────────────────────────────────────
+// 3D Model file handling
 // modelPath  = the string we store on the backend (absolute local path if FSAPI available)
 // sessionUrl = object URL valid only for this browser session (fallback)
 // modelFileName = display name shown in the UI
@@ -145,7 +147,7 @@ async function processFile(file: File) {
   savingFile.value = true
 
   try {
-    // ── Strategy 1: File System Access API ──────────────────────────────
+    // Strategy 1: File System Access API
     // Ask the user where to save the file on their disk.
     // We then know the exact local path and can give it to Three.js later.
     if ('showSaveFilePicker' in window) {
@@ -177,7 +179,7 @@ async function processFile(file: File) {
       sessionUrl.value = URL.createObjectURL(saved)
 
     } else {
-      // ── Strategy 2: Fallback — object URL only (no persistent path) ──
+      // Strategy 2: Fallback — object URL only (no persistent path)
       // Safari / Firefox don't support File System Access API.
       // We can still preview the model this session; the path stored will
       // just be the filename, and the exhibitor is warned.
@@ -204,12 +206,6 @@ function removeModel() {
 
 // Expose the session URL so parent can pass it to Booth3DScene
 defineExpose({ sessionUrl, modelPath })
-
-function modelIcon(name: string) {
-  if (name?.endsWith('.glb') || name?.endsWith('.gltf')) return '📦'
-  if (name?.endsWith('.obj')) return '🔷'
-  return '📁'
-}
 
 const hasModel = computed(() => !!modelFileName.value)
 const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePicker' in window)
@@ -275,17 +271,29 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
         />
       </UFormField>
 
-      <div class="flex gap-2">
-        <UButton type="button" class="bg-green-200 cursor-pointer" @click="state.status='approved'">
-          Approve
-        </UButton>
+      <UFormField v-if="canEditStatus" name="status" label="Status" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
+        <USelect
+            v-model="state.status"
+            variant="soft"
+            :items="STATUSES"
+            placeholder="Select a role"
+            :content="{
+                align: 'start',
+                side: 'bottom',
+            }"
+            :ui="{
+                base: 'w-full border border-blue-300 h-10 rounded-xl bg-blue-50 ',
+                content: 'bg-white rounded-xl shadow-lg border border-blue-100',
+                item: 'px-3 py-2 text-sm hover:bg-blue-50 cursor-pointer w-100 rounded-xl',
+                itemLabel: 'text-gray-700',
+                itemTrailingIcon: 'text-blue-500',
+            }"
+            trailing-icon="null"
+            
+        />
+      </UFormField>
 
-        <UButton type="button" class="bg-red-200" @click="state.status='rejected'">
-          Reject
-        </UButton>
-      </div>
-
-      <!-- ── 3D Model Upload ─────────────────────────────────────────────── -->
+      <!-- 3D Model Upload -->
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-1">
           3D Booth Model
@@ -307,7 +315,6 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
             v-if="hasModel"
             class="mb-3 flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3"
           >
-            <span class="text-2xl shrink-0">{{ modelIcon(modelFileName!) }}</span>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-violet-900 truncate">{{ modelFileName }}</p>
               <p class="text-xs text-violet-500 mt-0.5 truncate" :title="modelPath ?? ''">

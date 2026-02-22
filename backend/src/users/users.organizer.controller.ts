@@ -20,7 +20,7 @@ import { ExposService } from 'src/expos/expos.service';
 import { BoothsService } from 'src/booths/booths.service';
 import { CreateExpoDTO } from 'src/expos/dto/create-expo.dto';
 import { UpdateExpoDTO } from 'src/expos/dto/update-expo.dto';
-import { UpdateBoothStatusDTO } from 'src/booths/dto/update-booth-status.dto';
+import { UpdateBoothDTO } from 'src/booths/dto/update-booth.dto';
 
 @ApiTags('Organizer')
 @ApiBearerAuth()
@@ -78,17 +78,24 @@ export class UserOrganizerController {
     return this.exposService.getExpoBoothsByOrganizer(expoId, req.user.userId);
   }
 
-  @Patch('booths/:boothId/status')
-  @ApiOperation({ summary: 'Approve or reject booth' })
-  async updateBoothStatus(
+  @Patch('booths/:boothId')
+  @ApiOperation({ summary: 'Update booth' })
+  async updateBooth(
     @Param('boothId', ParseIntPipe) boothId: number,
-    @Body() dto: UpdateBoothStatusDTO,
-    @Request() req,
+    @Body() dto: UpdateBoothDTO,
   ) {
-    return this.boothsService.updateBoothStatus(
+    return this.boothsService.updateBooth(
       boothId,
-      req.user.userId,
-      dto.status,
+      dto,
     );
+  }
+
+  @Delete('booths/:boothId')
+  @ApiOperation({ summary: 'Delete booth' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBooth(
+    @Param('boothId', ParseIntPipe) boothId: number,
+  ) {
+    return this.boothsService.deleteBooth(boothId);
   }
 }

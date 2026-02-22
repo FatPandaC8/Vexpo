@@ -2,7 +2,6 @@
 // Admin: edit or delete any booth
 
 import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
 
 const props = defineProps<{ booth: any }>()
 const emit  = defineEmits<{ updated: [booth: any]; deleted: [] }>()
@@ -33,11 +32,11 @@ const saving  = ref(false)
 const success = ref(false)
 const error   = ref<string | null>(null)
 
-async function submit(event: FormSubmitEvent<typeof state>) {
+async function submit(event: any) {
   saving.value  = true
   error.value   = null
   try {
-    const updated = await api.patch<any>(`/booths/${props.booth.id}`, event.data)
+    const updated = await api.patch<any>(`/admin/booths/${props.booth.id}`, event.data)
     success.value = true
     emit('updated', updated)
     setTimeout(() => { success.value = false }, 3000)
@@ -86,8 +85,8 @@ const statusColor: Record<string, string> = {
           <p class="text-sm text-gray-400 mt-0.5">Expo #{{ booth.expoId }}</p>
         </div>
       </div>
-      <span class="px-3 py-1 rounded-full text-xs font-semibold border shrink-0 mt-1" :class="statusColor[booth.status] ?? 'bg-gray-100 text-gray-600 border-gray-200'">
-        {{ booth.status ?? 'pending' }}
+      <span class="px-3 py-1 rounded-full text-xs font-semibold border shrink-0 mt-1" :class="statusColor[booth.status]">
+        {{ booth.status }}
       </span>
     </div>
 
@@ -111,11 +110,23 @@ const statusColor: Record<string, string> = {
       </UFormField>
       <UFormField name="status" label="Status" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
         <USelect
-          v-model="state.status"
-          :options="STATUSES.map(s => ({ label: s.charAt(0).toUpperCase() + s.slice(1), value: s }))"
-          :disabled="saving"
-          class="w-full"
-          :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }"
+            v-model="state.status"
+            variant="soft"
+            :items="STATUSES"
+            placeholder="Select a role"
+            :content="{
+                align: 'start',
+                side: 'bottom',
+            }"
+            :ui="{
+                base: 'w-full border border-blue-300 h-10 rounded-xl bg-blue-50 ',
+                content: 'bg-white rounded-xl shadow-lg border border-blue-100',
+                item: 'px-3 py-2 text-sm hover:bg-blue-50 cursor-pointer w-100 rounded-xl',
+                itemLabel: 'text-gray-700',
+                itemTrailingIcon: 'text-blue-500',
+            }"
+            trailing-icon="null"
+            
         />
       </UFormField>
       <div class="pt-2">
@@ -131,11 +142,16 @@ const statusColor: Record<string, string> = {
       </button>
       <Transition name="fade">
         <div v-if="showDelete" class="mt-4 p-5 rounded-xl border border-red-200 bg-red-50/30">
+
           <p class="text-sm text-red-700 mb-3">Type <strong>{{ booth.name }}</strong> to confirm:</p>
-          <UInput v-model="deleteConfirm" placeholder="Booth name" class="mb-4 w-full max-w-xs" :ui="{ base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl' }" />
+
+          <UInput v-model="deleteConfirm" placeholder="Booth name" class="mb-4 w-full max-w-xs" 
+          :ui="{ base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl' }" />
+
           <UButton :disabled="!canDelete || deleteLoading" :loading="deleteLoading" size="sm" class="rounded-xl cursor-pointer px-5" :class="canDelete ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-400 cursor-not-allowed'" @click="deleteBooth">
             {{ deleteLoading ? 'Deleting…' : 'Delete Booth' }}
           </UButton>
+
         </div>
       </Transition>
     </div>

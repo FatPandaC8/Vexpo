@@ -1,4 +1,3 @@
-// src/booths/booths.admin.controller.ts
 import {
   Body,
   Controller,
@@ -19,7 +18,6 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { BoothsService } from './booths.service';
 import { UpdateBoothDTO } from './dto/update-booth.dto';
-import { UpdateBoothStatusDTO } from './dto/update-booth-status.dto';
 
 @ApiTags('Admin - Booths')
 @ApiBearerAuth()
@@ -51,16 +49,6 @@ export class BoothsAdminController {
     @Body() dto: UpdateBoothDTO,
   ) {
     return this.boothsService.updateBooth(id, dto);
-  }
-
-  @Patch(':id/status')
-  @ApiOperation({ summary: 'Update booth status (approve / reject)' })
-  async updateBoothStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateBoothStatusDTO,
-    @Req() req: any,
-  ) {
-    return this.boothsService.updateBoothStatus(id, req.user.id, dto.status);
   }
 
   @Delete(':id')

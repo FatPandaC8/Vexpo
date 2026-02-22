@@ -45,7 +45,7 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 }
 
-// ─── SVG Floor Map constants ──────────────────────────────────────────────────
+// SVG Floor Map constants
 const COLS   = 4
 const BW     = 172   // booth width
 const BH     = 118   // booth height
@@ -112,7 +112,7 @@ function navigateToBooth(id: number) {
     </div>
 
     <template v-else>
-      <!-- ── Hero ──────────────────────────────────────────────────────────── -->
+      <!-- Hero -->
       <section class="bg-linear-to-br from-[#3d52d5] via-[#2a3ab0] to-[#090c9b] text-white">
         <div class="max-w-7xl mx-auto px-8 py-12">
           <!-- Breadcrumb -->
@@ -168,7 +168,7 @@ function navigateToBooth(id: number) {
         </div>
       </section>
 
-      <!-- ── Hall section ───────────────────────────────────────────────────── -->
+      <!-- Hall section -->
       <section class="max-w-7xl mx-auto px-8 py-10">
 
         <div class="flex items-center justify-between mb-6">
@@ -194,7 +194,7 @@ function navigateToBooth(id: number) {
           <p class="font-semibold text-gray-500">No approved booths yet</p>
         </div>
 
-        <!-- ── SVG Floor Map ───────────────────────────────────────────── -->
+        <!-- SVG Floor Map -->
         <template v-else-if="viewMode === 'map'">
           <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
 
@@ -279,7 +279,7 @@ function navigateToBooth(id: number) {
                   fill="white" text-anchor="middle" letter-spacing="0.08em"
                 >▲  ENTRANCE</text>
 
-                <!-- ── Booth cards ── -->
+                <!-- Booth cards -->
                 <g
                   v-for="booth in boothPositions"
                   :key="booth.id"

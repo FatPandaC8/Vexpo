@@ -9,7 +9,7 @@ const boothId = Number(route.params.id)
 
 const booth = ref<any>(null)
 const loading = ref(true)
-const activeTab = ref<'overview' | '3d' | 'content'>('3d')
+const activeTab = ref<'overview' | '3d'>('3d')
 
 async function fetchBooth() {
   loading.value = true
@@ -23,12 +23,6 @@ async function fetchBooth() {
 }
 
 onMounted(fetchBooth)
-
-const statusStyle: Record<string, string> = {
-  approved: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  pending:  'bg-amber-100 text-amber-700 border-amber-200',
-  rejected: 'bg-red-100 text-red-700 border-red-200',
-}
 
 </script>
 
@@ -53,9 +47,9 @@ const statusStyle: Record<string, string> = {
         <div class="max-w-7xl mx-auto flex items-center gap-2 text-sm text-gray-400">
           <NuxtLink to="/expos" class="hover:text-gray-700 transition">Expos</NuxtLink>
           <UIcon name="i-lucide-chevron-right" class="w-3.5 h-3.5" />
-          <NuxtLink :to="`/expos/${expoId}`" class="hover:text-gray-700 transition">{{ booth.expo?.name ?? `Expo #${expoId}` }}</NuxtLink>
+          <NuxtLink :to="`/expos/${expoId}`" class="hover:text-gray-700 transition">{{ booth.expo?.name }}</NuxtLink>
           <UIcon name="i-lucide-chevron-right" class="w-3.5 h-3.5" />
-          <span class="text-gray-800 font-medium">{{ booth.name ?? `Booth #${boothId}` }}</span>
+          <span class="text-gray-800 font-medium">{{ booth.name }}</span>
         </div>
       </div>
 
@@ -64,48 +58,8 @@ const statusStyle: Record<string, string> = {
 
           <!-- LEFT: Info panel -->
           <div class="col-span-1 space-y-4">
-
-            <!-- Booth card -->
-            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-              <!-- Color header -->
-              <div class="h-24 flex items-center justify-center bg-[#3d52d5]">
-                <div class="w-16 h-16 rounded-2xl bg-white/50 flex items-center justify-center">
-                  <UIcon name="i-lucide-store" class="w-8 h-8 text-black" />
-                </div>
-              </div>
-
-              <div class="p-5">
-                <div class="flex items-start justify-between gap-2 mb-3">
-                  <h1 class="text-xl font-bold text-gray-900 leading-tight">{{ booth.name }}</h1>
-                </div>
-
-                <p class="text-sm text-gray-500 leading-relaxed mb-4">
-                  {{ booth.description ?? 'No description provided.' }}
-                </p>
-
-                <div v-if="booth.company" class="border-t border-gray-100 pt-4 space-y-2">
-                  <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Company</p>
-                  <p class="text-sm font-bold text-gray-900">{{ booth.company.name }}</p>
-                  <p v-if="booth.company.industry" class="text-xs text-gray-500">{{ booth.company.industry }}</p>
-                  <p v-if="booth.company.country" class="text-xs text-gray-400 flex items-center gap-1">
-                    <UIcon name="i-lucide-map-pin" class="w-3 h-3" />
-                    {{ booth.company.city ? `${booth.company.city}, ` : '' }}{{ booth.company.country }}
-                  </p>
-                  <a
-                    v-if="booth.company.website"
-                    :href="booth.company.website"
-                    target="_blank"
-                    class="text-xs text-[#3d52d5] hover:underline flex items-center gap-1"
-                  >
-                    <UIcon name="i-lucide-external-link" class="w-3 h-3" />
-                    Visit Website
-                  </a>
-                </div>
-              </div>
-            </div>
-
             <!-- Navigation tabs -->
-            <div class="bg-white rounded-2xl border border-gray-200 p-2 shadow-sm">
+            <div class="bg-white rounded-2xl border border-gray-200 p-2 shadow-sm space-y-1">
               <button
                   v-for="tab in [
                     { key: '3d',       label: '3D View',   icon: 'i-lucide-box'          },
@@ -169,6 +123,18 @@ const statusStyle: Record<string, string> = {
                     <p class="text-xs text-gray-400 mb-1">Contact</p>
                     <p class="font-semibold text-gray-800 text-sm truncate">{{ booth.company.email ?? '—' }}</p>
                   </div>
+                  <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                    <p class="text-xs text-gray-400 mb-1">Website</p>
+                    <a
+                      v-if="booth.company.website"
+                      :href="booth.company.website"
+                      target="_blank"
+                      class="text-xs text-[#3d52d5] hover:underline flex items-center gap-1"
+                    >
+                      <UIcon name="i-lucide-external-link" class="w-3 h-3" />
+                      Visit Website
+                    </a>
+                  </div>
                 </div>
 
                 <div v-if="booth.company?.description" class="p-5 rounded-xl bg-blue-50 border border-blue-100">
@@ -186,6 +152,6 @@ const statusStyle: Record<string, string> = {
 </template>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+  .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+  .fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>

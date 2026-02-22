@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import * as z from 'zod'
+import type { Cell, OccupiedCell } from '~/components/BoothMapPicker.vue'
 
 const auth = useAuth()
+const api  = useApi()
 
 const canEditStatus = computed(() =>
   auth.user.value?.roles?.includes('admin') ||
@@ -19,7 +21,6 @@ const emit = defineEmits<{
   deleted:    []
 }>()
 
-const api  = useApi()
 const mode = computed(() => props.booth ? 'edit' : 'create')
 
 const schema = z.object({
@@ -36,14 +37,43 @@ const state = reactive({
   status:      props.booth?.status      ?? 'pending',
 })
 
+// Map position
+const mapPosition = ref<Cell | null>(
+  props.booth?.mapRow != null && props.booth?.mapCol != null
+    ? { row: props.booth.mapRow, col: props.booth.mapCol }
+    : null
+)
+
+// Occupied cells from the same expo (loaded once)
+const occupiedCells = ref<OccupiedCell[]>([])
+
+async function loadOccupied() {
+  const expoId = props.expo?.id ?? props.booth?.expoId
+  if (!expoId) return
+  try {
+    const booths = await api.get<any[]>(`/expos/${expoId}/booths`)
+    occupiedCells.value = (booths as any[])
+      .filter((b: any) => b.mapRow != null && b.mapCol != null)
+      .map((b: any) => ({ row: b.mapRow, col: b.mapCol, name: b.name }))
+  } catch {
+    occupiedCells.value = []
+  }
+}
+
+onMounted(loadOccupied)
+
 watch(() => props.booth, (b) => {
   state.name        = b?.name        ?? ''
   state.description = b?.description ?? ''
   state.companyId   = b?.companyId   ?? undefined
   state.status      = b?.status      ?? 'pending'
+  mapPosition.value = b?.mapRow != null && b?.mapCol != null
+    ? { row: b.mapRow, col: b.mapCol }
+    : null
   modelPath.value     = b?.modelPath   ?? null
   modelFileName.value = b?.modelPath ? b.modelPath.split(/[\\/]/).pop() ?? null : null
   sessionUrl.value    = null
+  loadOccupied()
 })
 
 const STATUSES = ['pending', 'approved', 'rejected']
@@ -57,11 +87,16 @@ async function submit(event: any) {
   error.value   = null
   success.value = false
   try {
-    const payload = {
+    const payload: any = {
       ...event.data,
       modelPath: modelPath.value ?? undefined,
-      status: state.status,
+      status:    state.status,
+      mapRow:    mapPosition.value?.row ?? null,
+      mapCol:    mapPosition.value?.col ?? null,
     }
+
+    // Strip status for non-privileged roles
+    if (!canEditStatus.value) delete payload.status
 
     let result: any
     if (mode.value === 'create') {
@@ -132,36 +167,22 @@ function handleFileInput(e: Event) {
 
 async function processFile(file: File) {
   fileError.value = null
-
-  if (!isAllowed(file.name)) {
-    fileError.value = 'Only .glb, .gltf, or .obj files are accepted.'
-    return
-  }
-  if (file.size > 200 * 1024 * 1024) {
-    fileError.value = 'File too large (max 200 MB).'
-    return
-  }
+  if (!isAllowed(file.name)) { fileError.value = 'Only .glb, .gltf, or .obj files are accepted.'; return }
+  if (file.size > 200 * 1024 * 1024) { fileError.value = 'File too large (max 200 MB).'; return }
 
   savingFile.value = true
-
   try {
     if ('showSaveFilePicker' in window) {
       const handle = await (window as any).showSaveFilePicker({
         suggestedName: file.name,
-        types: [{
-          description: '3D Model',
-          accept: { 'model/gltf-binary': ['.glb'], 'model/gltf+json': ['.gltf'], 'text/plain': ['.obj'] },
-        }],
+        types: [{ description: '3D Model', accept: { 'model/gltf-binary': ['.glb'], 'model/gltf+json': ['.gltf'], 'text/plain': ['.obj'] } }],
       })
-
       const writable = await handle.createWritable()
       await writable.write(file)
       await writable.close()
-
       const saved = await handle.getFile()
       // @ts-ignore — .path is Chromium-only
       const localPath: string = (saved as any).path ?? saved.name
-
       modelPath.value     = localPath
       modelFileName.value = saved.name
       sessionUrl.value    = URL.createObjectURL(saved)
@@ -180,16 +201,12 @@ async function processFile(file: File) {
 }
 
 function removeModel() {
-  modelPath.value     = null
-  modelFileName.value = null
-  sessionUrl.value    = null
-  fileError.value     = null
+  modelPath.value = null; modelFileName.value = null; sessionUrl.value = null; fileError.value = null
 }
 
 defineExpose({ sessionUrl, modelPath })
 
 const hasModel = computed(() => !!modelFileName.value)
-const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePicker' in window)
 </script>
 
 <template>
@@ -230,44 +247,38 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
     </Transition>
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
-
-      <UFormField name="name" label="Booth Name" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <UInput
-          v-model="state.name"
-          placeholder="e.g. TechCorp Innovation Booth"
-          :disabled="saving"
-          class="w-full"
-          :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }"
+      <div class="grid grid-cols-2 gap-5">
+        <div class="space-y-3">
+          <UFormField name="name" label="Booth Name" :ui="{ error: 'text-red-500 italic text-xs mt-1' , label: 'font-bold'} ">
+            <UInput v-model="state.name" placeholder="e.g. TechCorp Innovation Booth" :disabled="saving" class="w-full"
+              :ui="{ base: 'border border-gray-400 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }" />
+          </UFormField>
+    
+          <UFormField name="description" label="Description" :ui="{ error: 'text-red-500 italic text-xs mt-1', label: 'font-bold' }">
+            <UTextarea v-model="state.description" placeholder="What will you be showcasing at this booth?" :rows="4"
+              :disabled="saving" class="w-full" :ui="{ base: 'border border-gray-400 focus:border-[#3d52d5] px-3 py-2 rounded-xl' }" />
+          </UFormField>
+    
+          <UFormField v-if="canEditStatus" name="status" label="Status" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
+            <USelect trailing-icon="null" v-model="state.status" variant="soft" :items="STATUSES" placeholder="Select a status"
+              :content="{ align: 'start', side: 'bottom' }"
+              :ui="{
+                base: 'w-full border border-blue-300 h-10 rounded-xl bg-blue-50',
+                content: 'bg-white rounded-xl shadow-lg border border-blue-100',
+                item: 'px-3 py-2 text-sm hover:bg-blue-50 cursor-pointer rounded-xl',
+                itemLabel: 'text-gray-700',
+              }" />
+          </UFormField>
+        </div>
+  
+  
+        <!-- Floor Map Position -->
+        <BoothMapPicker
+          v-model="mapPosition"
+          :occupied="occupiedCells"
+          label="Floor Map Position"
         />
-      </UFormField>
-
-      <UFormField name="description" label="Description" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <UTextarea
-          v-model="state.description"
-          placeholder="What will you be showcasing at this booth?"
-          :rows="4"
-          :disabled="saving"
-          class="w-full"
-          :ui="{ base: 'border border-gray-200 focus:border-[#3d52d5] px-3 py-2 rounded-xl' }"
-        />
-      </UFormField>
-
-      <UFormField v-if="canEditStatus" name="status" label="Status" :ui="{ error: 'text-red-500 italic text-xs mt-1' }">
-        <USelect
-          trailing-icon="null"
-          v-model="state.status"
-          variant="soft"
-          :items="STATUSES"
-          placeholder="Select a status"
-          :content="{ align: 'start', side: 'bottom' }"
-          :ui="{
-            base: 'w-full border border-blue-300 h-10 rounded-xl bg-blue-50',
-            content: 'bg-white rounded-xl shadow-lg border border-blue-100',
-            item: 'px-3 py-2 text-sm hover:bg-blue-50 cursor-pointer rounded-xl',
-            itemLabel: 'text-gray-700',
-          }"
-        />
-      </UFormField>
+      </div>
 
       <!-- 3D Model Upload -->
       <div>
@@ -275,59 +286,35 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
           3D Booth Model
           <span class="font-normal text-gray-400 text-xs ml-1">(optional · .glb / .gltf / .obj)</span>
         </label>
-        <p class="text-xs text-gray-400 mb-3">
-          The file is saved to your computer. The path is stored so visitors on your device see your custom 3D booth.
-        </p>
-
-        <div v-if="!hasFsApi" class="mb-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
-          <UIcon name="i-lucide-triangle-alert" class="w-3.5 h-3.5 shrink-0 mt-0.5" />
-          Your browser doesn't support persistent local file access. Use Chrome or Edge for the best experience.
-        </div>
 
         <Transition name="slide-down">
           <div v-if="hasModel" class="mb-3 flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3">
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-violet-900 truncate">{{ modelFileName }}</p>
               <p class="text-xs text-violet-500 mt-0.5 truncate" :title="modelPath ?? ''">
-                <template v-if="hasFsApi && modelPath && modelPath !== modelFileName">{{ modelPath }}</template>
+                <template v-if="modelPath && modelPath !== modelFileName">{{ modelPath }}</template>
                 <template v-else-if="sessionUrl">Session saved</template>
                 <template v-else>Saved</template>
               </p>
             </div>
-            <button
-              type="button"
+            <button type="button"
               class="text-violet-300 hover:text-red-500 transition shrink-0 p-1 rounded-lg hover:bg-red-50"
-              title="Remove model"
-              @click="removeModel"
-            >
+              title="Remove model" @click="removeModel">
               <UIcon name="i-lucide-x" class="w-4 h-4" />
             </button>
           </div>
         </Transition>
 
-        <div
-          class="relative border-2 border-dashed rounded-2xl transition-all duration-200"
-          :class="dropActive
-            ? 'border-violet-500 bg-violet-50 scale-[1.01]'
-            : 'border-gray-200 bg-gray-50/60 hover:border-violet-400 hover:bg-violet-50/30'"
-          @dragover.prevent="dropActive = true"
-          @dragleave.prevent="dropActive = false"
-          @drop.prevent="handleDrop"
-        >
+        <div class="relative border-2 border-dashed rounded-2xl transition-all duration-200 h-60"
+          :class="dropActive ? 'border-violet-500 bg-violet-50 scale-[1.01]' : 'border-gray-200 bg-gray-50/60 hover:border-violet-400 hover:bg-violet-50/30'"
+          @dragover.prevent="dropActive = true" @dragleave.prevent="dropActive = false" @drop.prevent="handleDrop">
           <label class="flex flex-col items-center justify-center gap-3 py-8 px-6 cursor-pointer">
             <input type="file" accept=".glb,.gltf,.obj" class="sr-only" @change="handleFileInput" />
-
-            <div
-              class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all"
-              :class="dropActive ? 'bg-violet-200 scale-110' : 'bg-violet-100'"
-            >
-              <UIcon
-                :name="savingFile ? 'i-lucide-loader-circle' : dropActive ? 'i-lucide-download' : 'i-lucide-box'"
-                class="w-7 h-7 text-violet-500"
-                :class="{ 'animate-spin': savingFile }"
-              />
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all"
+              :class="dropActive ? 'bg-violet-200 scale-110' : 'bg-violet-100'">
+              <UIcon :name="savingFile ? 'i-lucide-loader-circle' : dropActive ? 'i-lucide-download' : 'i-lucide-box'"
+                class="w-7 h-7 text-violet-500" :class="{ 'animate-spin': savingFile }" />
             </div>
-
             <div class="text-center">
               <p class="text-sm font-semibold text-gray-700">
                 <template v-if="savingFile">Saving file to disk…</template>
@@ -336,19 +323,14 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
                 <template v-else><span class="text-violet-600">Click to browse</span> or drag your 3D model here</template>
               </p>
               <p class="text-xs text-gray-400 mt-1">.glb · .gltf · .obj · max 200 MB</p>
-              <p v-if="hasFsApi" class="text-xs text-gray-400 mt-0.5">You'll be asked where to save the file on your computer</p>
             </div>
           </label>
-
           <div v-if="dropActive" class="absolute inset-0 border-4 border-violet-400 rounded-2xl pointer-events-none animate-pulse" />
         </div>
 
         <Transition name="fade">
-          <div
-            v-if="fileError"
-            class="mt-2 flex items-start gap-2 text-xs rounded-xl px-3 py-2"
-            :class="fileError.startsWith('⚠') ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-red-600'"
-          >
+          <div v-if="fileError" class="mt-2 flex items-start gap-2 text-xs rounded-xl px-3 py-2"
+            :class="fileError.startsWith('⚠') ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-red-600'">
             <UIcon name="i-lucide-circle-alert" class="w-3.5 h-3.5 shrink-0 mt-0.5" />
             {{ fileError }}
           </div>
@@ -357,51 +339,30 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
 
       <!-- Submit -->
       <div class="pt-2 flex items-center gap-3">
-        <UButton
-          type="submit"
-          :loading="saving"
-          :disabled="saving"
-          class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-7"
-          size="md"
-        >
+        <UButton type="submit" :loading="saving" :disabled="saving"
+          class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-7" size="md">
           {{ saving ? 'Saving…' : mode === 'create' ? 'Register Booth' : 'Save Changes' }}
         </UButton>
-        <span v-if="mode === 'create'" class="text-xs text-gray-400">
-          Pending organizer approval after registration.
-        </span>
       </div>
     </UForm>
 
     <!-- Delete (edit only) -->
     <template v-if="mode === 'edit'">
       <div class="mt-10 pt-8 border-t border-gray-100">
-        <button
-          type="button"
+        <button type="button"
           class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2"
-          @click="showDelete = !showDelete"
-        >
-          <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
-          Delete this booth
+          @click="showDelete = !showDelete">
+          <UIcon name="i-lucide-trash-2" class="w-4 h-4" />Delete this booth
         </button>
         <Transition name="fade">
           <div v-if="showDelete" class="mt-4 p-5 rounded-xl border border-red-200 bg-red-50/40">
-            <p class="text-sm text-red-700 mb-3">
-              Type <strong>{{ booth?.name }}</strong> to confirm:
-            </p>
-            <UInput
-              v-model="deleteConfirm"
-              placeholder="Booth name"
-              class="mb-4 w-full max-w-xs"
-              :ui="{ base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl' }"
-            />
-            <UButton
-              :disabled="!canDelete || deleteLoading"
-              :loading="deleteLoading"
-              size="sm"
+            <p class="text-sm text-red-700 mb-3">Type <strong>{{ booth?.name }}</strong> to confirm:</p>
+            <UInput v-model="deleteConfirm" placeholder="Booth name" class="mb-4 w-full max-w-xs"
+              :ui="{ base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl' }" />
+            <UButton :disabled="!canDelete || deleteLoading" :loading="deleteLoading" size="sm"
               class="rounded-xl cursor-pointer px-5"
               :class="canDelete ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
-              @click="deleteBooth"
-            >
+              @click="deleteBooth">
               {{ deleteLoading ? 'Deleting…' : 'Permanently Delete' }}
             </UButton>
           </div>
@@ -412,8 +373,8 @@ const hasFsApi = computed(() => typeof window !== 'undefined' && 'showSaveFilePi
 </template>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-.slide-down-enter-active, .slide-down-leave-active { transition: all 0.2s ease; }
-.slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-6px); }
+  .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+  .fade-enter-from, .fade-leave-to { opacity: 0; }
+  .slide-down-enter-active, .slide-down-leave-active { transition: all 0.2s ease; }
+  .slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-6px); }
 </style>

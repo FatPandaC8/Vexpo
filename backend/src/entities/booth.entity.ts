@@ -36,6 +36,12 @@ export class Booth {
   @Column({ nullable: true })
   modelPath: string;
 
+  @Column({ type: 'int' })
+  mapRow: number;
+
+  @Column({ type: 'int' })
+  mapCol: number;
+
   @ManyToOne(() => Expo, (expo) => expo.booths)
   @JoinColumn({ name: 'expoId' })
   expo: Expo;

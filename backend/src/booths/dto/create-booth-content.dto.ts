@@ -4,7 +4,11 @@ import {
   IsNotEmpty,
   IsOptional,
   IsNumber,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
+import { MAP_ROWS, MAP_COLS } from './update-booth.dto';
 
 export class CreateBoothContentDTO {
   @ApiProperty({ example: 'TechCorp Booth' })
@@ -30,4 +34,16 @@ export class CreateBoothContentDTO {
   @IsString()
   @IsOptional()
   modelPath?: string;
+
+  @ApiProperty({ example: 2, description: `Floor map row (0–${MAP_ROWS - 1})` })
+  @IsInt()
+  @Min(0)
+  @Max(MAP_ROWS - 1)
+  mapRow?: number;
+
+  @ApiProperty({ example: 3, description: `Floor map column (0–${MAP_COLS - 1})` })
+  @IsInt()
+  @Min(0)
+  @Max(MAP_COLS - 1)
+  mapCol?: number;
 }

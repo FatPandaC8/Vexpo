@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booth } from 'src/entities/booth.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { UpdateBoothDTO } from './dto/update-booth.dto';
 import { CreateBoothContentDTO } from './dto/create-booth-content.dto';
 
@@ -122,5 +122,23 @@ export class BoothsService {
     const booth = await this.getBoothById(id);
     await this.boothRepository.remove(booth);
     return { message: 'Booth deleted successfully' };
+  }
+
+  private async assertPositionFree(
+    expoId: number,
+    mapRow: number,
+    mapCol: number,
+    excludeBoothId?: number,
+  ) {
+    const where: any = { expoId, mapRow, mapCol };
+    if (excludeBoothId != null) {
+      where.id = Not(excludeBoothId);
+    }
+    const taken = await this.boothRepository.findOne({ where });
+    if (taken) {
+      throw new ConflictException(
+        `Map position (row ${mapRow}, col ${mapCol}) is already occupied by booth "${taken.name}"`,
+      );
+    }
   }
 }

@@ -5,7 +5,7 @@ const route = useRoute()
 const api = useApi()
 
 const expoId = Number(route.params.id)
-const boothId = Number(route.params.boothId)
+const boothId = Number(route.params.id)
 
 const booth = ref<any>(null)
 const loading = ref(true)
@@ -30,21 +30,6 @@ const statusStyle: Record<string, string> = {
   rejected: 'bg-red-100 text-red-700 border-red-200',
 }
 
-// Deterministic color palette for booth branding
-function boothAccent(name: string = '') {
-  const palettes = [
-    { bg: '#3d52d5', light: '#eef0fb', text: '#ffffff' },
-    { bg: '#7c3aed', light: '#f3f0ff', text: '#ffffff' },
-    { bg: '#0891b2', light: '#ecfeff', text: '#ffffff' },
-    { bg: '#059669', light: '#ecfdf5', text: '#ffffff' },
-    { bg: '#d97706', light: '#fffbeb', text: '#ffffff' },
-  ]
-  let hash = 0
-  for (const c of name) hash = (hash * 31 + c.charCodeAt(0)) % palettes.length
-  return palettes[hash]
-}
-
-const accent = computed(() => boothAccent(booth.value?.name))
 </script>
 
 <template>
@@ -83,22 +68,15 @@ const accent = computed(() => boothAccent(booth.value?.name))
             <!-- Booth card -->
             <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
               <!-- Color header -->
-              <div class="h-24 flex items-center justify-center" :style="{ background: accent.bg }">
-                <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
-                  <UIcon name="i-lucide-store" class="w-8 h-8 text-white" />
+              <div class="h-24 flex items-center justify-center bg-[#3d52d5]">
+                <div class="w-16 h-16 rounded-2xl bg-white/50 flex items-center justify-center">
+                  <UIcon name="i-lucide-store" class="w-8 h-8 text-black" />
                 </div>
               </div>
 
               <div class="p-5">
                 <div class="flex items-start justify-between gap-2 mb-3">
                   <h1 class="text-xl font-bold text-gray-900 leading-tight">{{ booth.name }}</h1>
-                  <span
-                    v-if="booth.status"
-                    class="px-2 py-0.5 rounded-full text-xs font-semibold border shrink-0 mt-0.5"
-                    :class="statusStyle[booth.status] ?? 'bg-gray-100 text-gray-600 border-gray-200'"
-                  >
-                    {{ booth.status }}
-                  </span>
                 </div>
 
                 <p class="text-sm text-gray-500 leading-relaxed mb-4">
@@ -126,30 +104,20 @@ const accent = computed(() => boothAccent(booth.value?.name))
               </div>
             </div>
 
-            <!-- Expo info -->
-            <div v-if="booth.expo" class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-              <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Expo</p>
-              <NuxtLink :to="`/expos/${expoId}`" class="font-bold text-gray-900 hover:text-[#3d52d5] transition text-sm">
-                {{ booth.expo.name }}
-              </NuxtLink>
-              <p class="text-xs text-gray-400 mt-1">{{ booth.expo.type ?? '—' }}</p>
-            </div>
-
             <!-- Navigation tabs -->
             <div class="bg-white rounded-2xl border border-gray-200 p-2 shadow-sm">
               <button
-                v-for="tab in [
-                  { key: '3d',       label: '3D View',   icon: 'i-lucide-box'          },
-                  { key: 'overview', label: 'Overview',  icon: 'i-lucide-info'         },
-                  { key: 'content',  label: 'Content',   icon: 'i-lucide-layout-grid'  },
-                ]"
-                :key="tab.key"
-                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left"
-                :class="activeTab === tab.key
-                  ? 'bg-[#3d52d5] text-white'
-                  : 'text-gray-600 hover:bg-gray-100'"
-                @click="activeTab = tab.key as any"
-              >
+                  v-for="tab in [
+                    { key: '3d',       label: '3D View',   icon: 'i-lucide-box'          },
+                    { key: 'overview', label: 'Overview',  icon: 'i-lucide-info'         },
+                  ]"
+                  :key="tab.key"
+                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left"
+                  :class="activeTab === tab.key
+                    ? 'bg-[#3d52d5] text-white'
+                    : 'text-gray-600 hover:bg-gray-100'"
+                  @click="activeTab = tab.key as any"
+                >
                 <UIcon :name="tab.icon" class="w-4 h-4" />
                 {{ tab.label }}
               </button>
@@ -164,10 +132,7 @@ const accent = computed(() => boothAccent(booth.value?.name))
             <template v-if="activeTab === '3d'">
               <div class="bg-gray-950 rounded-2xl overflow-hidden shadow-xl border border-gray-800" style="height: 560px;">
                 <!-- 3D Scene rendered with CSS + canvas-like technique -->
-                <Booth3DScene
-                  :booth="booth"
-                  :accent="accent.bg"
-                />
+                
               </div>
               <p class="text-xs text-gray-400 text-center mt-3 flex items-center justify-center gap-1.5">
                 <UIcon name="i-lucide-mouse-pointer-2" class="w-3.5 h-3.5" />
@@ -209,71 +174,6 @@ const accent = computed(() => boothAccent(booth.value?.name))
                 <div v-if="booth.company?.description" class="p-5 rounded-xl bg-blue-50 border border-blue-100">
                   <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">Company Description</p>
                   <p class="text-sm text-blue-900 leading-relaxed">{{ booth.company.description }}</p>
-                </div>
-              </div>
-            </template>
-
-            <!-- Content -->
-            <template v-else-if="activeTab === 'content'">
-              <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">Booth Content</h2>
-
-                <div v-if="!booth.content" class="text-center py-16">
-                  <UIcon name="i-lucide-package-open" class="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                  <p class="text-gray-500 font-medium">No content added yet</p>
-                  <p class="text-sm text-gray-400 mt-1">The exhibitor hasn't uploaded materials for this booth.</p>
-                </div>
-
-                <div v-else class="space-y-6">
-                  <!-- Logo -->
-                  <div v-if="booth.content?.logo">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Logo</p>
-                    <img :src="booth.content.logo" alt="Booth logo" class="h-16 object-contain rounded-xl border border-gray-100" />
-                  </div>
-
-                  <!-- Banner -->
-                  <div v-if="booth.content?.bannerImage">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Banner</p>
-                    <img :src="booth.content.bannerImage" alt="Banner" class="w-full rounded-xl object-cover h-40 border border-gray-100" />
-                  </div>
-
-                  <!-- Videos -->
-                  <div v-if="booth.content?.videos?.length">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Videos</p>
-                    <div class="space-y-2">
-                      <a
-                        v-for="(video, i) in booth.content.videos"
-                        :key="i"
-                        :href="video"
-                        target="_blank"
-                        class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition"
-                      >
-                        <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-                          <UIcon name="i-lucide-play" class="w-4 h-4 text-red-500" />
-                        </div>
-                        <span class="text-sm text-gray-700 truncate">{{ video }}</span>
-                      </a>
-                    </div>
-                  </div>
-
-                  <!-- Documents -->
-                  <div v-if="booth.content?.documents?.length">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Documents</p>
-                    <div class="space-y-2">
-                      <a
-                        v-for="(doc, i) in booth.content.documents"
-                        :key="i"
-                        :href="doc"
-                        target="_blank"
-                        class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition"
-                      >
-                        <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                          <UIcon name="i-lucide-file-text" class="w-4 h-4 text-blue-500" />
-                        </div>
-                        <span class="text-sm text-gray-700 truncate">Document {{ i + 1 }}</span>
-                      </a>
-                    </div>
-                  </div>
                 </div>
               </div>
             </template>

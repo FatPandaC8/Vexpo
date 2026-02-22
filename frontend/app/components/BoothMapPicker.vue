@@ -134,7 +134,3 @@ function cellTitle(r: number, c: number) {
     </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>

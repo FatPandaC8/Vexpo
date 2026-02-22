@@ -2,9 +2,13 @@
 import Header from '~/components/Header.vue'
 
 const route = useRoute()
+const router = useRouter()
 const api = useApi()
 const MAP_ROWS = 5
 const MAP_COLS = 6
+
+const rows = Array.from({ length: MAP_ROWS }, (_, i) => i)
+const cols = Array.from({ length: MAP_COLS }, (_, j) => j)
 
 const expoId = Number(route.params.id)
 
@@ -39,6 +43,14 @@ const expoStatus = computed(() => {
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+}
+
+function boothAt(r: number, c: number) {
+  return booths.value.find(b => b.mapRow === r && b.mapCol === c)
+}
+
+function openBooth(id: number) {
+  router.push(`/booths/${id}`)
 }
 
 </script>
@@ -121,8 +133,41 @@ function formatDate(d: string) {
         </div>
 
         <!-- Floor Map -->
-        <div v-else class="bg-white rounded-2xl border border-gray-200 py-24 text-center">
-          <p class="font-semibold text-gray-500">Has booths</p>
+        <div v-else>
+          <div class="border-2 border-gray-400 rounded-xl p-5 w-full h-150 flex flex-col items-center justify-center gap-6">
+
+            <!-- Rows -->
+            <div
+              v-for="r in rows"
+              :key="r"
+              class="flex gap-6"
+            >
+              <!-- Cells -->
+              <button
+                v-for="c in cols"
+                :key="c"
+                type="button"
+                class="w-40 h-20 border rounded-xl hover:bg-gray-100 transition cursor-pointer"
+                :class="boothAt(r, c) ? 'bg-blue-100 border-blue-400 hover:bg-blue-200' : 'hover:bg-gray-100'"
+                @click="boothAt(r,c) && openBooth(boothAt(r,c).id)"
+              >
+                <div v-if="boothAt(r,c)" class="text-center leading-tight px-2">
+                  <div class="font-semibold truncate">
+                    {{ boothAt(r,c).name }}
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    View booth
+                  </div>
+                </div>
+
+                <div v-else class="text-gray-300 text-xs">
+                  Empty
+                </div>
+              </button>
+
+            </div>
+
+          </div>
         </div>
       </section>
     </template>

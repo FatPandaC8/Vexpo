@@ -44,13 +44,7 @@ function isSelected(r: number, c: number) {
   return props.modelValue?.row === r && props.modelValue?.col === c;
 }
 
-function occupiedInfo(r: number, c: number): OccupiedCell | undefined {
-  return props.occupied.find((o) => o.row === r && o.col === c);
-}
-
 function isOccupied(r: number, c: number) {
-  const info = occupiedInfo(r, c);
-  if (!info) return false;
   if (isSelected(r, c)) return false;
   return true;
 }
@@ -65,12 +59,6 @@ function handleClick(r: number, c: number) {
   }
 }
 
-function cellTitle(r: number, c: number) {
-  if (isSelected(r, c)) return `Your booth: ${r + 1}${COLUMN_LABELS[c]}`;
-  const info = occupiedInfo(r, c);
-  if (info) return `Taken${info.name ? ": " + info.name : ""}`;
-  return `${r + 1}${COLUMN_LABELS[c]}`;
-}
 </script>
 
 <template>
@@ -106,7 +94,6 @@ function cellTitle(r: number, c: number) {
           v-for="c in cols"
           :key="c"
           type="button"
-          :title="cellTitle(r, c)"
           :disabled="readonly || isOccupied(r, c)"
           class="w-10 h-10 border transition-colors rounded-xl cursor-pointer"
           :class="{

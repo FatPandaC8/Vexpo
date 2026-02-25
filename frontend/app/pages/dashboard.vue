@@ -44,11 +44,6 @@ const exhibitorSidebar = ref<any>(null)
 const organizerSidebar = ref<any>(null)
 const adminSidebar     = ref<any>(null)
 
-// VISITOR events
-function onVisitorRegistered() {
-  visitorSidebar.value?.refresh()
-}
-
 // EXHIBITOR events
 function onBoothRegistered() {
   exhibitorSidebar.value?.refreshBooths()

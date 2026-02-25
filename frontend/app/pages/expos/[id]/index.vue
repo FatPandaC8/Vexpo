@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// TODO Today: Add organizer information tab next to the expo information
 import Header from '~/components/Header.vue'
 
 const route = useRoute()
@@ -15,11 +16,13 @@ const expoId = Number(route.params.id)
 const expo = ref<any>(null)
 const booths = ref<any[]>([])
 const loading = ref(true)
+const organizer = ref<any>(null)
 
 async function fetchExpo() {
   loading.value = true
   try {
     expo.value = await api.get<any>(`/expos/${expoId}`)
+    organizer.value = await api.get<any>(`/users/${expo.value.organizerId}`)
     booths.value = await api.get<any[]>(`/expos/${expoId}/booths`)
   } catch {
     expo.value = null
@@ -113,6 +116,14 @@ function openBooth(id: number) {
                   {{ expo.type }}
                 </div>
               </div>
+            </div>
+
+            <!--Organizer Information: name + email-->
+            <div>
+              <UCard variant="soft" class="border-2 border-blue-500 bg-[#3d52d5]/50 p-3">
+                <h1><span class="font-bold">Organized by:</span> <span> {{ organizer.name || 'Unknown organizer' }} </span></h1>
+                <p><span class="font-bold">Contact info:</span> <span> {{ organizer.email || 'Unknown organizer contact info' }} </span></p>
+              </UCard>
             </div>
           </div>
         </div>

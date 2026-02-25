@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
 import { UserRole } from 'src/entities/userrole.entity';
 import { Repository } from 'typeorm';
+import { PublicUserInfo } from './dto/public-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -41,6 +42,27 @@ export class UsersService {
       where: { id },
       relations: ['roles', 'roles.role'],
     });
+  }
+
+  async getPublicInfo(id: number) {
+    // get the user
+    const public_user = await this.findOneById(id);
+    // for more protection: check if the found user is an admin ?
+    const isAdmin = await this.userRoleRepository.findOneBy({
+      id: public_user?.id
+    })
+    // 1 is admin
+    if (isAdmin?.roleId === 1) {
+      throw new BadRequestException('You cannot view admin info')
+    }
+
+    // return the user info
+    const return_user: PublicUserInfo = {
+      name: public_user?.name,
+      email: public_user?.email
+    };
+
+    return return_user;
   }
 
   async findAll() {

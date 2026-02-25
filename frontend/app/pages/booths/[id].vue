@@ -24,6 +24,8 @@ async function fetchBooth() {
 
 onMounted(fetchBooth)
 
+console.log(booth.value);
+
 </script>
 
 <template>
@@ -112,12 +114,6 @@ onMounted(fetchBooth)
                   <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
                     <p class="text-xs text-gray-400 mb-1">Industry</p>
                     <p class="font-semibold text-gray-800">{{ booth.company.industry ?? '—' }}</p>
-                  </div>
-                  <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
-                    <p class="text-xs text-gray-400 mb-1">Location</p>
-                    <p class="font-semibold text-gray-800">
-                      {{ booth.company.city ? `${booth.company.city}, ` : '' }}{{ booth.company.country ?? '—' }}
-                    </p>
                   </div>
                   <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
                     <p class="text-xs text-gray-400 mb-1">Contact</p>

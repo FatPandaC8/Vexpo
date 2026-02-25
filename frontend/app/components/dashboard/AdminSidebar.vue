@@ -52,9 +52,9 @@ function label(item: any) {
 }
 function sub(item: any) {
   if (section.value === "users") return item.email ?? item.roles?.join(", ");
-  if (section.value === "expos") return item.type ?? "—";
-  if (section.value === "booths") return item.status ?? "—";
-  if (section.value === "companies") return item.industry ?? "—";
+  if (section.value === "expos") return item.type ?? "#";
+  if (section.value === "booths") return item.status ?? "#";
+  if (section.value === "companies") return item.industry ?? "#";
 }
 </script>
 

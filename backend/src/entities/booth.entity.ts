@@ -21,8 +21,8 @@ export class Booth {
   @Column()
   exhibitorId: number;
 
-  @Column({ nullable: true })
-  companyId: number | null;
+  @Column()
+  companyId: number;
 
   @Column({ default: 'pending' })
   status: 'pending' | 'approved' | 'rejected';

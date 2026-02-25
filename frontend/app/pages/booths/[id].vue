@@ -24,9 +24,7 @@ async function fetchBooth() {
 }
 
 onMounted(fetchBooth);
-onMounted(() => [
-  import('@google/model-viewer')
-])
+onMounted(() => [import("@google/model-viewer")]);
 </script>
 
 <template>
@@ -111,21 +109,41 @@ onMounted(() => [
                   <!--Now make it take the model from the booth instead of hard coding like this-->
                   <model-viewer
                     src="http://localhost:3001/test.glb"
-                    alt="avatar"
-                    shadow-intensity="1"
+                    ar
+                    ar-modes="webxr scene-viewer quick-look"
                     camera-controls
-                    loading="lazy"
+                    tone-mapping="neutral"
+                    poster="poster.webp"
+                    shadow-intensity="1"
                     class="w-full h-full"
+                  >
+                    <button
+                      class="Hotspot"
+                      slot="hotspot-1"
+                      data-position="-0.09532721890993273m 0.5332810798281482m 0.37321912248479805m"
+                      data-normal="-0.03489653688320022m 0.9947374591506833m 0.09633077948403657m"
+                      data-visibility-attribute="visible"
                     >
+                      <div class="HotspotAnnotation">
+                        <span class="bg-white rounded-xl p-3"
+                          >Angel of Grief</span
+                        >
+                      </div>
+                    </button>
+                    <div class="progress-bar hide" slot="progress-bar">
+                      <div class="update-bar"></div>
+                    </div>
+                    <button slot="ar-button" id="ar-button">
+                      View in your space
+                    </button>
                   </model-viewer>
                 </ClientOnly>
-
               </div>
               <p
                 class="text-xs text-gray-400 text-center mt-3 flex items-center justify-center gap-1.5"
               >
                 <UIcon name="i-lucide-mouse-pointer-2" class="w-3.5 h-3.5" />
-                Interactive 3D booth — drag to rotate, scroll to zoom
+                Interactive 3D booth - drag to rotate, scroll to zoom
               </p>
             </template>
 
@@ -156,13 +174,13 @@ onMounted(() => [
                   <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
                     <p class="text-xs text-gray-400 mb-1">Industry</p>
                     <p class="font-semibold text-gray-800">
-                      {{ booth.company.industry ?? "—" }}
+                      {{ booth.company.industry ?? "#" }}
                     </p>
                   </div>
                   <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
                     <p class="text-xs text-gray-400 mb-1">Contact</p>
                     <p class="font-semibold text-gray-800 text-sm truncate">
-                      {{ booth.company.email ?? "—" }}
+                      {{ booth.company.email ?? "#" }}
                     </p>
                   </div>
                   <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">

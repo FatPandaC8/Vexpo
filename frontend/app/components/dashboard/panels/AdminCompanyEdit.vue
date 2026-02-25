@@ -91,7 +91,7 @@ async function deleteCompany() {
       <div>
         <h2 class="text-2xl font-bold text-gray-900">{{ company.name }}</h2>
         <p class="text-sm text-gray-400 mt-0.5">
-          {{ company.industry ?? "Admin — edit company" }}
+          {{ company.industry ?? "Admin - edit company" }}
         </p>
       </div>
     </div>

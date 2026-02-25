@@ -86,7 +86,7 @@ const userMenuItems = computed(() => [
           >
             <ClientOnly>
               <span class="text-sm font-semibold text-gray-700">
-                {{ auth.user.value?.name || 'Hydration mismatch' }}
+                {{ auth.user.value?.name || "Hydration mismatch" }}
               </span>
             </ClientOnly>
             <UIcon name="i-lucide-chevron-down" class="text-gray-400" />

@@ -113,7 +113,7 @@ defineExpose({ refreshBooths: loadBooths });
           v-for="expo in expos"
           :key="expo.id"
           :title="expo.name"
-          :subtitle="expo.type ?? '—'"
+          :subtitle="expo.type ?? '#'"
           :active="activeView === 'register-booth' && activeId === expo.id"
           active-color="border-[#3d52d5]/40 bg-blue-50"
           @click="emit('select', { view: 'register-booth', data: expo })"

@@ -38,7 +38,6 @@ const state = reactive({
   status: props.booth?.status ?? "pending",
 });
 
-//j Company auto-fill (create mode only)
 const myCompany = ref<any>(null);
 const loadingCompany = ref(false);
 
@@ -97,10 +96,14 @@ watch(
         ? { row: b.mapRow, col: b.mapCol }
         : null;
     modelPath.value = b?.modelPath ?? null;
+    console.log("MODEL PATH: ", modelPath);
     modelFileName.value = b?.modelPath
       ? (b.modelPath.split(/[\\/]/).pop() ?? null)
       : null;
-    sessionUrl.value = null;
+    console.log("MODEL FILENAME: ", modelFileName);
+    uploadedFile.value = null;
+    fileUploadKey.value++; // remount UFileUpload so it shows empty
+    fileError.value = null;
     loadOccupied();
   },
 );
@@ -119,13 +122,12 @@ async function submit(event: any) {
     const payload: any = {
       ...event.data,
       companyId: state.companyId,
-      modelPath: modelPath.value ?? undefined,
+      modelPath: modelPath.value ?? null,
       status: state.status,
       mapRow: mapPosition.value?.row ?? null,
       mapCol: mapPosition.value?.col ?? null,
     };
 
-    // Strip status for non-privileged roles
     if (!canEditStatus.value) delete payload.status;
 
     let result: any;
@@ -149,7 +151,7 @@ async function submit(event: any) {
   }
 }
 
-// Delete
+// Delete booth
 const showDelete = ref(false);
 const deleteConfirm = ref("");
 const deleteLoading = ref(false);
@@ -168,95 +170,68 @@ async function deleteBooth() {
   }
 }
 
-// 3D Model file handling
+// 3D Model handling
 const modelPath = ref<string | null>(props.booth?.modelPath ?? null);
-const sessionUrl = ref<string | null>(null);
 const modelFileName = ref<string | null>(
   props.booth?.modelPath
     ? (props.booth.modelPath.split(/[\\/]/).pop() ?? null)
     : null,
 );
-const dropActive = ref(false);
+const uploadedFile = ref<File | null>(null);
 const fileError = ref<string | null>(null);
-const savingFile = ref(false);
+// Incrementing this key forces UFileUpload to fully remount (clears its internal state)
+const fileUploadKey = ref(0);
 
-const ALLOWED = [".glb", ".gltf"];
-function isAllowed(name: string) {
-  return ALLOWED.some((ext) => name.toLowerCase().endsWith(ext));
-}
-
-function handleDrop(e: DragEvent) {
-  dropActive.value = false;
-  const file = e.dataTransfer?.files?.[0];
-  if (file) processFile(file);
-}
-
-function handleFileInput(e: Event) {
-  const file = (e.target as HTMLInputElement).files?.[0];
-  if (file) processFile(file);
-  (e.target as HTMLInputElement).value = "";
-}
-
-async function processFile(file: File) {
+watch(uploadedFile, (file) => {
+  if (!file) return;
   fileError.value = null;
-  if (!isAllowed(file.name)) {
-    fileError.value = "Only .glb, .gltf files are accepted.";
-    return;
-  }
-  if (file.size > 200 * 1024 * 1024) {
-    fileError.value = "File too large (max 200 MB).";
+
+  const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+  if (ext !== ".glb") {
+    fileError.value = "Only a .glb file is accepted.";
+    uploadedFile.value = null;
+    fileUploadKey.value++;
     return;
   }
 
-  savingFile.value = true;
-  try {
-    if ("showSaveFilePicker" in window) {
-      const handle = await (window as any).showSaveFilePicker({
-        suggestedName: file.name,
-        types: [
-          {
-            description: "3D Model",
-            accept: {
-              "model/gltf-binary": [".glb"],
-              "model/gltf+json": [".gltf"],
-            },
-          },
-        ],
-      });
-      const writable = await handle.createWritable();
-      await writable.write(file);
-      await writable.close();
-      const saved = await handle.getFile();
-      // @ts-ignore — .path is Chromium-only
-      const localPath: string = (saved as any).path ?? saved.name;
-      modelPath.value = localPath;
-      modelFileName.value = saved.name;
-      sessionUrl.value = URL.createObjectURL(saved);
-    } else {
-      sessionUrl.value = URL.createObjectURL(file);
-      modelPath.value = file.name;
-      modelFileName.value = file.name;
-      fileError.value =
-        "⚠ Your browser doesn't support local file saving. The model will work this session only.";
-    }
-  } catch (e: any) {
-    if (e?.name === "AbortError") return;
-    fileError.value = "Could not save file: " + (e?.message ?? "unknown error");
-  } finally {
-    savingFile.value = false;
+  if (file.size > 20 * 1024 * 1024) {
+    fileError.value = "File too large (max 20 MB).";
+    uploadedFile.value = null;
+    fileUploadKey.value++;
+    return;
   }
-}
 
-function removeModel() {
+  modelPath.value = file.name;
+  modelFileName.value = file.name;
+});
+
+const removingModel = ref(false);
+
+async function removeModel() {
+  // Clear local state immediately
+  uploadedFile.value = null;
   modelPath.value = null;
   modelFileName.value = null;
-  sessionUrl.value = null;
   fileError.value = null;
+  fileUploadKey.value++; // force UFileUpload to remount empty
+
+  // If editing an existing booth, persist the removal to the DB right away
+  // so that a page reload doesn't bring the old modelPath back
+  if (mode.value === "edit" && props.booth?.id) {
+    removingModel.value = true;
+    try {
+      await api.patch(`/booths/${props.booth.id}`, { modelPath: null });
+    } catch {
+      // non-fatal the next "Save Changes" will also send null
+    } finally {
+      removingModel.value = false;
+    }
+  }
 }
 
-defineExpose({ sessionUrl, modelPath });
-
 const hasModel = computed(() => !!modelFileName.value);
+
+defineExpose({ modelPath });
 </script>
 
 <template>
@@ -315,7 +290,7 @@ const hasModel = computed(() => !!modelFileName.value);
                 {{ myCompany.name }}
               </p>
               <p class="text-xs text-gray-400">
-                ID #{{ myCompany.id }} - {{ myCompany.industry ?? "—" }}
+                ID #{{ myCompany.id }} - {{ myCompany.industry ?? "unknown" }}
               </p>
             </div>
           </div>
@@ -331,33 +306,6 @@ const hasModel = computed(() => !!modelFileName.value);
               >No company found. Go to <strong>Company</strong> tab in the
               sidebar to register one first.</span
             >
-          </div>
-        </template>
-
-        <template v-else>
-          <div v-if="booth?.company" class="flex items-center gap-3">
-            <div
-              class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0"
-            >
-              <UIcon
-                name="i-lucide-building-2"
-                class="w-4 h-4 text-violet-600"
-              />
-            </div>
-            <div class="min-w-0">
-              <p class="text-sm font-semibold text-gray-800 truncate">
-                {{ booth.company.name }}
-              </p>
-              <p class="text-xs text-gray-400">
-                ID #{{ booth.companyId }} · {{ booth.company.industry ?? "—" }}
-              </p>
-            </div>
-          </div>
-          <div v-else-if="booth?.companyId" class="text-sm text-gray-500">
-            Company ID: <strong>#{{ booth.companyId }}</strong>
-          </div>
-          <div v-else class="text-sm text-gray-400 italic">
-            No company linked to this booth
           </div>
         </template>
       </div>
@@ -465,106 +413,57 @@ const hasModel = computed(() => !!modelFileName.value);
         <label class="block text-sm font-semibold text-gray-700 mb-1">
           3D Booth Model
           <span class="font-normal text-gray-400 text-xs ml-1"
-            >(accept only .glb / .gltf)</span
+            >(only .glb - max 20 MB)</span
           >
         </label>
 
+        <!-- Currently linked model pill -->
         <Transition name="slide-down">
           <div
             v-if="hasModel"
             class="mb-3 flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3"
           >
+            <UIcon
+              name="i-lucide-box"
+              class="w-5 h-5 text-violet-500 shrink-0"
+            />
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-violet-900 truncate">
                 {{ modelFileName }}
               </p>
-              <p
-                class="text-xs text-violet-500 mt-0.5 truncate"
-                :title="modelPath ?? ''"
-              >
-                <template v-if="modelPath && modelPath !== modelFileName">{{
-                  modelPath
-                }}</template>
-                <template v-else-if="sessionUrl">Session saved</template>
-                <template v-else>Saved</template>
-              </p>
             </div>
             <button
               type="button"
-              class="text-violet-300 hover:text-red-500 transition shrink-0 p-1 rounded-lg hover:bg-red-50"
+              :disabled="removingModel"
+              class="text-violet-300 hover:text-red-500 transition shrink-0 p-1 rounded-lg hover:bg-red-50 disabled:opacity-40"
               title="Remove model"
               @click="removeModel"
             >
-              <UIcon name="i-lucide-x" class="w-4 h-4" />
+              <UIcon
+                :name="removingModel ? 'i-lucide-loader-circle' : 'i-lucide-x'"
+                class="w-4 h-4"
+                :class="{ 'animate-spin': removingModel }"
+              />
             </button>
           </div>
         </Transition>
 
-        <div
-          class="relative border-2 border-dashed rounded-2xl transition-all duration-200 h-60"
-          :class="
-            dropActive
-              ? 'border-violet-500 bg-violet-50 scale-[1.01]'
-              : 'border-gray-200 bg-gray-50/60 hover:border-violet-400 hover:bg-violet-50/30'
-          "
-          @dragover.prevent="dropActive = true"
-          @dragleave.prevent="dropActive = false"
-          @drop.prevent="handleDrop"
-        >
-          <label
-            class="flex flex-col items-center justify-center gap-3 py-8 px-6 cursor-pointer"
-          >
-            <input
-              type="file"
-              accept=".glb,.gltf,.obj"
-              class="sr-only"
-              @change="handleFileInput"
-            />
-            <div
-              class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all"
-              :class="dropActive ? 'bg-violet-200 scale-110' : 'bg-violet-100'"
-            >
-              <UIcon
-                :name="
-                  savingFile
-                    ? 'i-lucide-loader-circle'
-                    : dropActive
-                      ? 'i-lucide-download'
-                      : 'i-lucide-box'
-                "
-                class="w-7 h-7 text-violet-500"
-                :class="{ 'animate-spin': savingFile }"
-              />
-            </div>
-            <div class="text-center">
-              <p class="text-sm font-semibold text-gray-700">
-                <template v-if="savingFile">Saving file to disk…</template>
-                <template v-else-if="dropActive">Drop to save model</template>
-                <template v-else-if="hasModel"
-                  ><span class="text-violet-600">Click to replace</span> or drag
-                  a new model</template
-                >
-                <template v-else
-                  ><span class="text-violet-600">Click to browse</span> or drag
-                  your 3D model here</template
-                >
-              </p>
-              <p class="text-xs text-gray-400 mt-1">
-                .glb · .gltf max 20 MB
-              </p>
-            </div>
-          </label>
-          <div
-            v-if="dropActive"
-            class="absolute inset-0 border-4 border-violet-400 rounded-2xl pointer-events-none animate-pulse"
-          />
-        </div>
+        <!-- Key forces full remount when we need to clear the picker -->
+        <UFileUpload
+          :key="fileUploadKey"
+          v-model="uploadedFile"
+          accept=".glb,.gltf"
+          :multiple="false"
+          label="Drop your 3D model here or click to browse"
+          description="Supported: .glb - max 20 MB"
+          icon="i-lucide-box"
+          class="border-gray-200 bg-gray-50/60 hover:border-violet-500 hover:bg-violet-50/30 cursor-pointer"
+        />
 
         <Transition name="fade">
           <div
             v-if="fileError"
-            class="mt-2 flex items-start gap-2 text-xs rounded-xl px-3 py-2"
-            :class=" 'text-red-600'"
+            class="mt-2 flex items-start gap-2 text-xs text-red-600 rounded-xl px-3 py-2"
           >
             <UIcon
               name="i-lucide-circle-alert"
@@ -600,7 +499,7 @@ const hasModel = computed(() => !!modelFileName.value);
       <div class="mt-10 pt-8 border-t border-gray-100">
         <button
           type="button"
-          class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2"
+          class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2 cursor-pointer----"
           @click="showDelete = !showDelete"
         >
           <UIcon name="i-lucide-trash-2" class="w-4 h-4" />Delete this booth

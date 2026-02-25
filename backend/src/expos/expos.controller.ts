@@ -31,7 +31,7 @@ import { UpdateExpoDTO } from './dto/update-expo.dto';
 export class ExposController {
   constructor(private expoService: ExposService) {}
 
-  // ── Public ────────────────────────────────────────────────────────────────
+  // Public
 
   @Public()
   @Get()
@@ -55,7 +55,7 @@ export class ExposController {
     return this.expoService.findAllBoothsByExpoId(id);
   }
 
-  // ── Organizer / Admin ─────────────────────────────────────────────────────
+  // Organizer / Admin
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -71,7 +71,7 @@ export class ExposController {
   @Roles('organizer')
   @Patch(':id')
   @ApiOperation({
-    summary: 'Update expo — organizer must own it, admin bypasses',
+    summary: 'Update expo organizer must own it, admin bypasses',
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -89,7 +89,7 @@ export class ExposController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
-    summary: 'Delete expo — organizer must own it, admin bypasses',
+    summary: 'Delete expo organizer must own it, admin bypasses',
   })
   async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
@@ -97,7 +97,7 @@ export class ExposController {
     return this.expoService.deleteExpoByOrganizer(id, req.user.userId);
   }
 
-  // ── Organizer — booth management within their expo ────────────────────────
+  // Organizer booth management within their expo
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -105,7 +105,7 @@ export class ExposController {
   @Get(':id/booths/all')
   @ApiOperation({
     summary:
-      'Get ALL booths of expo (organizer/admin — not filtered by status)',
+      'Get ALL booths of expo (organizer/admin - not filtered by status)',
   })
   async findAllBoothsManage(
     @Param('id', ParseIntPipe) id: number,

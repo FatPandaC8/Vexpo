@@ -3,9 +3,9 @@
  * BoothMapPicker
  * A 5×6 interactive grid for picking / displaying a booth's floor-map position.
  * Props:
- *   modelValue  — { row, col } | null   (v-model)
- *   occupied    — array of { row, col, name } cells that are already taken
- *   readonly    — show-only mode (no clicking)
+ *   modelValue  - { row, col } | null   (v-model)
+ *   occupied    - array of { row, col, name } cells that are already taken
+ *   readonly     show-only mode (no clicking)
  */
 
 export interface Cell {
@@ -66,7 +66,7 @@ function handleClick(r: number, c: number) {
 }
 
 function cellTitle(r: number, c: number) {
-  if (isSelected(r, c)) return `Your booth — ${r + 1}${COLUMN_LABELS[c]}`;
+  if (isSelected(r, c)) return `Your booth: ${r + 1}${COLUMN_LABELS[c]}`;
   const info = occupiedInfo(r, c);
   if (info) return `Taken${info.name ? ": " + info.name : ""}`;
   return `${r + 1}${COLUMN_LABELS[c]}`;

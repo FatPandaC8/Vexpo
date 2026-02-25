@@ -1,41 +1,55 @@
 <script setup lang="ts">
-const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>()
-const props = defineProps<{ activeView: string; activeId?: number }>()
+const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
+const props = defineProps<{ activeView: string; activeId?: number }>();
 
-const api     = useApi()
-const section = ref<'expos' | 'booths'>('expos')
+const api = useApi();
+const section = ref<"expos" | "booths">("expos");
 
 const TABS = [
-  { key: 'expos',  label: 'My Expos', icon: 'i-lucide-calendar' },
-  { key: 'booths', label: 'Booths',   icon: 'i-lucide-store'    },
-]
+  { key: "expos", label: "My Expos", icon: "i-lucide-calendar" },
+  { key: "booths", label: "Booths", icon: "i-lucide-store" },
+];
 
-const expos         = ref<any[]>([])
-const booths        = ref<any[]>([])
-const loadingExpos  = ref(false)
-const loadingBooths = ref(false)
+const expos = ref<any[]>([]);
+const booths = ref<any[]>([]);
+const loadingExpos = ref(false);
+const loadingBooths = ref(false);
 
 async function loadExpos() {
-  loadingExpos.value = true
-  try { expos.value = await api.get('me/expos') }
-  catch { expos.value = [] }
-  finally { loadingExpos.value = false }
+  loadingExpos.value = true;
+  try {
+    expos.value = await api.get("me/expos");
+  } catch {
+    expos.value = [];
+  } finally {
+    loadingExpos.value = false;
+  }
 }
 
 async function loadBooths() {
-  loadingBooths.value = true
+  loadingBooths.value = true;
   try {
-    const res = await api.getPaginated<any>('/booths', { page: 1, limit: 20 })
-    booths.value = res.items
-  } catch { booths.value = [] }
-  finally { loadingBooths.value = false }
+    const res = await api.getPaginated<any>("/booths", { page: 1, limit: 20 });
+    booths.value = res.items;
+  } catch {
+    booths.value = [];
+  } finally {
+    loadingBooths.value = false;
+  }
 }
 
-onMounted(loadExpos)
-watch(section, (s) => { if (s === 'booths') loadBooths() })
-watch(() => props.activeId, () => { if (section.value === 'booths') loadBooths() })
+onMounted(loadExpos);
+watch(section, (s) => {
+  if (s === "booths") loadBooths();
+});
+watch(
+  () => props.activeId,
+  () => {
+    if (section.value === "booths") loadBooths();
+  },
+);
 
-defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths })
+defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths });
 </script>
 
 <template>
@@ -44,12 +58,18 @@ defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths })
 
     <!-- Expos -->
     <template v-if="section === 'expos'">
-      <SidebarSection label="My Expos" :loading="loadingExpos" @refresh="loadExpos">
+      <SidebarSection
+        label="My Expos"
+        :loading="loadingExpos"
+        @refresh="loadExpos"
+      >
         <UButton
-          size="xs" icon="i-lucide-plus"
+          size="xs"
+          icon="i-lucide-plus"
           class="bg-[#3d52d5] text-white hover:bg-blue-700"
           @click="emit('select', { view: 'expo-create' })"
-        >New</UButton>
+          >New</UButton
+        >
       </SidebarSection>
 
       <SidebarEmptyState
@@ -71,7 +91,11 @@ defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths })
 
     <!-- Booths -->
     <template v-else>
-      <SidebarSection label="Booth Requests" :loading="loadingBooths" @refresh="loadBooths" />
+      <SidebarSection
+        label="Booth Requests"
+        :loading="loadingBooths"
+        @refresh="loadBooths"
+      />
 
       <SidebarEmptyState
         v-if="booths.length === 0"

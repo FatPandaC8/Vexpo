@@ -3,75 +3,78 @@
 // New Google OAuth users land here with ?token=xxx (a temp token, 10 min TTL).
 // They pick a role → POST /auth/oauth/complete → get a full token → go to dashboard.
 
-import Logo from '~/components/Logo.vue'
+import Logo from "~/components/Logo.vue";
 
-const route = useRoute()
-const auth  = useAuth()
+const route = useRoute();
+const auth = useAuth();
 
-const tempToken = route.query.token as string | undefined
+const tempToken = route.query.token as string | undefined;
 
 // Guard: if no temp token, the user shouldn't be here
 if (!tempToken) {
-  await navigateTo('/auth')
+  await navigateTo("/auth");
 }
 
 // Store the temp token so useAuth's authHeaders() works for the /oauth/complete call
-auth.setToken(tempToken!)
+auth.setToken(tempToken!);
 
 // UI state
-const selectedRole = ref<'visitor' | 'exhibitor' | 'organizer' | null>(null)
-const isLoading    = ref(false)
-const errorMsg     = ref<string | null>(null)
+const selectedRole = ref<"visitor" | "exhibitor" | "organizer" | null>(null);
+const isLoading = ref(false);
+const errorMsg = ref<string | null>(null);
 
 const roleOptions: {
-  value: 'visitor' | 'exhibitor' | 'organizer'
-  label: string
-  description: string
-  icon: string
+  value: "visitor" | "exhibitor" | "organizer";
+  label: string;
+  description: string;
+  icon: string;
 }[] = [
   {
-    value:       'visitor',
-    label:       'Visitor',
-    description: 'Browse expos, explore booths, and connect with exhibitors.',
-    icon:        'i-lucide-user',
+    value: "visitor",
+    label: "Visitor",
+    description: "Browse expos, explore booths, and connect with exhibitors.",
+    icon: "i-lucide-user",
   },
   {
-    value:       'exhibitor',
-    label:       'Exhibitor',
-    description: 'Showcase your company, register booths, and meet visitors.',
-    icon:        'i-lucide-building-2',
+    value: "exhibitor",
+    label: "Exhibitor",
+    description: "Showcase your company, register booths, and meet visitors.",
+    icon: "i-lucide-building-2",
   },
   {
-    value:       'organizer',
-    label:       'Organizer',
-    description: 'Create and manage virtual expos from start to finish.',
-    icon:        'i-lucide-calendar-check',
+    value: "organizer",
+    label: "Organizer",
+    description: "Create and manage virtual expos from start to finish.",
+    icon: "i-lucide-calendar-check",
   },
-]
+];
 
 // Submit
 async function confirm() {
   if (!selectedRole.value) {
-    errorMsg.value = 'Please select a role to continue.'
-    return
+    errorMsg.value = "Please select a role to continue.";
+    return;
   }
-  errorMsg.value  = null
-  isLoading.value = true
+  errorMsg.value = null;
+  isLoading.value = true;
   try {
-    await auth.completeOAuth(selectedRole.value)
-    await navigateTo('/')
+    await auth.completeOAuth(selectedRole.value);
+    await navigateTo("/");
   } catch (err: any) {
-    const msg = err?.data?.message ?? err?.message
-    errorMsg.value = Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Something went wrong.')
+    const msg = err?.data?.message ?? err?.message;
+    errorMsg.value = Array.isArray(msg)
+      ? msg.join(", ")
+      : (msg ?? "Something went wrong.");
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-100 flex flex-col">
-
+  <div
+    class="min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-100 flex flex-col"
+  >
     <!-- Minimal header -->
     <header class="flex items-center gap-3 px-12 py-6">
       <Logo class="w-9 h-9" />
@@ -81,15 +84,17 @@ async function confirm() {
     <!-- Main content -->
     <main class="flex-1 flex items-center justify-center px-6 py-12">
       <div class="w-full max-w-2xl">
-
         <!-- Heading -->
         <div class="text-center mb-10">
-          <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-[#3d52d5]/10 flex items-center justify-center">
+          <div
+            class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-[#3d52d5]/10 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-sparkles" class="w-8 h-8 text-[#3d52d5]" />
           </div>
           <h1 class="text-3xl font-bold text-gray-900 mb-2">One last step!</h1>
           <p class="text-gray-500">
-            Tell us how you plan to use ExpoVerse so we can tailor your experience.
+            Tell us how you plan to use ExpoVerse so we can tailor your
+            experience.
           </p>
         </div>
 
@@ -101,7 +106,10 @@ async function confirm() {
           >
             <UIcon name="i-lucide-circle-alert" class="shrink-0 text-red-500" />
             <span>{{ errorMsg }}</span>
-            <button class="ml-auto text-red-400 hover:text-red-600" @click="errorMsg = null">
+            <button
+              class="ml-auto text-red-400 hover:text-red-600"
+              @click="errorMsg = null"
+            >
               <UIcon name="i-lucide-x" />
             </button>
           </div>
@@ -149,7 +157,9 @@ async function confirm() {
             </div>
 
             <h3 class="font-bold text-gray-900 mb-1">{{ option.label }}</h3>
-            <p class="text-xs text-gray-500 leading-relaxed">{{ option.description }}</p>
+            <p class="text-xs text-gray-500 leading-relaxed">
+              {{ option.description }}
+            </p>
           </button>
         </div>
 
@@ -167,15 +177,24 @@ async function confirm() {
           size="lg"
           @click="confirm"
         >
-          {{ isLoading ? 'Setting up your account…' : `Continue as ${selectedRole ? roleOptions.find(r => r.value === selectedRole)?.label : '…'}` }}
+          {{
+            isLoading
+              ? "Setting up your account…"
+              : `Continue as ${selectedRole ? roleOptions.find((r) => r.value === selectedRole)?.label : "…"}`
+          }}
         </UButton>
-
       </div>
     </main>
   </div>
 </template>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
-.fade-enter-from,  .fade-leave-to      { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

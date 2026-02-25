@@ -1,10 +1,10 @@
 <script setup lang="ts">
 defineProps<{
-  label:    string
-  loading?: boolean
-}>()
+  label: string;
+  loading?: boolean;
+}>();
 
-const emit = defineEmits<{ refresh: [] }>()
+const emit = defineEmits<{ refresh: [] }>();
 </script>
 
 <template>

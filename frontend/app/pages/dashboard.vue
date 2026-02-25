@@ -39,20 +39,19 @@ function select({ view, data }: { view: string; data?: any }) {
 }
 
 // Sidebar refs (for programmatic refresh)
-const visitorSidebar   = ref<any>(null)
-const exhibitorSidebar = ref<any>(null)
-const organizerSidebar = ref<any>(null)
-const adminSidebar     = ref<any>(null)
+const exhibitorSidebar  = ref<any>(null)
+const organizerSidebar  = ref<any>(null)
+const adminSidebar      = ref<any>(null)
 
 // EXHIBITOR events
 function onBoothRegistered() {
   exhibitorSidebar.value?.refreshBooths()
-  // Keep the success state visible in the panel — don't navigate away
+  // Keep the success state visible in the panel
 }
 
-function onCompanyUpdated(company: any) {
+function onCompanyUpdated(companyData: any) {
   // Switch to edit mode with the newly saved company
-  activeData.value = company;
+  activeData.value = companyData;
 }
 
 function onCompanyDeleted() {

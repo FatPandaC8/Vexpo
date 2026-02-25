@@ -32,7 +32,7 @@ export class CompaniesService {
 
   async getCompanyByExhibitor(exhibitorId: number) {
     return await this.companyRepository.findOneBy({
-      exhibitorId: exhibitorId
+      exhibitorId: exhibitorId,
     });
   }
 
@@ -49,12 +49,18 @@ export class CompaniesService {
     return company;
   }
 
-  async registerCompany(userId: number, dto: RegisterCompanyDTO) {
+  async registerCompany(
+    userId: number,
+    dto: RegisterCompanyDTO,
+  ): Promise<number> {
     const company = this.companyRepository.create({
       ...dto,
       exhibitorId: userId,
     });
-    return this.companyRepository.save(company);
+    this.companyRepository.save(company);
+
+    // after creating the company, it should auto give back the id of it self
+    return company.id;
   }
 
   async updateCompany(id: number, dto: UpdateCompanyDto) {

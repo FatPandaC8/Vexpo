@@ -50,7 +50,7 @@ export class UserAdminController {
     return this.userService.findOneById(userId);
   }
 
-  @ApiOperation({ description: "Edit user" })
+  @ApiOperation({ description: 'Edit user' })
   @Patch(':id')
   updateUser(
     @Param('id', ParseIntPipe) userId: number,

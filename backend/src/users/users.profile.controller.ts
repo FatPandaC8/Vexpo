@@ -18,12 +18,10 @@ export class UsersProfileController {
       id: user.id,
       name: user.name,
       email: user.email,
-      roles: user.roles?.map((ur) => ur.role.name) ?? [], 
+      roles: user.roles?.map((ur) => ur.role.name) ?? [],
     };
   }
 
   @Patch('change')
-  editMyProfile() {
-    
-  }
+  editMyProfile() {}
 }

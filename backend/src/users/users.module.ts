@@ -26,7 +26,7 @@ import { UsersMeController } from './users.me.controller';
     UsersController,
     UserAdminController,
     UsersProfileController,
-    UsersMeController
+    UsersMeController,
   ],
 })
 export class UsersModule {}

@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
+} from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { ApiOperation } from '@nestjs/swagger';
@@ -7,29 +18,35 @@ import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('companies')
 export class CompaniesController {
-    constructor(private companyService: CompaniesService) {}
+  constructor(private companyService: CompaniesService) {}
 
-    @Public()
-    @Get()
-    findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 20) {
+  @Public()
+  @Get()
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 20) {
     return this.companyService.findAllPaginated(page, limit);
-    }
+  }
 
-    @Roles('admin')
-    @Patch(':id')
-    @ApiOperation({ summary: 'Update company' })
-    async updateCompany(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() dto: UpdateCompanyDto,
-    ) {
-        return this.companyService.updateCompany(id, dto);
-    }
+  @Public()
+  @Get(':id')
+  findCompanyById(@Param('id', ParseIntPipe) id: number) {
+    return this.companyService.findById(id);
+  }
 
-    @Roles('admin')
-    @Delete(':id')
-    @ApiOperation({ summary: 'Delete company' })
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteCompany(@Param('id', ParseIntPipe) id: number) {
-        return this.companyService.deleteCompany(id);
-    }
+  @Roles('admin')
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update company' })
+  async updateCompany(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCompanyDto,
+  ) {
+    return this.companyService.updateCompany(id, dto);
+  }
+
+  @Roles('admin')
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete company' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteCompany(@Param('id', ParseIntPipe) id: number) {
+    return this.companyService.deleteCompany(id);
+  }
 }

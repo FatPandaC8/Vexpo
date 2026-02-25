@@ -15,6 +15,7 @@ async function fetchBooth() {
   loading.value = true
   try {
     booth.value = await api.get<any>(`/booths/${boothId}`)
+    // IMPORTANT: booth's company and company's id is null now
   } catch {
     booth.value = null
   } finally {
@@ -23,8 +24,6 @@ async function fetchBooth() {
 }
 
 onMounted(fetchBooth)
-
-console.log(booth.value);
 
 </script>
 

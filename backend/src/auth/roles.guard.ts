@@ -10,23 +10,23 @@ export class RolesGuard implements CanActivate {
     const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
       context.getHandler(),
       context.getClass(),
-    ])
-    if (isPublic) return true
+    ]);
+    if (isPublic) return true;
 
     const requiredRoles = this.reflector.getAllAndMerge<string[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
-    ])
-    if (!requiredRoles?.length) return true
+    ]);
+    if (!requiredRoles?.length) return true;
 
-    const request = context.switchToHttp().getRequest()
-    const user = request.user
-    if (!user?.roles) return false
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    if (!user?.roles) return false;
 
-    const userRoles = (user.roles as string[]).map((r) => r.toLowerCase())
+    const userRoles = (user.roles as string[]).map((r) => r.toLowerCase());
 
-    if (userRoles.includes('admin')) return true
+    if (userRoles.includes('admin')) return true;
 
-    return requiredRoles.some((r) => userRoles.includes(r.toLowerCase()))
+    return requiredRoles.some((r) => userRoles.includes(r.toLowerCase()));
   }
 }

@@ -37,6 +37,25 @@ const state = reactive({
   status:      props.booth?.status      ?? 'pending',
 })
 
+//j Company auto-fill (create mode only)
+const myCompany      = ref<any>(null)
+const loadingCompany = ref(false)
+
+async function loadMyCompany() {
+  if (mode.value !== 'create') return
+  loadingCompany.value = true
+  try {
+    myCompany.value = await api.get<any>('/me/company')
+    if (myCompany.value?.id && !state.companyId) {
+      state.companyId = myCompany.value.id
+    }
+  } catch {
+    myCompany.value = null
+  } finally {
+    loadingCompany.value = false
+  }
+}
+
 // Map position
 const mapPosition = ref<Cell | null>(
   props.booth?.mapRow != null && props.booth?.mapCol != null
@@ -60,7 +79,10 @@ async function loadOccupied() {
   }
 }
 
-onMounted(loadOccupied)
+onMounted(() => {
+  loadOccupied()
+  loadMyCompany()
+})
 
 watch(() => props.booth, (b) => {
   state.name        = b?.name        ?? ''
@@ -89,6 +111,7 @@ async function submit(event: any) {
   try {
     const payload: any = {
       ...event.data,
+      companyId: state.companyId,
       modelPath: modelPath.value ?? undefined,
       status:    state.status,
       mapRow:    mapPosition.value?.row ?? null,
@@ -212,22 +235,65 @@ const hasModel = computed(() => !!modelFileName.value)
 <template>
   <div>
     <!-- Header -->
-    <div class="flex items-center gap-4 mb-8">
-      <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center shrink-0">
-        <UIcon name="i-lucide-store" class="w-6 h-6 text-violet-600" />
+    <div class="flex justify-between">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center shrink-0">
+          <UIcon name="i-lucide-store" class="w-6 h-6 text-violet-600" />
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">
+            {{ mode === 'create' ? 'Register Booth' : 'Edit Booth' }}
+          </h2>
+          <p class="text-sm text-gray-400 mt-0.5">
+            <template v-if="mode === 'create'">
+              Registering for: <strong class="text-gray-700">{{ expo?.name }}</strong>
+            </template>
+            <template v-else>
+              Editing: <strong class="text-gray-700">{{ booth?.name }}</strong>
+            </template>
+          </p>
+        </div>
       </div>
-      <div>
-        <h2 class="text-2xl font-bold text-gray-900">
-          {{ mode === 'create' ? 'Register Booth' : 'Edit Booth' }}
-        </h2>
-        <p class="text-sm text-gray-400 mt-0.5">
-          <template v-if="mode === 'create'">
-            Registering for: <strong class="text-gray-700">{{ expo?.name }}</strong>
-          </template>
-          <template v-else>
-            Editing: <strong class="text-gray-700">{{ booth?.name }}</strong>
-          </template>
-        </p>
+
+      <!-- Company -->
+      <div class="rounded-xl border border-gray-400 bg-gray-50 px-4 py-3">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2.5">Company</p>
+  
+        <template v-if="mode === 'create'">
+          <div v-if="loadingCompany" class="flex items-center gap-2 text-sm text-gray-400">
+            <UIcon name="i-lucide-loader-circle" class="w-4 h-4 animate-spin" />
+            Detecting your company…
+          </div>
+          <div v-else-if="myCompany" class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-violet-600" />
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ myCompany.name }}</p>
+              <p class="text-xs text-gray-400">ID #{{ myCompany.id }} - {{ myCompany.industry ?? '—' }}</p>
+            </div>
+          </div>
+          <div v-else class="flex items-start gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            <UIcon name="i-lucide-triangle-alert" class="w-4 h-4 shrink-0 mt-0.5" />
+            <span>No company found. Go to <strong>Company</strong> tab in the sidebar to register one first.</span>
+          </div>
+        </template>
+  
+        <template v-else>
+          <div v-if="booth?.company" class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-violet-600" />
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ booth.company.name }}</p>
+              <p class="text-xs text-gray-400">ID #{{ booth.companyId }} · {{ booth.company.industry ?? '—' }}</p>
+            </div>
+          </div>
+          <div v-else-if="booth?.companyId" class="text-sm text-gray-500">
+            Company ID: <strong>#{{ booth.companyId }}</strong>
+          </div>
+          <div v-else class="text-sm text-gray-400 italic">No company linked to this booth</div>
+        </template>
       </div>
     </div>
 
@@ -239,6 +305,7 @@ const hasModel = computed(() => !!modelFileName.value)
         <span v-if="mode === 'create'" class="text-emerald-600 ml-1">Check "My Booths" in the sidebar.</span>
       </div>
     </Transition>
+
     <Transition name="fade">
       <div v-if="error" class="mb-6 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
         <UIcon name="i-lucide-circle-alert" class="shrink-0 text-red-500" />
@@ -269,8 +336,8 @@ const hasModel = computed(() => !!modelFileName.value)
                 itemLabel: 'text-gray-700',
               }" />
           </UFormField>
+
         </div>
-  
   
         <!-- Floor Map Position -->
         <BoothMapPicker

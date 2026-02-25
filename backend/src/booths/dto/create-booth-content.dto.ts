@@ -16,7 +16,10 @@ export class CreateBoothContentDTO {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: 'We showcase innovative tech solutions', required: false })
+  @ApiProperty({
+    example: 'We showcase innovative tech solutions',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   description?: string;
@@ -28,7 +31,8 @@ export class CreateBoothContentDTO {
 
   @ApiProperty({
     example: 'C:/Users/john/models/booth.glb',
-    description: 'Absolute path to the 3D model file saved on the exhibitor\'s local machine',
+    description:
+      "Absolute path to the 3D model file saved on the exhibitor's local machine",
     required: false,
   })
   @IsString()
@@ -41,7 +45,10 @@ export class CreateBoothContentDTO {
   @Max(MAP_ROWS - 1)
   mapRow?: number;
 
-  @ApiProperty({ example: 3, description: `Floor map column (0–${MAP_COLS - 1})` })
+  @ApiProperty({
+    example: 3,
+    description: `Floor map column (0–${MAP_COLS - 1})`,
+  })
   @IsInt()
   @Min(0)
   @Max(MAP_COLS - 1)

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
@@ -49,17 +53,17 @@ export class UsersService {
     const public_user = await this.findOneById(id);
     // for more protection: check if the found user is an admin ?
     const isAdmin = await this.userRoleRepository.findOneBy({
-      id: public_user?.id
-    })
+      id: public_user?.id,
+    });
     // 1 is admin
     if (isAdmin?.roleId === 1) {
-      throw new BadRequestException('You cannot view admin info')
+      throw new BadRequestException('You cannot view admin info');
     }
 
     // return the user info
     const return_user: PublicUserInfo = {
       name: public_user?.name,
-      email: public_user?.email
+      email: public_user?.email,
     };
 
     return return_user;
@@ -115,35 +119,35 @@ export class UsersService {
   async updateUser(
     id: number,
     data: {
-      name?: string
-      email?: string
-      role?: string
+      name?: string;
+      email?: string;
+      role?: string;
     },
   ) {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: ['roles', 'roles.role'],
-    })
+    });
 
-    if (!user) throw new NotFoundException('User not found')
+    if (!user) throw new NotFoundException('User not found');
 
     // update basic fields
     if (data.name !== undefined) {
-      user.name = data.name
+      user.name = data.name;
     }
 
     if (data.email !== undefined) {
-      user.email = data.email
+      user.email = data.email;
     }
 
-    await this.userRepository.save(user)
+    await this.userRepository.save(user);
 
     // update role if provided
     if (data.role) {
-      await this.setRole(id, data.role)
+      await this.setRole(id, data.role);
     }
 
-    return this.findOneById(id)
+    return this.findOneById(id);
   }
 
   async deleteUser(id: number) {

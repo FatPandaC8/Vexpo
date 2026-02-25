@@ -180,7 +180,7 @@ const dropActive = ref(false);
 const fileError = ref<string | null>(null);
 const savingFile = ref(false);
 
-const ALLOWED = [".glb", ".gltf", ".obj"];
+const ALLOWED = [".glb", ".gltf"];
 function isAllowed(name: string) {
   return ALLOWED.some((ext) => name.toLowerCase().endsWith(ext));
 }
@@ -200,7 +200,7 @@ function handleFileInput(e: Event) {
 async function processFile(file: File) {
   fileError.value = null;
   if (!isAllowed(file.name)) {
-    fileError.value = "Only .glb, .gltf, or .obj files are accepted.";
+    fileError.value = "Only .glb, .gltf files are accepted.";
     return;
   }
   if (file.size > 200 * 1024 * 1024) {
@@ -219,7 +219,6 @@ async function processFile(file: File) {
             accept: {
               "model/gltf-binary": [".glb"],
               "model/gltf+json": [".gltf"],
-              "text/plain": [".obj"],
             },
           },
         ],
@@ -466,7 +465,7 @@ const hasModel = computed(() => !!modelFileName.value);
         <label class="block text-sm font-semibold text-gray-700 mb-1">
           3D Booth Model
           <span class="font-normal text-gray-400 text-xs ml-1"
-            >(optional · .glb / .gltf / .obj)</span
+            >(accept only .glb / .gltf)</span
           >
         </label>
 
@@ -551,7 +550,7 @@ const hasModel = computed(() => !!modelFileName.value);
                 >
               </p>
               <p class="text-xs text-gray-400 mt-1">
-                .glb · .gltf · .obj · max 200 MB
+                .glb · .gltf max 20 MB
               </p>
             </div>
           </label>
@@ -565,11 +564,7 @@ const hasModel = computed(() => !!modelFileName.value);
           <div
             v-if="fileError"
             class="mt-2 flex items-start gap-2 text-xs rounded-xl px-3 py-2"
-            :class="
-              fileError.startsWith('⚠')
-                ? 'text-amber-700 bg-amber-50 border border-amber-200'
-                : 'text-red-600'
-            "
+            :class=" 'text-red-600'"
           >
             <UIcon
               name="i-lucide-circle-alert"

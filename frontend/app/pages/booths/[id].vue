@@ -107,15 +107,19 @@ onMounted(() => [
                 class="bg-gray-950 rounded-2xl overflow-hidden shadow-xl border border-gray-800"
                 style="height: 560px"
               >
-              <ClientOnly>
-                <model-viewer
-                  src="/frontend/public/test.glb"
-                  alt="avatar"
-                  shadow-intensity="1"
-                  camera-controls
-                  >
-                </model-viewer>
-              </ClientOnly>
+                <ClientOnly>
+                  <!--Now make it take the model from the booth instead of hard coding like this-->
+                  <model-viewer
+                    src="http://localhost:3001/test.glb"
+                    alt="avatar"
+                    shadow-intensity="1"
+                    camera-controls
+                    loading="lazy"
+                    class="w-full h-full"
+                    >
+                  </model-viewer>
+                </ClientOnly>
+
               </div>
               <p
                 class="text-xs text-gray-400 text-center mt-3 flex items-center justify-center gap-1.5"

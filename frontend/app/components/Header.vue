@@ -23,13 +23,13 @@ const userMenuItems = computed(() => [
     class="flex justify-between items-center bg-blue-50 h-20 sticky top-0 shadow-md z-50"
   >
     <!--Logo-->
-    <div class="mb-6 flex items-center ml-20 mt-5">
+    <NuxtLink to="/" class="mb-6 flex items-center ml-20 mt-5">
       <Logo class="w-10 h-10" />
       <div>
         <h2 class="text-lg font-bold text-[#3d52d5] ml-3">ExpoVerse</h2>
         <p class="text-sm ml-3 text-gray-500">Virtual Expo Platform</p>
       </div>
-    </div>
+    </NuxtLink>
     <!--Logo-->
 
     <!--Tabs-->

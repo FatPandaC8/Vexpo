@@ -149,11 +149,11 @@ function openBooth(id: number) {
                 class="border-2 border-blue-500 bg-[#3d52d5]/50 p-3"
               >
                 <h1>
-                  <span class="font-bold">Organized by:</span>
+                  <span class="font-bold">Organized by: </span>
                   <span> {{ organizer.name || "Unknown organizer" }} </span>
                 </h1>
                 <p>
-                  <span class="font-bold">Contact info:</span>
+                  <span class="font-bold">Contact info: </span>
                   <span>
                     {{ organizer.email || "Unknown organizer contact info" }}
                   </span>

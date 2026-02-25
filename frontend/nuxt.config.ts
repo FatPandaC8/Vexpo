@@ -19,5 +19,10 @@ export default defineNuxtConfig({
     public: {
       apiBase: 'http://localhost:3001'
     }
-  }
+  },
+  vue: {
+    compilerOptions: {
+      isCustomElement: tag => ['model-viewer'].includes(tag),
+    },
+  },
 });

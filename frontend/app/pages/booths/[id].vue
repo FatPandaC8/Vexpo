@@ -24,6 +24,9 @@ async function fetchBooth() {
 }
 
 onMounted(fetchBooth);
+onMounted(() => [
+  import('@google/model-viewer')
+])
 </script>
 
 <template>
@@ -104,7 +107,15 @@ onMounted(fetchBooth);
                 class="bg-gray-950 rounded-2xl overflow-hidden shadow-xl border border-gray-800"
                 style="height: 560px"
               >
-                <!-- 3D Scene rendered with CSS + canvas-like technique -->
+              <ClientOnly>
+                <model-viewer
+                  src="/frontend/public/test.glb"
+                  alt="avatar"
+                  shadow-intensity="1"
+                  camera-controls
+                  >
+                </model-viewer>
+              </ClientOnly>
               </div>
               <p
                 class="text-xs text-gray-400 text-center mt-3 flex items-center justify-center gap-1.5"

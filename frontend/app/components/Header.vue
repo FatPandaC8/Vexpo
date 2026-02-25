@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Logo from "./Logo.vue";
+
 const auth = useAuth();
 
 // Recap: computed - define a value that depends on other reactive data values
@@ -65,7 +66,7 @@ const userMenuItems = computed(() => [
     <!--Account-->
     <div class="flex items-center mr-20">
       <!-- Logged IN: dropdown -->
-      <template v-if="auth.isLoggedIn">
+      <template v-if="auth.isLoggedIn.value">
         <UDropdownMenu
           :items="userMenuItems"
           :ui="{
@@ -83,9 +84,11 @@ const userMenuItems = computed(() => [
             variant="ghost"
             class="flex items-center gap-2 rounded-xl px-3 py-2 hover:bg-blue-100 cursor-pointer"
           >
-            <span class="text-sm font-semibold text-gray-700 truncate">
-              {{ auth.user.value?.name ?? "Account" }}
-            </span>
+            <ClientOnly>
+              <span class="text-sm font-semibold text-gray-700">
+                {{ auth.user.value?.name || 'Hydration mismatch' }}
+              </span>
+            </ClientOnly>
             <UIcon name="i-lucide-chevron-down" class="text-gray-400" />
           </UButton>
         </UDropdownMenu>

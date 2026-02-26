@@ -15,8 +15,6 @@ const roleLabel = computed(() => {
 });
 
 const roleBadgeClass = computed(() => {
-  if (auth.isVisitor.value)
-    return "bg-blue-100 text-blue-700 border border-blue-200";
   if (auth.isExhibitor.value)
     return "bg-violet-100 text-violet-700 border border-violet-200";
   if (auth.isOrganizer.value)
@@ -27,7 +25,6 @@ const roleBadgeClass = computed(() => {
 });
 
 const roleIcon = computed(() => {
-  if (auth.isVisitor.value) return "i-lucide-user";
   if (auth.isExhibitor.value) return "i-lucide-building-2";
   if (auth.isOrganizer.value) return "i-lucide-calendar-check";
   if (auth.isAdmin.value) return "i-lucide-shield";

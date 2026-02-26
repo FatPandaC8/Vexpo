@@ -114,7 +114,7 @@ export class AuthService {
 
   async completeOAuthRegistration(
     userId: number,
-    role: 'visitor' | 'exhibitor' | 'organizer',
+    role: 'exhibitor' | 'organizer',
   ): Promise<{ access_token: string }> {
     await this.usersService.assignRole(userId, role);
 

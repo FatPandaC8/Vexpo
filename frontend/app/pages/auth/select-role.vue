@@ -19,26 +19,20 @@ if (!tempToken) {
 auth.setToken(tempToken!);
 
 // UI state
-const selectedRole = ref<"visitor" | "exhibitor" | "organizer" | null>(null);
+const selectedRole = ref< "exhibitor" | "organizer" | null>(null);
 const isLoading = ref(false);
 const errorMsg = ref<string | null>(null);
 
 const roleOptions: {
-  value: "visitor" | "exhibitor" | "organizer";
+  value: "exhibitor" | "organizer";
   label: string;
   description: string;
   icon: string;
 }[] = [
   {
-    value: "visitor",
-    label: "Visitor",
-    description: "Browse expos, explore booths, and connect with exhibitors.",
-    icon: "i-lucide-user",
-  },
-  {
     value: "exhibitor",
     label: "Exhibitor",
-    description: "Showcase your company, register booths, and meet visitors.",
+    description: "Showcase your company, register booths.",
     icon: "i-lucide-building-2",
   },
   {
@@ -116,7 +110,7 @@ async function confirm() {
         </Transition>
 
         <!-- Role cards -->
-        <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-2 gap-4 mb-8">
           <button
             v-for="option in roleOptions"
             :key="option.value"

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Logo from "~/components/Logo.vue";
-import Unsupported from "~/components/Unsupported.vue";
 
 definePageMeta({ middleware: "auth" });
 
@@ -14,7 +13,6 @@ const roleLabel = computed(() => {
 });
 
 const roleBadgeColor = computed(() => {
-  if (auth.isVisitor.value) return "bg-blue-100 text-blue-700";
   if (auth.isExhibitor.value) return "bg-violet-100 text-violet-700";
   if (auth.isOrganizer.value) return "bg-emerald-100 text-emerald-700";
   if (auth.isAdmin.value) return "bg-red-100 text-red-700";
@@ -97,13 +95,6 @@ function onAdminDeleted() {
 
 // Welcome copy per role
 const welcomeConfig = computed(() => {
-  if (auth.isVisitor.value)
-    return {
-      icon: "i-lucide-ticket",
-      color: "bg-blue-100 text-blue-500",
-      title: "Browse & Register for Expos",
-      body: "Pick an expo from the sidebar to view details and register, or browse all available expos.",
-    };
   if (auth.isExhibitor.value)
     return {
       icon: "i-lucide-store",
@@ -167,10 +158,8 @@ const welcomeConfig = computed(() => {
       >
         <!-- Scrollable sidebar body -->
         <div class="flex-1 overflow-y-auto p-4 flex flex-col min-h-0">
-          <Unsupported v-if="auth.isVisitor.value" />
-
           <DashboardExhibitorSidebar
-            v-else-if="auth.isExhibitor.value"
+            v-if="auth.isExhibitor.value"
             ref="exhibitorSidebar"
             :active-view="activeView"
             :active-id="activeId"

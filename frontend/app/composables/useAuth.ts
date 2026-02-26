@@ -20,7 +20,6 @@ export const useAuth = () => {
   const isLoggedIn = computed(() => !!token.value)
 
   const role = computed(() => user.value?.roles?.at(0) ?? null)
-  const isVisitor   = computed(() => role.value === 'visitor')
   const isExhibitor = computed(() => role.value === 'exhibitor')
   const isOrganizer = computed(() => role.value === 'organizer')
   const isAdmin     = computed(() => role.value === 'admin')
@@ -71,7 +70,7 @@ export const useAuth = () => {
     await fetchProfile()
   }
 
-  async function completeOAuth(role: 'visitor' | 'exhibitor' | 'organizer') {
+  async function completeOAuth(role: 'exhibitor' | 'organizer') {
     const res = await $fetch<{ access_token: string }>('/auth/oauth/complete', {
       method: 'POST',
       baseURL: BASE,
@@ -104,7 +103,6 @@ export const useAuth = () => {
     user,
     isLoggedIn,
     role,
-    isVisitor,
     isExhibitor,
     isOrganizer,
     isAdmin,

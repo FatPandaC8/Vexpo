@@ -298,9 +298,6 @@ defineExpose({ modelPath });
               <p class="text-xs text-gray-400">ID #{{ booth.companyId }} · {{ booth.company.industry ?? '—' }}</p>
             </div>
           </div>
-          <div v-else-if="booth?.companyId" class="text-sm text-gray-500">
-            Company ID: <strong>#{{ booth.companyId }}</strong>
-          </div>
           <div v-else class="text-sm text-gray-400 italic">No company linked to this booth</div>
         </template>
       </div>

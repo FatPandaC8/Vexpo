@@ -59,7 +59,7 @@ export class BoothsController {
       return this.boothsService.updateBooth(id, dto);
     }
 
-    // Exhibitor: strip status — cannot self-approve
+    // Exhibitor: strip status - cannot self-approve
     const { status, ...exhibitorDto } = dto;
     return this.boothsService.updateBoothByExhibitor(id, userId, exhibitorDto);
   }

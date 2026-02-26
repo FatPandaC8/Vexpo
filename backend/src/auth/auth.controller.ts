@@ -101,11 +101,4 @@ export class AuthController {
   async logout() {
     return this.authService.logout();
   }
-
-  @ApiOperation({ description: 'See the profile of current user.' })
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  async profile(@Request() req) {
-    return req.user;
-  }
 }

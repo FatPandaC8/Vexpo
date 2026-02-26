@@ -69,13 +69,6 @@ export class UsersService {
     return return_user;
   }
 
-  async findAll() {
-    return this.userRepository.find({
-      relations: ['roles', 'roles.role'],
-      select: ['id', 'name', 'email'],
-    });
-  }
-
   async createUserOnly(data: {
     name: string;
     email: string;

@@ -28,14 +28,6 @@ export class BoothsService {
     return booth;
   }
 
-  async getBoothsByExpo(expoId: number) {
-    return this.boothRepository.find({
-      where: { expoId },
-      relations: ['company'],
-      order: { createdAt: 'ASC' },
-    });
-  }
-
   async createBooth(
     expoId: number,
     exhibitorId: number,

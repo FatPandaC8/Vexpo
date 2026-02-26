@@ -41,7 +41,7 @@ async function save(event: any) {
   error.value = null;
   success.value = false;
   try {
-    const updated = await api.patch(`/admin/users/${props.user.id}`, {
+    const updated = await api.patch(`/users/${props.user.id}`, {
       name: event.data.name,
       email: event.data.email,
       role: event.data.role,
@@ -70,7 +70,8 @@ const deleteLoading = ref(false);
 async function deleteUser() {
   deleteLoading.value = true;
   try {
-    await api.del(`/admin/users/${props.user.id}`);
+    console.log(props.user.id)
+    await api.del(`/users/${props.user.id}`);
     emit("deleted");
   } catch (e: any) {
     error.value = e?.data?.message ?? "Delete failed";

@@ -33,7 +33,6 @@ async function loadOccupied() {
   const expoId = props.booth?.expoId;
   if (!expoId) return;
   try {
-    // Use the public endpoint; admin can also call /admin/booths with filters
     const booths = await api.get<any[]>(`/expos/${expoId}/booths`);
     occupiedCells.value = (booths as any[])
       .filter((b: any) => b.mapRow != null && b.mapCol != null)
@@ -96,7 +95,7 @@ async function deleteBooth() {
   if (!canDelete.value) return;
   deleteLoading.value = true;
   try {
-    await api.del(`/admin/booths/${props.booth.id}`);
+    await api.del(`/booths/${props.booth.id}`);
     emit("deleted");
   } catch (e: any) {
     error.value = e?.data?.message ?? "Delete failed";

@@ -25,11 +25,13 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { ExposService } from './expos.service';
 import { CreateExpoDTO } from './dto/create-expo.dto';
 import { UpdateExpoDTO } from './dto/update-expo.dto';
+import { CreateBoothContentDTO } from 'src/booths/dto/create-booth-content.dto';
+import { BoothsService } from 'src/booths/booths.service';
 
 @ApiTags('Expos')
 @Controller('expos')
 export class ExposController {
-  constructor(private expoService: ExposService) {}
+  constructor(private expoService: ExposService, private boothsService: BoothsService) {}
 
   // Public
 
@@ -115,5 +117,16 @@ export class ExposController {
     if (roles.includes('admin'))
       return this.expoService.findAllBoothsByExpoId(id);
     return this.expoService.getExpoBoothsByOrganizer(id, req.user.userId);
+  }
+
+  @Roles('exhibitor')
+  @Post(':expoId/booths')
+  @ApiOperation({ summary: 'Register a booth for an expo' })
+  createBooth(
+    @Param('expoId', ParseIntPipe) expoId: number,
+    @Body() dto: CreateBoothContentDTO,
+    @Req() req: any,
+  ) {
+    return this.boothsService.createBooth(expoId, req.user.userId, dto);
   }
 }

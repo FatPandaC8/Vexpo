@@ -8,13 +8,16 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { ApiOperation } from '@nestjs/swagger';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Roles } from 'src/auth/roles.decorator';
+import { RegisterCompanyDTO } from './dto/create-company.dto';
 
 @Controller('companies')
 export class CompaniesController {
@@ -48,5 +51,12 @@ export class CompaniesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteCompany(@Param('id', ParseIntPipe) id: number) {
     return this.companyService.deleteCompany(id);
+  }
+
+  @Roles('exhibitor')
+  @Post()
+  @ApiOperation({ summary: 'Register a company' })
+  registerCompany(@Body() dto: RegisterCompanyDTO, @Req() req: any) {
+    return this.companyService.registerCompany(req.user.userId, dto);
   }
 }

@@ -15,7 +15,7 @@ const TABS = [
 ];
 
 const ENDPOINT: Record<Section, string> = {
-  users: "/admin/users",
+  users: "/users",
   expos: "/expos",
   booths: "/booths",
   companies: "/companies",

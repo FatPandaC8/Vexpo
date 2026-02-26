@@ -51,17 +51,6 @@ export class UsersMeController {
   // ── Booths (exhibitor+) ───────────────────────────────────────────────────
 
   @Roles('exhibitor')
-  @Post('expos/:expoId/booths')
-  @ApiOperation({ summary: 'Register a booth for an expo' })
-  createBooth(
-    @Param('expoId', ParseIntPipe) expoId: number,
-    @Body() dto: CreateBoothContentDTO,
-    @Req() req: any,
-  ) {
-    return this.boothsService.createBooth(expoId, req.user.userId, dto);
-  }
-
-  @Roles('exhibitor')
   @Get('me/booths')
   @ApiOperation({ summary: 'Get my booths' })
   getMyBooths(@Req() req: any) {
@@ -75,13 +64,6 @@ export class UsersMeController {
   @ApiOperation({ summary: 'Get my company' })
   getMyCompany(@Req() req: any) {
     return this.companiesService.getCompanyByExhibitor(req.user.userId);
-  }
-
-  @Roles('exhibitor')
-  @Post('companies')
-  @ApiOperation({ summary: 'Register a company' })
-  registerCompany(@Body() dto: RegisterCompanyDTO, @Req() req: any) {
-    return this.companiesService.registerCompany(req.user.userId, dto);
   }
 
   @Roles('exhibitor')

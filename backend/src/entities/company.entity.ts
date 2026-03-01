@@ -10,13 +10,14 @@ import { Booth } from './booth.entity';
 
 @Entity('company')
 export class Company {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: number;
 
   @Column()
   name: string;
 
-  @Column()
+  // one company one exhibitor
+  @Column({unique: true})
   exhibitorId: number;
 
   @Column()

@@ -1,15 +1,15 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Unique } from 'typeorm';
 import { UserRole } from './userrole.entity';
 
 @Entity('user')
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: number;
 
   @Column()
   name: string;
 
-  @Column()
+  @Column({unique: true})
   email: string;
 
   @Column({ nullable: true })

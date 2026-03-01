@@ -6,13 +6,16 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Unique,
 } from 'typeorm';
 import { Expo } from './expo.entity';
 import { Company } from './company.entity';
 
 @Entity('booth')
+@Unique(["exhibitorId", "expoId"]) // only one booth of exhibitor is allowed in this expo
+@Unique(["expoId", "mapRow", "mapCol"]) // self explanatory 
 export class Booth {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: number;
 
   @Column()

@@ -4,7 +4,7 @@ import { Booth } from './booth.entity';
 @Entity('expo')
 export class Expo {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column()
   name: string;
@@ -13,7 +13,7 @@ export class Expo {
   type: string;
 
   @Column()
-  organizerId: number;
+  organizerId: string;
 
   @Column({ type: 'date' })
   startDate: string;

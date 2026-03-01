@@ -32,7 +32,7 @@ export class ExposService {
       .getMany();
   }
 
-  async findExpoById(expoId: number) {
+  async findExpoById(expoId: string) {
     const expo = await this.expoRepository.findOne({
       where: { id: expoId },
       relations: ['booths'],
@@ -42,7 +42,7 @@ export class ExposService {
     return expo;
   }
 
-  async findAllBoothsByExpoId(expoId: number) {
+  async findAllBoothsByExpoId(expoId: string) {
     // need to make a booth content table
     await this.findExpoById(expoId);
 
@@ -56,7 +56,7 @@ export class ExposService {
     });
   }
 
-  async getExposByOrganizer(organizerId: number) {
+  async getExposByOrganizer(organizerId: string) {
     return this.expoRepository.find({
       where: { organizerId },
       relations: ['booths'],
@@ -64,7 +64,7 @@ export class ExposService {
     });
   }
 
-  async createExpo(organizerId: number, dto: CreateExpoDTO) {
+  async createExpo(organizerId: string, dto: CreateExpoDTO) {
     const expo = this.expoRepository.create({
       ...dto,
       organizerId,
@@ -74,8 +74,8 @@ export class ExposService {
   }
 
   async updateExpoByOrganizer(
-    expoId: number,
-    organizerId: number,
+    expoId: string,
+    organizerId: string,
     dto: UpdateExpoDTO,
   ) {
     const expo = await this.findExpoById(expoId);
@@ -88,7 +88,7 @@ export class ExposService {
     return this.expoRepository.save(expo);
   }
 
-  async deleteExpoByOrganizer(expoId: number, organizerId: number) {
+  async deleteExpoByOrganizer(expoId: string, organizerId: string) {
     const expo = await this.findExpoById(expoId);
 
     if (expo.organizerId !== organizerId) {
@@ -99,7 +99,7 @@ export class ExposService {
     return { message: 'Expo deleted successfully' };
   }
 
-  async getExpoBoothsByOrganizer(expoId: number, organizerId: number) {
+  async getExpoBoothsByOrganizer(expoId: string, organizerId: string) {
     const expo = await this.findExpoById(expoId);
 
     if (expo.organizerId !== organizerId) {
@@ -116,13 +116,13 @@ export class ExposService {
   }
 
   // Admin
-  async updateExpo(id: number, dto: UpdateExpoDTO) {
+  async updateExpo(id: string, dto: UpdateExpoDTO) {
     const expo = await this.findExpoById(id);
     Object.assign(expo, dto);
     return this.expoRepository.save(expo);
   }
 
-  async deleteExpo(id: number) {
+  async deleteExpo(id: string) {
     const expo = await this.findExpoById(id);
     await this.expoRepository.remove(expo);
     return { message: 'Expo deleted successfully' };

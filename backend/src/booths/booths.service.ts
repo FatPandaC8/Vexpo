@@ -17,7 +17,7 @@ export class BoothsService {
     private boothRepository: Repository<Booth>,
   ) {}
 
-  async getBoothById(boothId: number) {
+  async getBoothById(boothId: string) {
     const booth = await this.boothRepository.findOne({
       where: { id: boothId },
       relations: ['expo', 'company'],
@@ -29,8 +29,8 @@ export class BoothsService {
   }
 
   async createBooth(
-    expoId: number,
-    exhibitorId: number,
+    expoId: string,
+    exhibitorId: string,
     dto: CreateBoothContentDTO,
   ) {
     // One booth per exhibitor per expo
@@ -47,10 +47,11 @@ export class BoothsService {
       exhibitorId,
       status: 'pending',
     });
+    
     return this.boothRepository.save(booth);
   }
 
-  async getBoothsByExhibitor(exhibitorId: number) {
+  async getBoothsByExhibitor(exhibitorId: string) {
     return this.boothRepository.find({
       where: { exhibitorId },
       relations: ['expo', 'company'],
@@ -59,8 +60,8 @@ export class BoothsService {
   }
 
   async updateBoothByExhibitor(
-    boothId: number,
-    exhibitorId: number,
+    boothId: string,
+    exhibitorId: string,
     dto: UpdateBoothDTO,
   ) {
     const booth = await this.boothRepository.findOne({
@@ -74,7 +75,7 @@ export class BoothsService {
     return this.boothRepository.save(booth);
   }
 
-  async deleteBoothByExhibitor(boothId: number, exhibitorId: number) {
+  async deleteBoothByExhibitor(boothId: string, exhibitorId: string) {
     const booth = await this.boothRepository.findOne({
       where: { id: boothId },
     });
@@ -104,13 +105,13 @@ export class BoothsService {
     };
   }
 
-  async updateBooth(id: number, dto: UpdateBoothDTO) {
+  async updateBooth(id: string, dto: UpdateBoothDTO) {
     const booth = await this.getBoothById(id);
     Object.assign(booth, dto);
     return this.boothRepository.save(booth);
   }
 
-  async deleteBooth(id: number) {
+  async deleteBooth(id: string) {
     const booth = await this.getBoothById(id);
     await this.boothRepository.remove(booth);
     return { message: 'Booth deleted successfully' };

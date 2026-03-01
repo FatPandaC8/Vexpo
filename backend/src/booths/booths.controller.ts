@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Query,
   Req,
@@ -36,7 +37,7 @@ export class BoothsController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get booth by ID' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.boothsService.getBoothById(id);
   }
 
@@ -48,12 +49,12 @@ export class BoothsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update booth' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateBoothDTO,
     @Req() req: any,
   ) {
     const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
-    const userId: number = req.user.userId;
+    const userId: string = req.user.userId;
 
     if (roles.includes('admin') || roles.includes('organizer')) {
       return this.boothsService.updateBooth(id, dto);
@@ -70,9 +71,9 @@ export class BoothsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete booth' })
-  async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+  async remove(@Param('id', ParseUUIDPipe) id: string, @Req() req: any) {
     const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
-    const userId: number = req.user.userId;
+    const userId: string = req.user.userId;
 
     if (roles.includes('admin') || roles.includes('organizer')) {
       return this.boothsService.deleteBooth(id);

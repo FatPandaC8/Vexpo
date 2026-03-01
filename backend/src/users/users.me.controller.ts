@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Req,
@@ -70,7 +71,7 @@ export class UsersMeController {
   @Patch('companies/:id')
   @ApiOperation({ summary: 'Update own company' })
   updateCompany(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCompanyDto,
   ) {
     return this.companiesService.updateCompany(id, dto);

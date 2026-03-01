@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -46,14 +47,14 @@ export class ExposController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get expo by ID' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.expoService.findExpoById(id);
   }
 
   @Public()
   @Get(':id/booths')
   @ApiOperation({ summary: 'Get approved booths of an expo' })
-  findBooths(@Param('id', ParseIntPipe) id: number) {
+  findBooths(@Param('id', ParseUUIDPipe) id: string) {
     return this.expoService.findAllBoothsByExpoId(id);
   }
 
@@ -76,7 +77,7 @@ export class ExposController {
     summary: 'Update expo organizer must own it, admin bypasses',
   })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateExpoDTO,
     @Req() req: any,
   ) {
@@ -93,7 +94,7 @@ export class ExposController {
   @ApiOperation({
     summary: 'Delete expo organizer must own it, admin bypasses',
   })
-  async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+  async remove(@Param('id', ParseUUIDPipe) id: string, @Req() req: any) {
     const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
     if (roles.includes('admin')) return this.expoService.deleteExpo(id);
     return this.expoService.deleteExpoByOrganizer(id, req.user.userId);
@@ -110,7 +111,7 @@ export class ExposController {
       'Get ALL booths of expo (organizer/admin - not filtered by status)',
   })
   async findAllBoothsManage(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() req: any,
   ) {
     const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
@@ -123,7 +124,7 @@ export class ExposController {
   @Post(':expoId/booths')
   @ApiOperation({ summary: 'Register a booth for an expo' })
   createBooth(
-    @Param('expoId', ParseIntPipe) expoId: number,
+    @Param('expoId', ParseUUIDPipe) expoId: string,
     @Body() dto: CreateBoothContentDTO,
     @Req() req: any,
   ) {

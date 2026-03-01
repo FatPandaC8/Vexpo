@@ -16,16 +16,16 @@ import { Company } from './company.entity';
 @Unique(["expoId", "mapRow", "mapCol"]) // self explanatory 
 export class Booth {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column()
-  expoId: number;
+  expoId: string;
 
   @Column()
-  exhibitorId: number;
+  exhibitorId: string;
 
   @Column()
-  companyId: number;
+  companyId: string;
 
   @Column({ default: 'pending' })
   status: 'pending' | 'approved' | 'rejected';

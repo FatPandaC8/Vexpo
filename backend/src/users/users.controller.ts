@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, ParseUUIDPipe, Patch, Query } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiForbiddenResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { Public } from 'src/auth/jwt-auth.guard';
@@ -19,7 +19,7 @@ export class UsersController {
     description: 'The specific orgnizer/exhibitor name & email.',
   })
   @Get(':id')
-  findOrganizerById(@Param('id', ParseIntPipe) userId: number) {
+  findOrganizerById(@Param('id', ParseUUIDPipe) userId: string) {
     return this.userService.getPublicInfo(userId);
   }
 
@@ -36,7 +36,7 @@ export class UsersController {
   @ApiOperation({ description: 'Get the user based on their id.' })
   @ApiOkResponse({ description: 'The specific user' })
   @Get(':id')
-  findUserIdAdmin(@Param('id', ParseIntPipe) userId: number) {
+  findUserIdAdmin(@Param('id', ParseUUIDPipe) userId: string) {
     return this.userService.findOneById(userId);
   }
 
@@ -44,7 +44,7 @@ export class UsersController {
   @ApiOperation({ description: 'Edit user' })
   @Patch(':id')
   updateUser(
-    @Param('id', ParseIntPipe) userId: number,
+    @Param('id', ParseUUIDPipe) userId: string,
     @Body() dto: UpdateUserDTO,
   ) {
     return this.userService.updateUser(userId, dto);

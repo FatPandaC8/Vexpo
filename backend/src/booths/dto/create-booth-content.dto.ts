@@ -25,12 +25,12 @@ export class CreateBoothContentDTO {
   description?: string;
 
   @ApiProperty({ example: 1, required: false })
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  companyId?: number;
+  companyId?: string;
 
   @ApiProperty({
-    example: 'C:/Users/john/models/booth.glb',
+    example: 'models/booth.glb',
     description:
       "Absolute path to the 3D model file saved on the exhibitor's local machine",
     required: false,

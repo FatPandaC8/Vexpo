@@ -30,13 +30,13 @@ export class CompaniesService {
     };
   }
 
-  async getCompanyByExhibitor(exhibitorId: number) {
+  async getCompanyByExhibitor(exhibitorId: string) {
     return await this.companyRepository.findOneBy({
       exhibitorId: exhibitorId,
     });
   }
 
-  async findById(id: number) {
+  async findById(id: string) {
     const company = await this.companyRepository.findOne({
       where: { id },
       relations: ['booths'],
@@ -50,9 +50,9 @@ export class CompaniesService {
   }
 
   async registerCompany(
-    userId: number,
+    userId: string,
     dto: RegisterCompanyDTO,
-  ): Promise<number> {
+  ): Promise<string> {
     const company = this.companyRepository.create({
       ...dto,
       exhibitorId: userId,
@@ -63,13 +63,13 @@ export class CompaniesService {
     return company.id;
   }
 
-  async updateCompany(id: number, dto: UpdateCompanyDto) {
+  async updateCompany(id: string, dto: UpdateCompanyDto) {
     const company = await this.findById(id);
     Object.assign(company, dto);
     return this.companyRepository.save(company);
   }
 
-  async deleteCompany(id: number) {
+  async deleteCompany(id: string) {
     const company = await this.findById(id);
     await this.companyRepository.remove(company);
     return { message: 'Company deleted successfully' };

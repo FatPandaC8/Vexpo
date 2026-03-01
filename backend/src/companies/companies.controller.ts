@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -31,7 +32,7 @@ export class CompaniesController {
 
   @Public()
   @Get(':id')
-  findCompanyById(@Param('id', ParseIntPipe) id: number) {
+  findCompanyById(@Param('id', ParseUUIDPipe) id: string) {
     return this.companyService.findById(id);
   }
 
@@ -39,7 +40,7 @@ export class CompaniesController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update company' })
   async updateCompany(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCompanyDto,
   ) {
     return this.companyService.updateCompany(id, dto);
@@ -49,7 +50,7 @@ export class CompaniesController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete company' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteCompany(@Param('id', ParseIntPipe) id: number) {
+  async deleteCompany(@Param('id', ParseUUIDPipe) id: string) {
     return this.companyService.deleteCompany(id);
   }
 

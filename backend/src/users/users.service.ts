@@ -23,10 +23,10 @@ export class UsersService {
 
   // PUBLIC API
 
-  profile(userId: number) {
+  profile(userId: string) {
     return this.userRepository.findOne({
       where: {
-        id: userId,
+        id: userId
       },
       select: ['name', 'email'],
     });
@@ -41,14 +41,14 @@ export class UsersService {
     });
   }
 
-  async findOneById(id: number): Promise<User | null> {
+  async findOneById(id: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id },
       relations: ['roles', 'roles.role'],
     });
   }
 
-  async getPublicInfo(id: number) {
+  async getPublicInfo(id: string) {
     // get the user
     const public_user = await this.findOneById(id);
 
@@ -81,7 +81,7 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  async assignRole(userId: number, roleName: string) {
+  async assignRole(userId: string, roleName: string) {
     const exists = await this.userRoleRepository.findOne({
       where: {
         user: { id: userId },
@@ -105,13 +105,13 @@ export class UsersService {
     return this.userRoleRepository.save(userRole);
   }
 
-  async setRole(userId: number, roleName: string) {
+  async setRole(userId: string, roleName: string) {
     await this.userRoleRepository.delete({ user: { id: userId } });
     return this.assignRole(userId, roleName);
   }
 
   async updateUser(
-    id: number,
+    id: string,
     data: {
       name?: string;
       email?: string;

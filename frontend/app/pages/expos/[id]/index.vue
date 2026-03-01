@@ -152,12 +152,6 @@ function openBooth(id: number) {
                   <span class="font-bold">Organized by: </span>
                   <span> {{ organizer.name || "Unknown organizer" }} </span>
                 </h1>
-                <p>
-                  <span class="font-bold">Contact info: </span>
-                  <span>
-                    {{ organizer.email || "Unknown organizer contact info" }}
-                  </span>
-                </p>
               </UCard>
             </div>
           </div>

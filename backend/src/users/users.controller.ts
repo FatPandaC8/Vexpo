@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Query } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiForbiddenResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { JwtAuthGuard, Public } from 'src/auth/jwt-auth.guard';
+import { Public } from 'src/auth/jwt-auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
@@ -19,7 +19,7 @@ export class UsersController {
     description: 'The specific orgnizer/exhibitor name & email.',
   })
   @Get(':id')
-  findUserId(@Param('id', ParseIntPipe) userId: number) {
+  findOrganizerById(@Param('id', ParseIntPipe) userId: number) {
     return this.userService.getPublicInfo(userId);
   }
 

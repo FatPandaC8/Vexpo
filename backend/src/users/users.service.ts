@@ -51,10 +51,12 @@ export class UsersService {
   async getPublicInfo(id: number) {
     // get the user
     const public_user = await this.findOneById(id);
+
     // for more protection: check if the found user is an admin ?
     const isAdmin = await this.userRoleRepository.findOneBy({
       id: public_user?.id,
     });
+    
     // 1 is admin
     if (isAdmin?.roleId === 1) {
       throw new BadRequestException('You cannot view admin info');
@@ -63,7 +65,6 @@ export class UsersService {
     // return the user info
     const return_user: PublicUserInfo = {
       name: public_user?.name,
-      email: public_user?.email,
     };
 
     return return_user;

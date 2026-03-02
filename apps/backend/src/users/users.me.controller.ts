@@ -34,7 +34,7 @@ export class UsersMeController {
     private companiesService: CompaniesService,
   ) {}
 
-  // ── Profile (any authenticated user) ─────────────────────────────────────
+  // Profile (any authenticated user)
 
   @Get('me')
   @ApiOperation({ summary: 'Get own profile' })
@@ -49,16 +49,16 @@ export class UsersMeController {
     };
   }
 
-  // ── Booths (exhibitor+) ───────────────────────────────────────────────────
+  // Booths (exhibitor+)
 
   @Roles('exhibitor')
-  @Get('me/booths')
+  @Get('me/booth')
   @ApiOperation({ summary: 'Get my booths' })
   getMyBooths(@Req() req: any) {
     return this.boothsService.getBoothsByExhibitor(req.user.userId);
   }
 
-  // ── Company (exhibitor+) ──────────────────────────────────────────────────
+  // Company (exhibitor+)
 
   @Roles('exhibitor')
   @Get('me/company')
@@ -77,7 +77,7 @@ export class UsersMeController {
     return this.companiesService.updateCompany(id, dto);
   }
 
-  // ── Expos (organizer+) ────────────────────────────────────────────────────
+  // Expos (organizer+)
 
   @Roles('organizer')
   @Get('me/expos')

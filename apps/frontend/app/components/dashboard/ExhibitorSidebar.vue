@@ -1,29 +1,29 @@
 <script setup lang="ts">
 const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
-const props = defineProps<{ activeView: string; activeId?: number }>();
+const props = defineProps<{ activeView: string; activeId?: string }>();
 
 const api = useApi();
-const section = ref<"booths" | "expos" | "company">("booths");
+const section = ref<"booth" | "expos" | "company">("booth");
 
 const TABS = [
-  { key: "booths", label: "Booths", icon: "i-lucide-store" },
+  { key: "booth", label: "myBooth", icon: "i-lucide-store" },
   { key: "expos", label: "Find Expo", icon: "i-lucide-search" },
   { key: "company", label: "Company", icon: "i-lucide-building-2" },
 ];
 
-const booths = ref<any[]>([]);
+const myBooth = ref<any>();
 const expos = ref<any[]>([]);
 const company = ref<any>(null);
 const loadingBooths = ref(false);
 const loadingExpos = ref(false);
 const loadingCompany = ref(false);
 
-async function loadBooths() {
+async function loadBooth() {
   loadingBooths.value = true;
   try {
-    booths.value = await api.get<any[]>("/me/booths");
+    myBooth.value = await api.get<any>("/me/booth");
   } catch {
-    booths.value = [];
+    myBooth.value = [];
   } finally {
     loadingBooths.value = false;
   }
@@ -52,45 +52,45 @@ async function loadCompany() {
 watch(
   section,
   (v) => {
-    if (v === "booths") loadBooths();
+    if (v === "booth") loadBooth();
     else if (v === "expos") loadExpos();
     else loadCompany();
   },
   { immediate: true },
 );
 
-defineExpose({ refreshBooths: loadBooths });
+defineExpose({ refreshBooths: loadBooth });
 </script>
 
 <template>
   <aside class="flex flex-col h-full">
     <SidebarTabs v-model="section" :tabs="TABS" :cols="3" />
 
-    <!-- My Booths -->
-    <template v-if="section === 'booths'">
+    <!-- My myBooth -->
+    <template v-if="section === 'booth'">
       <SidebarSection
-        label="My Booths"
+        label="My myBooth"
         :loading="loadingBooths"
-        @refresh="loadBooths"
+        @refresh="loadBooth"
       />
 
       <SidebarEmptyState
-        v-if="booths.length === 0"
+        v-if="myBooth === undefined"
         icon="i-lucide-store"
-        title="No booths yet"
+        title="No myBooth yet"
         subtitle='Use "Find Expo" to register a booth'
       />
+
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
         <SidebarItem
-          v-for="booth in booths"
-          :key="booth.id"
-          :title="booth.name ?? 'Booth #' + booth.id"
-          :subtitle="`Expo #${booth.expoId}`"
-          :active="activeView === 'booth-edit' && activeId === booth.id"
+          :key="myBooth.id"
+          :title="myBooth.name ?? 'Booth #' + myBooth.id"
+          :subtitle="`Expo #${myBooth.expoId}`"
+          :active="activeView === 'booth-edit' && activeId === myBooth.id"
           active-color="border-[#3d52d5]/40 bg-blue-50"
-          @click="emit('select', { view: 'booth-edit', data: booth })"
+          @click="emit('select', { view: 'booth-edit', data: myBooth })"
         >
-          <StatusBadge :status="booth.status ?? 'pending'" class="mt-1.5" />
+          <StatusBadge :status="myBooth.status ?? 'pending'" class="mt-1.5" />
         </SidebarItem>
       </div>
     </template>

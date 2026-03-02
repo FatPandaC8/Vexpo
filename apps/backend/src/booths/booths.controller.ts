@@ -25,7 +25,7 @@ import { UpdateBoothDTO } from './dto/update-booth.dto';
 export class BoothsController {
   constructor(private boothsService: BoothsService) {}
 
-  // ── Public ────────────────────────────────────────────────────────────────
+  // Public
 
   @Public()
   @Get()
@@ -41,7 +41,7 @@ export class BoothsController {
     return this.boothsService.getBoothById(id);
   }
 
-  // ── Authenticated — exhibitor owns, organizer/admin bypass ────────────────
+  // Authenticated - exhibitor owns, organizer/admin bypass 
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)

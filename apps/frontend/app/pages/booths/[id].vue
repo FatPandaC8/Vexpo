@@ -4,8 +4,8 @@ import Header from "~/components/Header.vue";
 const route = useRoute();
 const api = useApi();
 
-const expoId = Number(route.params.id);
-const boothId = Number(route.params.id);
+const expoId = String(route.params.id);
+const boothId = String(route.params.id);
 
 const booth = ref<any>(null);
 const loading = ref(true);

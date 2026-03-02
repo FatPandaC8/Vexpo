@@ -32,7 +32,7 @@ const roleIcon = computed(() => {
 });
 
 // Sidebar nav
-const activeSection = ref<"profile" | "notifications" | "security">("profile");
+const activeSection = ref<"profile" | "security">("profile");
 
 const sections = [
   { key: "profile", label: "Profile", icon: "i-lucide-user" },

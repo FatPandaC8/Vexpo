@@ -52,15 +52,12 @@ export class CompaniesService {
   async registerCompany(
     userId: string,
     dto: RegisterCompanyDTO,
-  ): Promise<string> {
+  ) {
     const company = this.companyRepository.create({
       ...dto,
       exhibitorId: userId,
     });
-    this.companyRepository.save(company);
-
-    // after creating the company, it should auto give back the id of it self
-    return company.id;
+    return this.companyRepository.save(company);
   }
 
   async updateCompany(id: string, dto: UpdateCompanyDto) {

@@ -144,7 +144,7 @@ export class UsersService {
     return this.findOneById(id);
   }
 
-  async deleteUser(id: number) {
+  async deleteUser(id: string) {
     const result = await this.userRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException('User not found');
   }

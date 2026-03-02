@@ -55,7 +55,7 @@ export class UsersController {
   @ApiBadRequestResponse({ description: 'Admins cannot delete themselves' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteUser(@Param('id', ParseIntPipe) userId: number) {
+  deleteUser(@Param('id', ParseUUIDPipe) userId: string) {
     return this.userService.deleteUser(userId);
   }
 }

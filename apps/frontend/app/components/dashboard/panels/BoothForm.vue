@@ -11,6 +11,7 @@ const canEditStatus = computed(
     auth.user.value?.roles?.includes("organizer"),
 );
 
+// Recap: defineProps is to declare the properties that a component accepts from its parent
 const props = defineProps<{
   expo?: any;
   booth?: any;
@@ -83,6 +84,8 @@ onMounted(() => {
   loadOccupied();
   loadMyCompany();
 });
+
+console.log(occupiedCells.value)
 
 watch(
   () => props.booth,

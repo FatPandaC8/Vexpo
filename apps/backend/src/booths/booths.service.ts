@@ -52,10 +52,9 @@ export class BoothsService {
   }
 
   async getBoothsByExhibitor(exhibitorId: string) {
-    return this.boothRepository.find({
+    return this.boothRepository.findOne({
       where: { exhibitorId },
       relations: ['expo', 'company'],
-      order: { createdAt: 'DESC' },
     });
   }
 

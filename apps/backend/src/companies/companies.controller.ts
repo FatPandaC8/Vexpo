@@ -6,19 +6,21 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  ParseIntPipe,
   ParseUUIDPipe,
   Patch,
   Post,
   Query,
   Req,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
-import { Public } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard, Public } from 'src/auth/jwt-auth.guard';
 import { ApiOperation } from '@nestjs/swagger';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { RegisterCompanyDTO } from './dto/create-company.dto';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('companies')
 export class CompaniesController {
@@ -54,10 +56,12 @@ export class CompaniesController {
     return this.companyService.deleteCompany(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('exhibitor')
   @Post()
   @ApiOperation({ summary: 'Register a company' })
-  registerCompany(@Body() dto: RegisterCompanyDTO, @Req() req: any) {
+  registerCompany(@Body() dto: RegisterCompanyDTO, @Request() req: any) {
+    console.log(req)
     return this.companyService.registerCompany(req.user.userId, dto);
   }
 }

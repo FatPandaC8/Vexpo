@@ -11,7 +11,7 @@ const MAP_COLS = 6;
 const rows = Array.from({ length: MAP_ROWS }, (_, i) => i);
 const cols = Array.from({ length: MAP_COLS }, (_, j) => j);
 
-const expoId = Number(route.params.id);
+const expoId = String(route.params.id);
 
 const expo = ref<any>(null);
 const booths = ref<any[]>([]);

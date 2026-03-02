@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
-const props = defineProps<{ activeView: string; activeId?: number }>();
+const props = defineProps<{ activeView: string; activeId?: string }>();
 
 const api = useApi();
 

@@ -1,0 +1,3 @@
+4/2/26:
+    OneToMany and ManyToMany has problems when creating the user database.
+    TypeORM does not freaking make the entities ? maybe there's a solution for migration ??

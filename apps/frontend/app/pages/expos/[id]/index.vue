@@ -32,6 +32,7 @@ async function fetchExpo() {
 }
 
 onMounted(fetchExpo);
+console.log(booths.value.length);
 
 const today = new Date();
 

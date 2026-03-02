@@ -52,7 +52,6 @@ export class ExposService {
         status: 'approved',
       },
       relations: ['company'],
-      order: { createdAt: 'DESC' },
     });
   }
 

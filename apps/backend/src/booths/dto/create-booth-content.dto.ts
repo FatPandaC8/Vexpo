@@ -43,7 +43,7 @@ export class CreateBoothContentDTO {
   @IsInt()
   @Min(0)
   @Max(MAP_ROWS - 1)
-  mapRow?: number;
+  mapRow: number;
 
   @ApiProperty({
     example: 3,
@@ -52,5 +52,5 @@ export class CreateBoothContentDTO {
   @IsInt()
   @Min(0)
   @Max(MAP_COLS - 1)
-  mapCol?: number;
+  mapCol: number;
 }

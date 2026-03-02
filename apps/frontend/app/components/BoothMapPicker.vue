@@ -46,12 +46,11 @@ function isSelected(r: number, c: number) {
 
 function isOccupied(r: number, c: number) {
   if (isSelected(r, c)) return false;
-  return true;
+  return props.occupied.some(cell => cell.row === r && cell.col === c)
 }
 
 function handleClick(r: number, c: number) {
   if (props.readonly) return;
-  if (isOccupied(r, c)) return;
   if (isSelected(r, c)) {
     emit("update:modelValue", null);
   } else {

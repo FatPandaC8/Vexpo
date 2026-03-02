@@ -28,14 +28,14 @@ const mode = computed(() => (props.booth ? "edit" : "create"));
 const schema = z.object({
   name: z.string().min(2, "Booth name must be at least 2 characters"),
   description: z.string().optional(),
-  companyId: z.number().optional(),
+  companyId: z.uuid(),
   status: z.enum(["pending", "approved", "rejected"]).optional(),
 });
 
 const state = reactive({
   name: props.booth?.name ?? "",
   description: props.booth?.description ?? "",
-  companyId: props.booth?.companyId ?? (undefined as number | undefined),
+  companyId: props.booth?.companyId ?? (undefined as string | undefined),
   status: props.booth?.status ?? "pending",
 });
 
@@ -122,13 +122,18 @@ async function submit(event: any) {
   error.value = null;
   success.value = false;
   try {
+    if (mapPosition.value === null) {
+      error.value = 'Please select a floor map position'
+      return
+    }
+    
     const payload: any = {
       ...event.data,
       companyId: state.companyId,
       modelPath: modelPath.value ?? null,
       status: state.status,
-      mapRow: mapPosition.value?.row ?? null,
-      mapCol: mapPosition.value?.col ?? null,
+      mapRow: mapPosition.value?.row,
+      mapCol: mapPosition.value?.col,
     };
 
     if (!canEditStatus.value) delete payload.status;
@@ -282,7 +287,7 @@ defineExpose({ modelPath });
             </div>
             <div class="min-w-0 flex-1">
               <p class="text-sm font-semibold text-gray-800 truncate">{{ myCompany.name }}</p>
-              <p class="text-xs text-gray-400">ID #{{ myCompany.id }} - {{ myCompany.industry ?? '—' }}</p>
+              <p class="text-xs text-gray-400">ID #{{ myCompany.id }}</p>
             </div>
           </div>
           <div v-else class="flex items-start gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
@@ -470,12 +475,12 @@ defineExpose({ modelPath });
       </div>
 
       <!-- Submit -->
-      <div class="pt-2 flex items-center gap-3">
+      <div class="pt-2">
         <UButton
           type="submit"
           :loading="saving"
           :disabled="saving"
-          class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-7"
+          class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-6"
           size="md"
         >
           {{

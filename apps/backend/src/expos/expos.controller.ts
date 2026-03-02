@@ -120,6 +120,7 @@ export class ExposController {
     return this.expoService.getExpoBoothsByOrganizer(id, req.user.userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Roles('exhibitor')
   @Post(':expoId/booths')
   @ApiOperation({ summary: 'Register a booth for an expo' })

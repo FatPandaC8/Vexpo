@@ -265,7 +265,7 @@ function boothCount(expo: any) {
                     {{ getStatus(expo) }}
                   </span>
                   <span
-                    v-if="expo.type"
+                    v-if="expo?.type"
                     class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
                   >
                     {{ expo.type }}

@@ -134,7 +134,7 @@ function openBooth(id: number) {
                   {{ formatDate(expo?.endDate) }}
                 </div>
                 <div
-                  v-if="expo.type"
+                  v-if="expo?.type"
                   class="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-2 text-sm"
                 >
                   {{ expo.type }}
@@ -150,7 +150,7 @@ function openBooth(id: number) {
               >
                 <h1>
                   <span class="font-bold">Organized by: </span>
-                  <span> {{ organizer.name || "Unknown organizer" }} </span>
+                  <span> {{ organizer?.name || "Unknown organizer" }} </span>
                 </h1>
               </UCard>
             </div>

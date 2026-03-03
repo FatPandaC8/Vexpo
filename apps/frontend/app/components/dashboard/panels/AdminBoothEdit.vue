@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as z from "zod";
+import { UpdateBoothSchema } from "@vexpo/schema";
 import type { Cell, OccupiedCell } from "~/components/BoothMapPicker.vue";
 
 const props = defineProps<{ booth: any }>();
@@ -7,11 +7,7 @@ const emit = defineEmits<{ updated: [booth: any]; deleted: [] }>();
 
 const api = useApi();
 
-const schema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  description: z.string().optional(),
-  status: z.string().optional(),
-});
+const schema = UpdateBoothSchema;
 
 const STATUSES = ["pending", "approved", "rejected"];
 

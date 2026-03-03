@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Admin: create (expo=undefined) or edit/delete an expo
 
-import * as z from "zod";
+import { UpdateExpoSchema } from "@vexpo/schema";
 
 const props = defineProps<{ expo?: any }>();
 const emit = defineEmits<{ saved: [expo: any]; deleted: [] }>();
@@ -9,13 +9,7 @@ const emit = defineEmits<{ saved: [expo: any]; deleted: [] }>();
 const api = useApi();
 const mode = computed(() => "edit");
 
-const schema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters"),
-  type: z.string(),
-  description: z.string().optional(),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
-});
+const schema = UpdateExpoSchema;
 
 const state = reactive({
   name: props.expo?.name ?? "",

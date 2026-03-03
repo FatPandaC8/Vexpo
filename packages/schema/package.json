@@ -5,13 +5,14 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "import": "./dist/esm/index.js",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc && tsc -p tsconfig.esm.json"
   },
   "dependencies": {
     "zod": "^3.25.76"

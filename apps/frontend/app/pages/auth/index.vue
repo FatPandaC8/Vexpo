@@ -6,6 +6,7 @@ import Logo from "~/components/Logo.vue";
 import Footer from "~/components/Footer.vue";
 import { LoginSchema, RegisterSchema } from "@vexpo/schema";
 
+
 const auth = useAuth();
 const activeTab = ref("signin");
 const rememberMe = ref(true);

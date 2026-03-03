@@ -1,19 +1,14 @@
 <script setup lang="ts">
 // Admin: edit or delete any company
 
-import * as z from "zod";
+import { UpdateCompanySchema } from "@vexpo/schema";
 
 const props = defineProps<{ company: any }>();
 const emit = defineEmits<{ updated: [company: any]; deleted: [] }>();
 
 const api = useApi();
 
-const schema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  description: z.string().optional(),
-  industry: z.string().optional(),
-  website: z.url("Must be a valid URL").optional().or(z.literal("")),
-});
+const schema = UpdateCompanySchema;
 
 const state = reactive({
   name: props.company.name ?? "",

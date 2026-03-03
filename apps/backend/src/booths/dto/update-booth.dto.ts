@@ -37,3 +37,5 @@ export class UpdateBoothDTO {
   @Max(MAP_COLS - 1)
   mapCol?: number;
 }
+
+export { MAP_ROWS, MAP_COLS };

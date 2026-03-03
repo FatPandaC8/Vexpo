@@ -14,7 +14,12 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MAP_ROWS = exports.MAP_COLS = void 0;
 __exportStar(require("./auth.schema"), exports);
 __exportStar(require("./expo.schema"), exports);
 __exportStar(require("./booth.schema"), exports);
 __exportStar(require("./company.schema"), exports);
+__exportStar(require("./user.schema"), exports);
+exports.MAP_COLS = 6;
+exports.MAP_ROWS = 5;
+// Nuxt uses CJS import vs Nest uses ESM import type

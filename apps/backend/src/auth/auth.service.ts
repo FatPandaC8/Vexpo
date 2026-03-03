@@ -70,7 +70,7 @@ export class AuthService {
     };
   }
 
-  async logout() {
+  logout() {
     console.log('LOG OUT');
   }
 

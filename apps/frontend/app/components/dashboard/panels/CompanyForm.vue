@@ -14,7 +14,9 @@ const emit = defineEmits<{
 const api = useApi();
 const mode = computed(() => (props.company ? "edit" : "create"));
 
-const schema = computed(() => props.company ? UpdateCompanySchema : RegisterCompanySchema);
+const schema = computed(() =>
+  props.company ? UpdateCompanySchema : RegisterCompanySchema,
+);
 
 const state = reactive({
   name: props.company?.name ?? "",

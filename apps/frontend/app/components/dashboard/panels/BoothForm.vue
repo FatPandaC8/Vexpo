@@ -25,7 +25,9 @@ const emit = defineEmits<{
 
 const mode = computed(() => (props.booth ? "edit" : "create"));
 
-const schema = computed(() => props.booth ? UpdateBoothSchema : CreateBoothSchema);
+const schema = computed(() =>
+  props.booth ? UpdateBoothSchema : CreateBoothSchema,
+);
 
 const state = reactive({
   name: props.booth?.name ?? "",

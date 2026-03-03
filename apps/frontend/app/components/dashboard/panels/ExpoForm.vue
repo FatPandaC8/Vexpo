@@ -14,7 +14,9 @@ const emit = defineEmits<{
 const api = useApi();
 const mode = computed(() => (props.expo ? "edit" : "create"));
 
-const schema = computed(() => props.expo ? UpdateExpoSchema : CreateExpoSchema);
+const schema = computed(() =>
+  props.expo ? UpdateExpoSchema : CreateExpoSchema,
+);
 
 const state = reactive({
   name: props.expo?.name ?? "",

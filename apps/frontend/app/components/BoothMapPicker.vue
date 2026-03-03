@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MAP_COLS, MAP_ROWS } from '@vexpo/schema';
+import { MAP_COLS, MAP_ROWS } from "@vexpo/schema";
 
 /**
  * BoothMapPicker

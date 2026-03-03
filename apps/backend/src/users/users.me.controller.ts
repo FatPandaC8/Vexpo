@@ -3,10 +3,8 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
   ParseUUIDPipe,
   Patch,
-  Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,9 +13,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { BoothsService } from 'src/booths/booths.service';
-import { CreateBoothContentDTO } from 'src/booths/dto/create-booth-content.dto';
 import { CompaniesService } from 'src/companies/companies.service';
-import { RegisterCompanyDTO } from 'src/companies/dto/create-company.dto';
 import { UpdateCompanyDto } from 'src/companies/dto/update-company.dto';
 import { ExposService } from 'src/expos/expos.service';
 import { UsersService } from './users.service';

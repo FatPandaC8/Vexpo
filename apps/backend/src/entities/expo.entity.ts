@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Booth } from './booth.entity';
 
 @Entity('expo')
@@ -29,4 +29,10 @@ export class Expo {
 
   @OneToMany(() => Booth, (booth) => booth.expo)
   booths: Booth[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Admin: view user details, change role, delete
 // IMPORTANT: Must be able to change: name, email, role
-import * as z from "zod";
+import { UpdateUserSchema } from "@vexpo/schema";
 
 const props = defineProps<{ user: any }>();
 const emit = defineEmits<{ updated: [user: any]; deleted: [] }>();
@@ -10,11 +10,7 @@ const api = useApi();
 
 const ROLES = ["exhibitor", "organizer", "admin"];
 
-const schema = z.object({
-  name: z.string().min(4, "Min name length is 4"),
-  email: z.email(),
-  role: z.string().min(1, "Select a role"),
-});
+const schema = UpdateUserSchema;
 
 const state = reactive({
   name: props.user.name ?? "",

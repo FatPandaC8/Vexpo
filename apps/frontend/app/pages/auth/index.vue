@@ -6,7 +6,6 @@ import Logo from "~/components/Logo.vue";
 import Footer from "~/components/Footer.vue";
 import { LoginSchema, RegisterSchema } from "@vexpo/schema";
 
-
 const auth = useAuth();
 const activeTab = ref("signin");
 const rememberMe = ref(true);
@@ -59,14 +58,13 @@ async function onSignIn(event: FormSubmitEvent<typeof signInState>) {
 
 async function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
   try {
-
     const parsed = RegisterSchema.parse({
       name: event.data.name,
       role: event.data.role,
       email: event.data.email,
       password: event.data.confirmPassword,
     });
-    
+
     await auth.register(parsed);
     await navigateTo("/");
   } catch (err: any) {

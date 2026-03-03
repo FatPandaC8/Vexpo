@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as z from "zod";
+import { CreateBoothSchema, UpdateBoothSchema } from "@vexpo/schema";
 import type { Cell, OccupiedCell } from "~/components/BoothMapPicker.vue";
 
 const auth = useAuth();
@@ -25,12 +25,7 @@ const emit = defineEmits<{
 
 const mode = computed(() => (props.booth ? "edit" : "create"));
 
-const schema = z.object({
-  name: z.string().min(2, "Booth name must be at least 2 characters"),
-  description: z.string().optional(),
-  companyId: z.uuid(),
-  status: z.enum(["pending", "approved", "rejected"]).optional(),
-});
+const schema = computed(() => props.booth ? UpdateBoothSchema : CreateBoothSchema);
 
 const state = reactive({
   name: props.booth?.name ?? "",

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 // TODO Today: Add organizer information tab next to the expo information
+import { MAP_COLS, MAP_ROWS } from "@vexpo/schema";
 import Header from "~/components/Header.vue";
 
 const route = useRoute();
 const router = useRouter();
 const api = useApi();
-const MAP_ROWS = 5;
-const MAP_COLS = 6;
 
 const rows = Array.from({ length: MAP_ROWS }, (_, i) => i);
 const cols = Array.from({ length: MAP_COLS }, (_, j) => j);

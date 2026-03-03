@@ -1,3 +1,5 @@
+import type { RegisterDTO } from "@vexpo/schema"
+
 interface AuthUser {
   id: number
   name: string
@@ -45,7 +47,7 @@ export const useAuth = () => {
     }
   }
 
-  async function login(email: string, password: string) {
+  async function login(email: string, password: string) { // change to LoginDTO
     const res = await $fetch<{ access_token: string }>('/auth/login', {
       method: 'POST',
       baseURL: BASE,
@@ -55,12 +57,7 @@ export const useAuth = () => {
     await fetchProfile()
   }
 
-  async function register(payload: {
-    name: string
-    email: string
-    password: string
-    role: string
-  }) {
+  async function register(payload: RegisterDTO) {
     const res = await $fetch<{ access_token: string }>('/auth/register', {
       method: 'POST',
       baseURL: BASE,

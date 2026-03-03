@@ -4,6 +4,7 @@ import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import Logo from "~/components/Logo.vue";
 import Footer from "~/components/Footer.vue";
+import { LoginSchema, RegisterSchema } from "@vexpo/schema";
 
 const auth = useAuth();
 const activeTab = ref("signin");
@@ -36,23 +37,15 @@ const signUpState = reactive({
   role: "",
 });
 
-const signInSchema = z.object({
-  email: z.email("Invalid email format"),
-  password: z.string().min(8, "Must be at least 8 characters"),
+const signInSchema = LoginSchema;
+// signUpSchema still needs the local .refine() for confirmPassword — keep that one local
+// since confirmPassword is UI-only and doesn't exist on the backend DTO
+const signUpSchema = RegisterSchema.extend({
+  confirmPassword: z.string().min(8),
+}).refine((d) => d.password === d.confirmPassword, {
+  message: "Passwords must match",
+  path: ["confirmPassword"],
 });
-
-const signUpSchema = z
-  .object({
-    name: z.string().min(2, "Name required"),
-    email: z.email("Invalid email"),
-    password: z.string().min(8, "Must be at least 8 characters"),
-    confirmPassword: z.string().min(8, "Password does not match"),
-    role: z.string().min(1, "Please select a role."),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords must match",
-    path: ["confirmPassword"],
-  });
 
 async function onSignIn(event: FormSubmitEvent<typeof signInState>) {
   try {
@@ -65,13 +58,15 @@ async function onSignIn(event: FormSubmitEvent<typeof signInState>) {
 
 async function onSignUp(event: FormSubmitEvent<typeof signUpState>) {
   try {
-    const payload = {
+
+    const parsed = RegisterSchema.parse({
       name: event.data.name,
+      role: event.data.role,
       email: event.data.email,
       password: event.data.confirmPassword,
-      role: event.data.role,
-    };
-    await auth.register(payload);
+    });
+    
+    await auth.register(parsed);
     await navigateTo("/");
   } catch (err: any) {
     alert(err?.data?.message || "Registration failed");

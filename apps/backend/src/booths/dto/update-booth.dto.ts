@@ -1,15 +1,12 @@
+import { MAP_COLS, MAP_ROWS } from '@vexpo/schema';
 import {
   IsEnum,
   IsInt,
-  IsNumber,
   IsOptional,
   IsString,
   Max,
   Min,
 } from 'class-validator';
-
-export const MAP_ROWS = 5;
-export const MAP_COLS = 6;
 
 export class UpdateBoothDTO {
   @IsOptional()

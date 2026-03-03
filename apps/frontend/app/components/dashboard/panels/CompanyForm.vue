@@ -1,7 +1,6 @@
 <script setup lang="ts">
 // Exhibitor: create a new company (mode='create') or edit existing (mode='edit')
-
-import * as z from "zod";
+import { RegisterCompanySchema, UpdateCompanySchema } from "@vexpo/schema";
 
 const props = defineProps<{
   company?: any;
@@ -15,15 +14,7 @@ const emit = defineEmits<{
 const api = useApi();
 const mode = computed(() => (props.company ? "edit" : "create"));
 
-const schema = z.object({
-  name: z.string().min(2, "Company name must be at least 2 characters"),
-  email: z.email(),
-  description: z.string().optional(),
-  industry: z.string().optional(),
-  website: z.url("Must be a valid URL").optional().or(z.literal("")),
-  country: z.string().optional().or(z.literal("")),
-  city: z.string().optional().or(z.literal("")),
-});
+const schema = computed(() => props.company ? UpdateCompanySchema : RegisterCompanySchema);
 
 const state = reactive({
   name: props.company?.name ?? "",

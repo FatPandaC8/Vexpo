@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { MAP_COLS, MAP_ROWS } from '@vexpo/schema';
+
 /**
  * BoothMapPicker
  * A 5×6 interactive grid for picking / displaying a booth's floor-map position.
@@ -15,9 +17,6 @@ export interface Cell {
 export interface OccupiedCell extends Cell {
   name?: string;
 }
-
-const MAP_ROWS = 5;
-const MAP_COLS = 6;
 
 const props = withDefaults(
   defineProps<{

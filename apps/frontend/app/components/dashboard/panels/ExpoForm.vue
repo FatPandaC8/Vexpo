@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as z from "zod";
+import { CreateExpoSchema, UpdateExpoSchema } from "@vexpo/schema";
 
 // Reminder: defineProps is for falling through attribute from parent to child
 const props = defineProps<{
@@ -14,13 +14,7 @@ const emit = defineEmits<{
 const api = useApi();
 const mode = computed(() => (props.expo ? "edit" : "create"));
 
-const schema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters"),
-  type: z.string(),
-  description: z.string().optional(),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
-});
+const schema = computed(() => props.expo ? UpdateExpoSchema : CreateExpoSchema);
 
 const state = reactive({
   name: props.expo?.name ?? "",

@@ -25,12 +25,12 @@ import { Company } from './entities/company.entity';
     AuthModule,
     UsersModule,
     TypeOrmModule.forRoot({
-      type: (process.env.TYPEORM_type as "postgres") || "postgres",
-      host: (process.env.TYPEORM_host),
+      type: (process.env.TYPEORM_type as 'postgres') || 'postgres',
+      host: process.env.TYPEORM_host,
       port: Number(process.env.TYPEORM_port),
-      username: (process.env.TYPEORM_username),
-      password: (process.env.TYPEORM_password),
-      database: (process.env.TYPEORM_database_name),
+      username: process.env.TYPEORM_username,
+      password: process.env.TYPEORM_password,
+      database: process.env.TYPEORM_database_name,
       entities: [User, Role, UserRole, Expo, Booth, Company],
       autoLoadEntities: true,
       synchronize: Boolean(process.env.IN_DEVELOPEMENT), // for dev only, not for production

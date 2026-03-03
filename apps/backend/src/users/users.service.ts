@@ -26,7 +26,7 @@ export class UsersService {
   profile(userId: string) {
     return this.userRepository.findOne({
       where: {
-        id: userId
+        id: userId,
       },
       select: ['name', 'email'],
     });
@@ -56,7 +56,7 @@ export class UsersService {
     const isAdmin = await this.userRoleRepository.findOneBy({
       id: public_user?.id,
     });
-    
+
     // 1 is admin
     if (isAdmin?.roleId === 1) {
       throw new BadRequestException('You cannot view admin info');

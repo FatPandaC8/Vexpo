@@ -17,7 +17,7 @@ const items = [
   { label: "Sign Up", value: "signup", slot: "signup" },
 ];
 
-const roles = [ "exhibitor", "organizer"];
+const roles = ["exhibitor", "organizer"];
 
 // Separate form states
 // The reactive state might seem like a computed, but no

@@ -19,7 +19,7 @@ if (!tempToken) {
 auth.setToken(tempToken!);
 
 // UI state
-const selectedRole = ref< "exhibitor" | "organizer" | null>(null);
+const selectedRole = ref<"exhibitor" | "organizer" | null>(null);
 const isLoading = ref(false);
 const errorMsg = ref<string | null>(null);
 

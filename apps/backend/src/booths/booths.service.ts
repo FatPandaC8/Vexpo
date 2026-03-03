@@ -47,7 +47,7 @@ export class BoothsService {
       exhibitorId,
       status: 'pending',
     });
-    
+
     return this.boothRepository.save(booth);
   }
 

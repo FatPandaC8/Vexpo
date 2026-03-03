@@ -61,7 +61,7 @@ export class CompaniesController {
   @Post()
   @ApiOperation({ summary: 'Register a company' })
   registerCompany(@Body() dto: RegisterCompanyDTO, @Request() req: any) {
-    console.log(req)
+    console.log(req);
     return this.companyService.registerCompany(req.user.userId, dto);
   }
 }

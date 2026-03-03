@@ -49,10 +49,7 @@ export class CompaniesService {
     return company;
   }
 
-  async registerCompany(
-    userId: string,
-    dto: RegisterCompanyDTO,
-  ) {
+  async registerCompany(userId: string, dto: RegisterCompanyDTO) {
     const company = this.companyRepository.create({
       ...dto,
       exhibitorId: userId,

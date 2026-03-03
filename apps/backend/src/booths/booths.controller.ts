@@ -41,7 +41,7 @@ export class BoothsController {
     return this.boothsService.getBoothById(id);
   }
 
-  // Authenticated - exhibitor owns, organizer/admin bypass 
+  // Authenticated - exhibitor owns, organizer/admin bypass
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)

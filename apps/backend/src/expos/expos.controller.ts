@@ -32,7 +32,10 @@ import { BoothsService } from 'src/booths/booths.service';
 @ApiTags('Expos')
 @Controller('expos')
 export class ExposController {
-  constructor(private expoService: ExposService, private boothsService: BoothsService) {}
+  constructor(
+    private expoService: ExposService,
+    private boothsService: BoothsService,
+  ) {}
 
   // Public
 

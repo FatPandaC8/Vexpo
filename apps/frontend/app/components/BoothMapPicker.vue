@@ -46,7 +46,7 @@ function isSelected(r: number, c: number) {
 
 function isOccupied(r: number, c: number) {
   if (isSelected(r, c)) return false;
-  return props.occupied.some(cell => cell.row === r && cell.col === c)
+  return props.occupied.some((cell) => cell.row === r && cell.col === c);
 }
 
 function handleClick(r: number, c: number) {
@@ -57,7 +57,6 @@ function handleClick(r: number, c: number) {
     emit("update:modelValue", { row: r, col: c });
   }
 }
-
 </script>
 
 <template>

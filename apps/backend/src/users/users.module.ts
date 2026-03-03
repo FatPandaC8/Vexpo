@@ -20,9 +20,6 @@ import { UsersMeController } from './users.me.controller';
   ],
   providers: [UsersService],
   exports: [UsersService, TypeOrmModule],
-  controllers: [
-    UsersController,
-    UsersMeController,
-  ],
+  controllers: [UsersController, UsersMeController],
 })
 export class UsersModule {}

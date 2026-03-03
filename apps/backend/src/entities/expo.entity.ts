@@ -3,7 +3,7 @@ import { Booth } from './booth.entity';
 
 @Entity('expo')
 export class Expo {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()

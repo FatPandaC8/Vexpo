@@ -70,7 +70,7 @@ const deleteLoading = ref(false);
 async function deleteUser() {
   deleteLoading.value = true;
   try {
-    console.log(props.user.id)
+    console.log(props.user.id);
     await api.del(`/users/${props.user.id}`);
     emit("deleted");
   } catch (e: any) {

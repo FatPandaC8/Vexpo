@@ -1,9 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsString } from 'class-validator';
+import { OAuthCompleteSchema } from '@vexpo/schema';
+import { createZodDto } from 'nestjs-zod';
 
-export class OAuthCompleteDTO {
-  @ApiProperty({ example: 'EXHIBITOR' })
-  @IsString()
-  @IsIn(['exhibitor', 'organizer'])
-  role: 'exhibitor' | 'organizer';
-}
+export class OAuthCompleteDTO extends createZodDto(OAuthCompleteSchema) {}

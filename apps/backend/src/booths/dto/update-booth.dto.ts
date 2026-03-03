@@ -1,41 +1,4 @@
-import { MAP_COLS, MAP_ROWS } from '@vexpo/schema';
-import {
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { UpdateBoothSchema } from '@vexpo/schema';
+import { createZodDto } from 'nestjs-zod';
 
-export class UpdateBoothDTO {
-  @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  modelPath?: string;
-
-  @IsOptional()
-  @IsEnum(['pending', 'approved', 'rejected'])
-  status?: string;
-
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(MAP_ROWS - 1)
-  mapRow?: number;
-
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(MAP_COLS - 1)
-  mapCol?: number;
-}
-
-export { MAP_ROWS, MAP_COLS };
+export class UpdateBoothDTO extends createZodDto(UpdateBoothSchema) {}

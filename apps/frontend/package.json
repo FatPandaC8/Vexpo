@@ -16,6 +16,7 @@
     "@nuxt/eslint": "^1.15.1",
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.4.0",
+    "@vexpo/schema": "^1.0.0",
     "nuxt": "^4.3.1",
     "nuxt-svgo": "^4.2.6",
     "vue": "^3.5.28",

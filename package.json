@@ -11,6 +11,7 @@
     "test": "turbo test"
   },
   "devDependencies": {
+    "@types/babel__core": "^7.20.5",
     "turbo": "^2.8.12"
   },
   "packageManager": "npm@9.2.0"

@@ -58,12 +58,9 @@ async function submit(event: any) {
 }
 
 const showDelete = ref(false);
-const deleteConfirm = ref("");
 const deleteLoading = ref(false);
-const canDelete = computed(() => deleteConfirm.value === props.company.name);
 
 async function deleteCompany() {
-  if (!canDelete.value) return;
   deleteLoading.value = true;
   try {
     await api.del(`/companies/${props.company.id}`);
@@ -200,26 +197,11 @@ async function deleteCompany() {
           v-if="showDelete"
           class="mt-4 p-5 rounded-xl border border-red-200 bg-red-50/30"
         >
-          <p class="text-sm text-red-700 mb-3">
-            Type <strong>{{ company.name }}</strong> to confirm:
-          </p>
-          <UInput
-            v-model="deleteConfirm"
-            placeholder="Company name"
-            class="mb-4 w-full max-w-xs"
-            :ui="{
-              base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl',
-            }"
-          />
           <UButton
-            :disabled="!canDelete || deleteLoading"
+            :disabled="deleteLoading"
             :loading="deleteLoading"
             size="sm"
             class="rounded-xl cursor-pointer px-5"
-            :class="
-              canDelete
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             "
             @click="deleteCompany"
           >

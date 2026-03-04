@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // Exhibitor: create a new company (mode='create') or edit existing (mode='edit')
 import { RegisterCompanySchema, UpdateCompanySchema } from "@vexpo/schema";
+import DeleteConfirm from "~/components/common/DeleteConfirm.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
 
 const props = defineProps<{
@@ -267,48 +268,15 @@ async function deleteCompany() {
     </UForm>
 
     <!-- Delete (edit mode only) -->
-    <template v-if="mode === 'edit'">
-      <div class="mt-10 pt-8 border-t border-gray-100">
-        <button
-          class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2"
-          @click="showDelete = !showDelete"
-        >
-          <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
-          Delete this company
-        </button>
-        <Transition name="fade">
-          <div
-            v-if="showDelete"
-            class="mt-4 p-5 rounded-xl border border-red-200 bg-red-50/30"
-          >
-            <p class="text-sm text-red-700 mb-3">
-              Type <strong>{{ company?.name }}</strong> to confirm:
-            </p>
-            <UInput
-              v-model="deleteConfirm"
-              placeholder="Company name"
-              class="mb-4 w-full max-w-xs"
-              :ui="{
-                base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl',
-              }"
-            />
-            <UButton
-              :disabled="!canDelete || deleteLoading"
-              :loading="deleteLoading"
-              size="sm"
-              class="rounded-xl cursor-pointer px-5"
-              :class="
-                canDelete
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              "
-              @click="deleteCompany"
-            >
-              {{ deleteLoading ? "Deleting…" : "Permanently Delete" }}
-            </UButton>
-          </div>
-        </Transition>
-      </div>
-    </template>
+    <DeleteConfirm
+      :mode="mode"
+      v-model:showDelete="showDelete"
+      v-model:deleteConfirm="deleteConfirm"
+      :title="'company'"
+      :name="company?.name"
+      :can-delete="canDelete"
+      :delete-loading="deleteLoading"
+      @delete="deleteCompany"
+    />
   </div>
 </template>

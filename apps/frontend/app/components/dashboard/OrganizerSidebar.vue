@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { TABS } from '~/utils/sidebar/organizer.sidebar.constants';
+import StatusBadge from '../common/StatusBadge.vue';
 
 const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
 const props = defineProps<{ activeView: string; activeId?: string }>();

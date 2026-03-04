@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CreateExpoSchema, UpdateExpoSchema } from "@vexpo/schema";
+import DeleteConfirm from "~/components/common/DeleteConfirm.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
 import {  } from "~/utils/form.constants";
 
@@ -206,50 +207,15 @@ async function deleteExpo() {
     </UForm>
 
     <!-- Delete -->
-    <template v-if="mode === 'edit'">
-      <div class="mt-10 pt-8 border-t border-gray-100">
-        <button
-          class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2"
-          @click="showDelete = !showDelete"
-        >
-          <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
-          Delete this expo
-        </button>
-
-        <Transition name="fade">
-          <div
-            v-if="showDelete"
-            class="mt-4 p-5 rounded-xl border border-red-200 bg-red-50/30"
-          >
-            <p class="text-sm text-red-700 mb-3">
-              Type <strong>{{ expo?.name }}</strong> to confirm:
-            </p>
-
-            <UInput
-              v-model="deleteConfirm"
-              class="mb-4 w-full max-w-xs"
-              :ui="{
-                base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl',
-              }"
-            />
-
-            <UButton
-              :disabled="!canDelete || deleteLoading"
-              :loading="deleteLoading"
-              size="sm"
-              class="rounded-xl px-5"
-              :class="
-                canDelete
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-100 text-gray-400'
-              "
-              @click="deleteExpo"
-            >
-              {{ deleteLoading ? "Deleting…" : "Permanently Delete" }}
-            </UButton>
-          </div>
-        </Transition>
-      </div>
-    </template>
+    <DeleteConfirm
+      :mode="mode"
+      v-model:showDelete="showDelete"
+      v-model:deleteConfirm="deleteConfirm"
+      :title="'expo'"
+      :name="expo?.name"
+      :can-delete="canDelete"
+      :delete-loading="deleteLoading"
+      @delete="deleteExpo"
+    />
   </div>
 </template>

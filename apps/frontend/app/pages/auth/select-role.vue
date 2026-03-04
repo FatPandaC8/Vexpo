@@ -3,7 +3,7 @@
 // New Google OAuth users land here with ?token=xxx (a temp token, 10 min TTL).
 // They pick a role → POST /auth/oauth/complete → get a full token → go to dashboard.
 
-import Logo from "~/components/Logo.vue";
+import Logo from '~/components/common/Logo.vue';
 
 const route = useRoute();
 const auth = useAuth();
@@ -22,26 +22,6 @@ auth.setToken(tempToken!);
 const selectedRole = ref<"exhibitor" | "organizer" | null>(null);
 const isLoading = ref(false);
 const errorMsg = ref<string | null>(null);
-
-const roleOptions: {
-  value: "exhibitor" | "organizer";
-  label: string;
-  description: string;
-  icon: string;
-}[] = [
-  {
-    value: "exhibitor",
-    label: "Exhibitor",
-    description: "Showcase your company, register booths.",
-    icon: "i-lucide-building-2",
-  },
-  {
-    value: "organizer",
-    label: "Organizer",
-    description: "Create and manage virtual expos from start to finish.",
-    icon: "i-lucide-calendar-check",
-  },
-];
 
 // Submit
 async function confirm() {

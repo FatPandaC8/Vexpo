@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
-import Unsupported from "~/components/Unsupported.vue";
+import Unsupported from "~/components/common/Unsupported.vue";
 
 definePageMeta({ middleware: "auth" });
 
@@ -33,11 +33,6 @@ const roleIcon = computed(() => {
 
 // Sidebar nav
 const activeSection = ref<"profile" | "security">("profile");
-
-const sections = [
-  { key: "profile", label: "Profile", icon: "i-lucide-user" },
-  { key: "security", label: "Security", icon: "i-lucide-lock" },
-] as const;
 
 // Profile form
 const profileState = reactive({

@@ -2,13 +2,13 @@
 // Admin: view user details, change role, delete
 // IMPORTANT: Must be able to change: name, email, role
 import { UpdateUserSchema } from "@vexpo/schema";
+import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
+import { ROLES } from "~/utils/sidebar/admin.sidebar.constants";
 
 const props = defineProps<{ user: any }>();
 const emit = defineEmits<{ updated: [user: any]; deleted: [] }>();
 
 const api = useApi();
-
-const ROLES = ["exhibitor", "organizer", "admin"];
 
 const schema = UpdateUserSchema;
 
@@ -106,24 +106,8 @@ const roleBadge: Record<string, string> = {
       </div>
     </div>
 
-    <Transition name="fade">
-      <div
-        v-if="success"
-        class="mb-5 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700"
-      >
-        <UIcon name="i-lucide-circle-check" class="shrink-0 text-emerald-500" />
-        Role updated successfully.
-      </div>
-    </Transition>
-    <Transition name="fade">
-      <div
-        v-if="error"
-        class="mb-5 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
-      >
-        <UIcon name="i-lucide-circle-alert" class="shrink-0 text-red-500" />
-        {{ error }}
-      </div>
-    </Transition>
+    <SuccessIndicator :success="success" :message="admin_user_successMsg"/>
+    <SuccessIndicator :success="success" :message="error"/>
 
     <!-- Role change form -->
     <UCard class="rounded-2xl border border-gray-300 p-6 mb-6">
@@ -212,14 +196,3 @@ const roleBadge: Record<string, string> = {
     </div>
   </div>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

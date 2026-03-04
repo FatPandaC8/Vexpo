@@ -1,31 +1,12 @@
 <script setup lang="ts">
+import { EDIT_VIEW, ENDPOINT, TABS, type Section } from '~/utils/sidebar/admin.sidebar.constants';
+
 const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
 const props = defineProps<{ activeView: string; activeId?: string }>();
 
 const api = useApi();
 
-type Section = "users" | "expos" | "booths" | "companies";
 const section = ref<Section>("users");
-
-const TABS = [
-  { key: "users", label: "Users", icon: "i-lucide-users" },
-  { key: "expos", label: "Expos", icon: "i-lucide-calendar" },
-  { key: "booths", label: "Booths", icon: "i-lucide-store" },
-  { key: "companies", label: "Companies", icon: "i-lucide-building-2" },
-];
-
-const ENDPOINT: Record<Section, string> = {
-  users: "/users",
-  expos: "/expos",
-  booths: "/booths",
-  companies: "/companies",
-};
-const EDIT_VIEW: Record<Section, string> = {
-  users: "admin-user-edit",
-  expos: "admin-expo-edit",
-  booths: "admin-booth-edit",
-  companies: "admin-company-edit",
-};
 
 const items = ref<any[]>([]);
 const loading = ref(false);

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { CreateBoothSchema, UpdateBoothSchema } from "@vexpo/schema";
 import type { Cell, OccupiedCell } from "~/components/BoothMapPicker.vue";
+import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
+import { STATUSES } from "~/utils/sidebar/admin.sidebar.constants";
 
 const auth = useAuth();
 const api = useApi();
@@ -28,14 +30,14 @@ const schema = computed(() =>
   mode.value === "edit" ? UpdateBoothSchema : CreateBoothSchema,
 );
 
-// ── Map position ─────────────────────────────────────────────────────────────
+// Map position
 const mapPosition = ref<Cell | null>(
   props.booth?.mapRow != null && props.booth?.mapCol != null
     ? { row: props.booth.mapRow, col: props.booth.mapCol }
     : null,
 );
 
-// ── 3D model ─────────────────────────────────────────────────────────────────
+// 3D model
 const modelPath = ref<string | null>(props.booth?.modelPath ?? null);
 const modelFileName = ref<string | null>(
   props.booth?.modelPath
@@ -47,7 +49,7 @@ const fileError = ref<string | null>(null);
 const fileUploadKey = ref(0);
 const removingModel = ref(false);
 
-// ── Company ───────────────────────────────────────────────────────────────────
+// Company
 const myCompany = ref<any>(null);
 const loadingCompany = ref(false);
 
@@ -63,7 +65,7 @@ async function loadMyCompany() {
   }
 }
 
-// ── State (must contain every field the schema needs) ────────────────────────
+// State (must contain every field the schema needs)
 const state = reactive({
   name: props.booth?.name ?? "",
   description: props.booth?.description ?? "",
@@ -92,7 +94,7 @@ watch(myCompany, (company) => {
   }
 });
 
-// ── Occupied cells ────────────────────────────────────────────────────────────
+// Occupied cells
 const occupiedCells = ref<OccupiedCell[]>([]);
 
 async function loadOccupied() {
@@ -142,8 +144,8 @@ watch(
   },
 );
 
-// ── Submit ────────────────────────────────────────────────────────────────────
-const STATUSES = ["pending", "approved", "rejected"];
+// Submit 
+
 const saving = ref(false);
 const success = ref(false);
 const error = ref<string | null>(null);
@@ -180,7 +182,7 @@ async function submit(event: any) {
   }
 }
 
-// ── Delete ────────────────────────────────────────────────────────────────────
+// Delete
 const showDelete = ref(false);
 const deleteConfirm = ref("");
 const deleteLoading = ref(false);
@@ -199,7 +201,7 @@ async function deleteBooth() {
   }
 }
 
-// ── File upload ───────────────────────────────────────────────────────────────
+// File upload
 watch(uploadedFile, (file) => {
   if (!file) return;
   fileError.value = null;
@@ -319,29 +321,8 @@ defineExpose({ modelPath });
       </div>
     </div>
 
-    <!-- Alerts -->
-    <Transition name="fade">
-      <div
-        v-if="success"
-        class="mb-6 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700"
-      >
-        <UIcon name="i-lucide-circle-check" class="shrink-0 text-emerald-500" />
-        Booth {{ mode === "create" ? "registered" : "updated" }} successfully!
-        <span v-if="mode === 'create'" class="text-emerald-600 ml-1">
-          Check "Booths" in the sidebar.
-        </span>
-      </div>
-    </Transition>
-
-    <Transition name="fade">
-      <div
-        v-if="error"
-        class="mb-6 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
-      >
-        <UIcon name="i-lucide-circle-alert" class="shrink-0 text-red-500" />
-        {{ error }}
-      </div>
-    </Transition>
+    <SuccessIndicator :success="success" :message="booth_successMsg"/>
+    <SuccessIndicator :success="success" :message="error"/>
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <div class="grid grid-cols-2 gap-5">
@@ -520,14 +501,6 @@ defineExpose({ modelPath });
 </template>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
 .slide-down-enter-active,
 .slide-down-leave-active {
   transition: all 0.2s ease;

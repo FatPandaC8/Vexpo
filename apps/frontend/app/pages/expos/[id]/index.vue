@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // TODO Today: Add organizer information tab next to the expo information
 import { MAP_COLS, MAP_ROWS } from "@vexpo/schema";
-import Header from "~/components/Header.vue";
+import Header from "~/components/common/Header.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -42,14 +42,6 @@ const expoStatus = computed(() => {
   if (today < start) return "Upcoming";
   return "Past";
 });
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 function boothAt(r: number, c: number) {
   return booths.value.find((b) => b.mapRow === r && b.mapCol === c);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Header from "~/components/Header.vue";
+import Header from '~/components/common/Header.vue';
 
 const api = useApi();
 
@@ -8,17 +8,6 @@ const selectedType = ref("All");
 const selectedStatus = ref("All");
 const loading = ref(false);
 const expos = ref<any[]>([]);
-
-const types = [
-  "All",
-  "Technology",
-  "Finance",
-  "Healthcare",
-  "Education",
-  "Retail",
-  "Manufacturing",
-];
-const statuses = ["All", "Live", "Upcoming", "Archived"];
 
 async function fetchExpos() {
   loading.value = true;
@@ -89,14 +78,6 @@ const statusDot: Record<string, string> = {
   Upcoming: "bg-blue-400",
   Archived: "bg-gray-400",
 };
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 function boothCount(expo: any) {
   return expo.booths?.length ?? 0;

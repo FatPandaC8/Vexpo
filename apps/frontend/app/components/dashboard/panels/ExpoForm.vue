@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { CreateExpoSchema, UpdateExpoSchema } from "@vexpo/schema";
+import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
+import {  } from "~/utils/form.constants";
 
 // Reminder: defineProps is for falling through attribute from parent to child
 const props = defineProps<{
@@ -118,26 +120,10 @@ async function deleteExpo() {
     </div>
 
     <!-- Success -->
-    <Transition name="fade">
-      <div
-        v-if="success"
-        class="mb-6 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700"
-      >
-        <UIcon name="i-lucide-circle-check" class="text-emerald-500" />
-        Expo {{ mode === "create" ? "created" : "updated" }} successfully.
-      </div>
-    </Transition>
+    <SuccessIndicator :success="success" :message="expo_successMsg"/>
 
     <!-- Error -->
-    <Transition name="fade">
-      <div
-        v-if="error"
-        class="mb-6 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
-      >
-        <UIcon name="i-lucide-circle-alert" class="text-red-500" />
-        {{ error }}
-      </div>
-    </Transition>
+    <SuccessIndicator :success="success" :message="error"/>
 
     <!-- Form -->
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
@@ -267,14 +253,3 @@ async function deleteExpo() {
     </template>
   </div>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

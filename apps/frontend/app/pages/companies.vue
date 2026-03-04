@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Header from "~/components/Header.vue";
+import Header from '~/components/common/Header.vue';
 
 const api = useApi();
 
@@ -7,17 +7,6 @@ const search = ref("");
 const selectedIndustry = ref("All");
 const loading = ref(false);
 const companies = ref<any[]>([]);
-
-const industries = [
-  "All",
-  "Technology",
-  "Finance",
-  "Healthcare",
-  "Education",
-  "Retail",
-  "Manufacturing",
-  "Energy",
-];
 
 async function fetchCompanies() {
   loading.value = true;
@@ -143,17 +132,17 @@ function boothCount(company: any) {
             </h3>
             <div class="space-y-1">
               <button
-                v-for="industry in industries"
-                :key="industry"
+                v-for="type in types"
+                :key="type"
                 class="w-full text-left px-3 py-2 rounded-xl text-sm transition-all font-medium"
                 :class="
-                  selectedIndustry === industry
+                  selectedIndustry === type
                     ? 'bg-slate-800 text-white shadow-sm'
                     : 'text-gray-600 hover:bg-gray-100'
                 "
-                @click="selectedIndustry = industry"
+                @click="selectedIndustry = type"
               >
-                {{ industry }}
+                {{ type }}
               </button>
             </div>
           </div>

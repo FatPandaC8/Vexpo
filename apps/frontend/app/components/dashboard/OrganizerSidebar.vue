@@ -1,14 +1,11 @@
 <script setup lang="ts">
+import { TABS } from '~/utils/sidebar/organizer.sidebar.constants';
+
 const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
 const props = defineProps<{ activeView: string; activeId?: string }>();
 
 const api = useApi();
 const section = ref<"expos" | "booths">("expos");
-
-const TABS = [
-  { key: "expos", label: "My Expos", icon: "i-lucide-calendar" },
-  { key: "booths", label: "Booths", icon: "i-lucide-store" },
-];
 
 const expos = ref<any[]>([]);
 const booths = ref<any[]>([]);

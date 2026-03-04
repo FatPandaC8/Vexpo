@@ -1,15 +1,12 @@
 <script setup lang="ts">
+import { TABS } from '~/utils/sidebar/exhibitor.sidebar.constants';
+import StatusBadge from '../common/StatusBadge.vue';
+
 const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
 const props = defineProps<{ activeView: string; activeId?: string }>();
 
 const api = useApi();
 const section = ref<"booth" | "expos" | "company">("booth");
-
-const TABS = [
-  { key: "booth", label: "myBooth", icon: "i-lucide-store" },
-  { key: "expos", label: "Find Expo", icon: "i-lucide-search" },
-  { key: "company", label: "Company", icon: "i-lucide-building-2" },
-];
 
 const myBooth = ref<any>();
 const expos = ref<any[]>([]);

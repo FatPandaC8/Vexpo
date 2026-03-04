@@ -13,7 +13,8 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     'nuxt-svgo',
     '@nuxt/image',
-    '@nuxt/eslint'
+    '@nuxt/eslint',
+    '@pinia/nuxt',
   ],
   runtimeConfig: {
     public: {

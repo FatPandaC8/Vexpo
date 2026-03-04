@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { UpdateBoothSchema } from "@vexpo/schema";
 import type { Cell, OccupiedCell } from "~/components/BoothMapPicker.vue";
+import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
+import { STATUSES } from "~/utils/sidebar/admin.sidebar.constants";
 
 const props = defineProps<{ booth: any }>();
 const emit = defineEmits<{ updated: [booth: any]; deleted: [] }>();
@@ -8,8 +10,6 @@ const emit = defineEmits<{ updated: [booth: any]; deleted: [] }>();
 const api = useApi();
 
 const schema = UpdateBoothSchema;
-
-const STATUSES = ["pending", "approved", "rejected"];
 
 const state = reactive({
   name: props.booth.name ?? "",
@@ -131,27 +131,8 @@ const statusColor: Record<string, string> = {
       </span>
     </div>
 
-    <Transition name="fade">
-      <div
-        v-if="success"
-        class="mb-5 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700"
-      >
-        <UIcon
-          name="i-lucide-circle-check"
-          class="shrink-0 text-emerald-500"
-        />Booth updated.
-      </div>
-    </Transition>
-    <Transition name="fade">
-      <div
-        v-if="error"
-        class="mb-5 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
-      >
-        <UIcon name="i-lucide-circle-alert" class="shrink-0 text-red-500" />{{
-          error
-        }}
-      </div>
-    </Transition>
+    <SuccessIndicator :success="success" :message="admin_booth_successMsg"/>
+    <SuccessIndicator :success="success" :message="error"/>
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <UFormField

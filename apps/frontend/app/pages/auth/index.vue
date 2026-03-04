@@ -1,9 +1,8 @@
 <script setup lang="ts">
-// admin@admin.com - admin123
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
-import Logo from "~/components/Logo.vue";
-import Footer from "~/components/Footer.vue";
+import Logo from "~/components/common/Logo.vue";
+import Footer from "~/components/common/Footer.vue";
 import { LoginSchema, RegisterSchema } from "@vexpo/schema";
 
 const auth = useAuth();
@@ -12,13 +11,6 @@ const rememberMe = ref(true);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const agreeTerms = ref(false);
-
-const items = [
-  { label: "Sign In", value: "signin", slot: "signin" },
-  { label: "Sign Up", value: "signup", slot: "signup" },
-];
-
-const roles = ["exhibitor", "organizer"];
 
 // Separate form states
 // The reactive state might seem like a computed, but no

@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import Footer from '~/components/common/Footer.vue';
+import Header from '~/components/common/Header.vue';
+// TODO: Refactor this
 const api = useApi();
-const auth = useAuth();
 
 const loading = ref(false);
 const expos = ref<any[]>([]);
 
 async function fetchExpos() {
   loading.value = true;
-  await new Promise((r) => setTimeout(r, 2000));
   try {
     expos.value = await api.get<any[]>("/expos");
   } catch {
@@ -27,14 +28,6 @@ function getStatus(expo: any) {
   if (now.value >= start && now.value <= end) return "Live";
   if (now.value < start) return "Upcoming";
   return "Past";
-}
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 const trendingExpos = computed(() =>
@@ -228,7 +221,7 @@ const statusDot: Record<string, string> = {
       </div>
     </section>
 
-    <div v-if="auth.isLoggedIn.value === false">
+    <div>
       <!-- Why -->
       <section class="mb-40">
         <div class="flex flex-col items-center text-center mb-12">

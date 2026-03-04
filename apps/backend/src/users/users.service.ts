@@ -6,7 +6,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
-import { UserRole } from 'src/entities/userrole.entity';
 import { Repository } from 'typeorm';
 import { PublicUserInfo } from './dto/public-user.dto';
 
@@ -17,8 +16,6 @@ export class UsersService {
     private userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
-    @InjectRepository(UserRole)
-    private userRoleRepository: Repository<UserRole>,
   ) {}
 
   // PUBLIC API
@@ -48,17 +45,15 @@ export class UsersService {
     });
   }
 
-  async getPublicInfo(id: string) {
+  async getPublicInfo(userId: string) {
     // get the user
-    const public_user = await this.findOneById(id);
+    const public_user = await this.findOneById(userId);
 
     // for more protection: check if the found user is an admin ?
-    const isAdmin = await this.userRoleRepository.findOneBy({
-      id: public_user?.id,
-    });
+    const isAdmin = public_user?.role;
 
     // 1 is admin
-    if (isAdmin?.roleId === 1) {
+    if (isAdmin?.name === 'admin') {
       throw new BadRequestException('You cannot view admin info');
     }
 
@@ -77,37 +72,19 @@ export class UsersService {
   }): Promise<User> {
     const user = this.userRepository.create(data as Partial<User>);
     // the Partial<User> is a workaround, as first it need roles but oauth does not have role yet when signing up
-    // so cast it as that, with default value of []
+    // so cast it as that, with default value of null
     return this.userRepository.save(user);
   }
 
   async assignRole(userId: string, roleName: string) {
-    const exists = await this.userRoleRepository.findOne({
-      where: {
-        user: { id: userId },
-        role: { name: roleName },
-      },
-    });
+    const userToAssign = await this.userRepository.findOneBy({id: userId});
 
-    if (exists) return exists;
+    if (!userToAssign) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+    userToAssign.role.name = roleName; // NOTE: the ! is an assertion that the variable is not null by any chance
 
-    const role = await this.roleRepository.findOne({
-      where: { name: roleName },
-    });
-
-    if (!role) throw new NotFoundException('Role not found');
-
-    const userRole = this.userRoleRepository.create({
-      userId,
-      role,
-    });
-
-    return this.userRoleRepository.save(userRole);
-  }
-
-  async setRole(userId: string, roleName: string) {
-    await this.userRoleRepository.delete({ user: { id: userId } });
-    return this.assignRole(userId, roleName);
+    return this.userRepository.save(userToAssign);
   }
 
   async updateUser(
@@ -138,7 +115,7 @@ export class UsersService {
 
     // update role if provided
     if (data.role) {
-      await this.setRole(id, data.role);
+      await this.assignRole(id, data.role);
     }
 
     return this.findOneById(id);

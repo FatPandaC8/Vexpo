@@ -11,7 +11,6 @@ import { BoothsModule } from './booths/booths.module';
 import { CompaniesModule } from './companies/companies.module';
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
-import { UserRole } from './entities/userrole.entity';
 import { Expo } from './entities/expo.entity';
 import { Booth } from './entities/booth.entity';
 import { Company } from './entities/company.entity';
@@ -31,7 +30,7 @@ import { Company } from './entities/company.entity';
       username: process.env.TYPEORM_username,
       password: process.env.TYPEORM_password,
       database: process.env.TYPEORM_database_name,
-      entities: [User, Role, UserRole, Expo, Booth, Company],
+      entities: [User, Role, Expo, Booth, Company],
       autoLoadEntities: true,
       synchronize: Boolean(process.env.IN_DEVELOPEMENT), // for dev only, not for production
     }),

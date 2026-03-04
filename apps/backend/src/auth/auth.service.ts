@@ -39,7 +39,7 @@ export class AuthService {
     const payload = {
       sub: fullUser!.id,
       email: fullUser!.email,
-      roles: fullUser!.roles.map((ur) => ur.role.name),
+      role: fullUser!.role,
     };
 
     return {
@@ -62,7 +62,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      roles: user.roles.map((ur) => ur.role.name), // e.g. ['organizer']
+      role: user.role, // e.g. ['organizer']
     };
 
     return {
@@ -84,7 +84,7 @@ export class AuthService {
       const payload = {
         sub: user.id,
         email: user.email,
-        roles: user.roles.map((ur) => ur.role.name), // lowercase
+        role: user.role, // lowercase
       };
       return {
         access_token: await this.jwtService.signAsync(payload),
@@ -124,7 +124,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      roles: user.roles.map((ur) => ur.role.name), // lowercase
+      role: user.role, // lowercase
     };
 
     return {

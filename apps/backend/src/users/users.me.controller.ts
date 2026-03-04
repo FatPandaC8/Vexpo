@@ -41,7 +41,7 @@ export class UsersMeController {
       id: user.id,
       name: user.name,
       email: user.email,
-      roles: user.roles?.map((ur) => ur.role.name) ?? [],
+      role: user.role,
     };
   }
 

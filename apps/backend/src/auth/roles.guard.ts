@@ -21,12 +21,14 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    if (!user?.roles) return false;
 
-    const userRoles = (user.roles as string[]).map((r) => r.toLowerCase());
+    // user.role is now a single lowercase string (set by JwtStrategy)
+    if (!user?.role) return false;
 
-    if (userRoles.includes('admin')) return true;
+    const userRole = (user.role as string).toLowerCase();
 
-    return requiredRoles.some((r) => userRoles.includes(r.toLowerCase()));
+    if (userRole === 'admin') return true;
+
+    return requiredRoles.some((r) => r.toLowerCase() === userRole);
   }
 }

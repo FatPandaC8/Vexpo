@@ -52,10 +52,10 @@ export class BoothsController {
     @Body() dto: UpdateBoothDTO,
     @Req() req: any,
   ) {
-    const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
+    const role: string = req.user.role as string;
     const userId: string = req.user.userId;
 
-    if (roles.includes('admin') || roles.includes('organizer')) {
+    if (role === 'admin' || role === 'organizer') {
       return this.boothsService.updateBooth(id, dto);
     }
 
@@ -71,10 +71,10 @@ export class BoothsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete booth' })
   async remove(@Param('id', ParseUUIDPipe) id: string, @Req() req: any) {
-    const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
+    const role: string = req.user.role as string;
     const userId: string = req.user.userId;
 
-    if (roles.includes('admin') || roles.includes('organizer')) {
+    if (role === 'admin' || role === 'organizer') {
       return this.boothsService.deleteBooth(id);
     }
     return this.boothsService.deleteBoothByExhibitor(id, userId);

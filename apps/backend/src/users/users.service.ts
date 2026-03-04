@@ -18,51 +18,30 @@ export class UsersService {
     private roleRepository: Repository<Role>,
   ) {}
 
-  // PUBLIC API
-
-  profile(userId: string) {
-    return this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-      select: ['name', 'email'],
-    });
-  }
-
   async findOneByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { email },
-      relations: ['roles', 'roles.role'], // if no relation, user will be loaded with no role
-      // if only have roles, user's role attribute will be empty
-      // if have roles.role, user's role attribute is loaded with roles
+      relations: ['role'],
     });
   }
 
   async findOneById(id: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id },
-      relations: ['roles', 'roles.role'],
+      relations: ['role'],
     });
   }
 
   async getPublicInfo(userId: string) {
-    // get the user
-    const public_user = await this.findOneById(userId);
+    const user = await this.findOneById(userId);
+    if (!user) throw new NotFoundException('User not found');
 
-    // for more protection: check if the found user is an admin ?
-    const isAdmin = public_user?.role;
-
-    // 1 is admin
-    if (isAdmin?.name === 'admin') {
+    if (user.role?.name === 'admin') {
       throw new BadRequestException('You cannot view admin info');
     }
 
-    // return the user info
-    const return_user: PublicUserInfo = {
-      name: public_user?.name,
-    };
-
-    return return_user;
+    const returnUser: PublicUserInfo = { name: user.name };
+    return returnUser;
   }
 
   async createUserOnly(data: {
@@ -76,44 +55,39 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  async assignRole(userId: string, roleName: string) {
-    const userToAssign = await this.userRepository.findOneBy({id: userId});
+  async assignRole(userId: string, roleName: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['role'],
+    });
+    if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
 
-    if (!userToAssign) {
-      throw new Error(`User with ID ${userId} not found`);
+    let role = await this.roleRepository.findOne({ where: { name: roleName } });
+    if (!role) {
+      throw new BadRequestException('Invalid role')
     }
-    userToAssign.role.name = roleName; // NOTE: the ! is an assertion that the variable is not null by any chance
 
-    return this.userRepository.save(userToAssign);
+    // Point user to the shared role row (works for both new users and role changes)
+    user.role = role;
+    await this.userRepository.save(user);
+
+    return (await this.findOneById(userId)) as User;
   }
 
   async updateUser(
     id: string,
-    data: {
-      name?: string;
-      email?: string;
-      role?: string;
-    },
+    data: { name?: string; email?: string; role?: string },
   ) {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['roles', 'roles.role'],
+      relations: ['role'],
     });
-
     if (!user) throw new NotFoundException('User not found');
 
-    // update basic fields
-    if (data.name !== undefined) {
-      user.name = data.name;
-    }
-
-    if (data.email !== undefined) {
-      user.email = data.email;
-    }
-
+    if (data.name !== undefined) user.name = data.name;
+    if (data.email !== undefined) user.email = data.email;
     await this.userRepository.save(user);
 
-    // update role if provided
     if (data.role) {
       await this.assignRole(id, data.role);
     }
@@ -127,10 +101,9 @@ export class UsersService {
   }
 
   async findAllPaginated(page: number = 1, limit: number = 20) {
-    // TODO: not optimized if the the number are large Bach :(
+    // TODO: not optimized if the the number are large Bach :(7
     const [items, total] = await this.userRepository.findAndCount({
-      relations: ['roles', 'roles.role'],
-      select: ['id', 'name', 'email'],
+      relations: ['role'],
       skip: (page - 1) * limit,
       take: limit,
       order: { id: 'DESC' },
@@ -138,12 +111,7 @@ export class UsersService {
 
     return {
       items,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
   }
 }

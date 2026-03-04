@@ -83,8 +83,8 @@ export class ExposController {
     @Body() dto: UpdateExpoDTO,
     @Req() req: any,
   ) {
-    const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
-    if (roles.includes('admin')) return this.expoService.updateExpo(id, dto);
+    const userRole: string = (req.user.role as string).toLowerCase();
+    if (userRole === 'admin') return this.expoService.updateExpo(id, dto);
     return this.expoService.updateExpoByOrganizer(id, req.user.userId, dto);
   }
 
@@ -97,8 +97,8 @@ export class ExposController {
     summary: 'Delete expo organizer must own it, admin bypasses',
   })
   async remove(@Param('id', ParseUUIDPipe) id: string, @Req() req: any) {
-    const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
-    if (roles.includes('admin')) return this.expoService.deleteExpo(id);
+    const userRole: string = (req.user.role as string).toLowerCase();
+    if (userRole === 'admin') return this.expoService.deleteExpo(id);
     return this.expoService.deleteExpoByOrganizer(id, req.user.userId);
   }
 
@@ -116,9 +116,8 @@ export class ExposController {
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: any,
   ) {
-    const roles: string[] = req.user.roles.map((r: string) => r.toLowerCase());
-    if (roles.includes('admin'))
-      return this.expoService.findAllBoothsByExpoId(id);
+    const userRole: string = (req.user.role as string).toLowerCase();
+    if (userRole === 'admin') return this.expoService.findAllBoothsByExpoId(id);
     return this.expoService.getExpoBoothsByOrganizer(id, req.user.userId);
   }
 

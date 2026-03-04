@@ -26,48 +26,36 @@ export class AuthService {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = await this.usersService.createUserOnly({
-      name,
-      email,
-      password: hashed,
-    });
-
+    const user = await this.usersService.createUserOnly({ name, email, password: hashed });
     await this.usersService.assignRole(user.id, role);
 
     const fullUser = await this.usersService.findOneById(user.id);
-
+    if (!fullUser) {
+      throw new NotFoundException('Cannot found this user')
+    }
     const payload = {
-      sub: fullUser!.id,
-      email: fullUser!.email,
-      role: fullUser!.role,
+      sub: fullUser.id,
+      email: fullUser.email,
+      role: fullUser.role?.name ?? null,   // plain string e.g. "organizer"
     };
 
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    return { access_token: await this.jwtService.signAsync(payload) };
   }
 
   async login(dto: LoginDTO): Promise<{ access_token: string }> {
     const user = await this.usersService.findOneByEmail(dto.email);
     if (!user) throw new NotFoundException('User not found');
 
-    const isMatchPassword = await bcrypt.compare(
-      dto.password,
-      user.password as string,
-    );
-    if (!isMatchPassword) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    const isMatchPassword = await bcrypt.compare(dto.password, user.password as string);
+    if (!isMatchPassword) throw new UnauthorizedException('Invalid credentials');
 
     const payload = {
       sub: user.id,
       email: user.email,
-      role: user.role, // e.g. ['organizer']
+      role: user.role?.name ?? null,        // plain string
     };
 
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    return { access_token: await this.jwtService.signAsync(payload) };
   }
 
   logout() {
@@ -80,36 +68,31 @@ export class AuthService {
     picture?: string;
   }): Promise<{ access_token: string; is_new_user: boolean }> {
     const user = await this.usersService.findOneByEmail(oauthUser.email);
+
     if (user) {
       const payload = {
         sub: user.id,
         email: user.email,
-        role: user.role, // lowercase
+        role: user.role?.name ?? null,      // plain string
       };
       return {
         access_token: await this.jwtService.signAsync(payload),
         is_new_user: false,
       };
-    } else {
-      const newUser = await this.usersService.createUserOnly({
-        name: oauthUser.name,
-        email: oauthUser.email,
-        password: null,
-      });
-
-      const tempPayload = {
-        sub: newUser.id,
-        email: newUser.email,
-        temp: true,
-      };
-
-      return {
-        access_token: await this.jwtService.signAsync(tempPayload, {
-          expiresIn: '10m',
-        }),
-        is_new_user: true,
-      };
     }
+
+    const newUser = await this.usersService.createUserOnly({
+      name: oauthUser.name,
+      email: oauthUser.email,
+      password: null,
+    });
+
+    // Temp token - no role yet
+    const tempPayload = { sub: newUser.id, email: newUser.email, temp: true };
+    return {
+      access_token: await this.jwtService.signAsync(tempPayload, { expiresIn: '10m' }),
+      is_new_user: true,
+    };
   }
 
   async completeOAuthRegistration(
@@ -124,11 +107,9 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      role: user.role, // lowercase
+      role: user.role?.name ?? null,        // plain string
     };
 
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    return { access_token: await this.jwtService.signAsync(payload) };
   }
 }

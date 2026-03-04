@@ -7,11 +7,10 @@ const api = useApi();
 
 const canEditStatus = computed(
   () =>
-    auth.user.value?.roles?.includes("admin") ||
-    auth.user.value?.roles?.includes("organizer"),
+    auth.user.value?.role === "admin" ||
+    auth.user.value?.role === "organizer",
 );
 
-// Recap: defineProps is to declare the properties that a component accepts from its parent
 const props = defineProps<{
   expo?: any;
   booth?: any;
@@ -26,16 +25,29 @@ const emit = defineEmits<{
 const mode = computed(() => (props.booth ? "edit" : "create"));
 
 const schema = computed(() =>
-  props.booth ? UpdateBoothSchema : CreateBoothSchema,
+  mode.value === "edit" ? UpdateBoothSchema : CreateBoothSchema,
 );
 
-const state = reactive({
-  name: props.booth?.name ?? "",
-  description: props.booth?.description ?? "",
-  companyId: props.booth?.companyId ?? (undefined as string | undefined),
-  status: props.booth?.status ?? "pending",
-});
+// ── Map position ─────────────────────────────────────────────────────────────
+const mapPosition = ref<Cell | null>(
+  props.booth?.mapRow != null && props.booth?.mapCol != null
+    ? { row: props.booth.mapRow, col: props.booth.mapCol }
+    : null,
+);
 
+// ── 3D model ─────────────────────────────────────────────────────────────────
+const modelPath = ref<string | null>(props.booth?.modelPath ?? null);
+const modelFileName = ref<string | null>(
+  props.booth?.modelPath
+    ? (props.booth.modelPath.split(/[\\/]/).pop() ?? null)
+    : null,
+);
+const uploadedFile = ref<File | null>(null);
+const fileError = ref<string | null>(null);
+const fileUploadKey = ref(0);
+const removingModel = ref(false);
+
+// ── Company ───────────────────────────────────────────────────────────────────
 const myCompany = ref<any>(null);
 const loadingCompany = ref(false);
 
@@ -44,9 +56,6 @@ async function loadMyCompany() {
   loadingCompany.value = true;
   try {
     myCompany.value = await api.get<any>("/me/company");
-    if (myCompany.value?.id && !state.companyId) {
-      state.companyId = myCompany.value.id;
-    }
   } catch {
     myCompany.value = null;
   } finally {
@@ -54,14 +63,36 @@ async function loadMyCompany() {
   }
 }
 
-// Map position
-const mapPosition = ref<Cell | null>(
-  props.booth?.mapRow != null && props.booth?.mapCol != null
-    ? { row: props.booth.mapRow, col: props.booth.mapCol }
-    : null,
-);
+// ── State (must contain every field the schema needs) ────────────────────────
+const state = reactive({
+  name: props.booth?.name ?? "",
+  description: props.booth?.description ?? "",
+  companyId: props.booth?.companyId as string | undefined,
+  status: props.booth?.status ?? "pending",
+  modelPath: props.booth?.modelPath as string | undefined,
+  mapRow: props.booth?.mapRow as number | undefined,
+  mapCol: props.booth?.mapCol as number | undefined,
+});
 
-// Occupied cells from the same expo (loaded once)
+// Keep state.mapRow / mapCol in sync with the map picker
+watch(mapPosition, (pos) => {
+  state.mapRow = pos?.row;
+  state.mapCol = pos?.col;
+});
+
+// Keep state.modelPath in sync with the model ref
+watch(modelPath, (val) => {
+  state.modelPath = val ?? undefined;
+});
+
+// Keep state.companyId in sync when company loads (create mode)
+watch(myCompany, (company) => {
+  if (company?.id && !state.companyId) {
+    state.companyId = company.id;
+  }
+});
+
+// ── Occupied cells ────────────────────────────────────────────────────────────
 const occupiedCells = ref<OccupiedCell[]>([]);
 
 async function loadOccupied() {
@@ -82,8 +113,7 @@ onMounted(() => {
   loadMyCompany();
 });
 
-console.log(occupiedCells.value);
-
+// Sync everything when the booth prop changes (e.g. switching between booths)
 watch(
   () => props.booth,
   (b) => {
@@ -91,48 +121,44 @@ watch(
     state.description = b?.description ?? "";
     state.companyId = b?.companyId ?? undefined;
     state.status = b?.status ?? "pending";
+    state.mapRow = b?.mapRow ?? undefined;
+    state.mapCol = b?.mapCol ?? undefined;
+    state.modelPath = b?.modelPath ?? undefined;
+
     mapPosition.value =
       b?.mapRow != null && b?.mapCol != null
         ? { row: b.mapRow, col: b.mapCol }
         : null;
+
     modelPath.value = b?.modelPath ?? null;
-    console.log("MODEL PATH: ", modelPath);
     modelFileName.value = b?.modelPath
       ? (b.modelPath.split(/[\\/]/).pop() ?? null)
       : null;
-    console.log("MODEL FILENAME: ", modelFileName);
+
     uploadedFile.value = null;
-    fileUploadKey.value++; // remount UFileUpload so it shows empty
+    fileUploadKey.value++;
     fileError.value = null;
     loadOccupied();
   },
 );
 
+// ── Submit ────────────────────────────────────────────────────────────────────
 const STATUSES = ["pending", "approved", "rejected"];
-
 const saving = ref(false);
 const success = ref(false);
 const error = ref<string | null>(null);
 
+// UForm calls @submit only after schema passes — event.data is the validated payload
 async function submit(event: any) {
+  console.log("Pressed", event.data);
   saving.value = true;
   error.value = null;
   success.value = false;
+
   try {
-    if (mapPosition.value === null) {
-      error.value = "Please select a floor map position";
-      return;
-    }
+    const payload = { ...event.data };
 
-    const payload: any = {
-      ...event.data,
-      companyId: state.companyId,
-      modelPath: modelPath.value ?? null,
-      status: state.status,
-      mapRow: mapPosition.value?.row,
-      mapCol: mapPosition.value?.col,
-    };
-
+    // Exhibitors cannot set status
     if (!canEditStatus.value) delete payload.status;
 
     let result: any;
@@ -145,9 +171,7 @@ async function submit(event: any) {
     }
 
     success.value = true;
-    setTimeout(() => {
-      success.value = false;
-    }, 4000);
+    setTimeout(() => { success.value = false; }, 4000);
   } catch (e: any) {
     const msg = e?.data?.message ?? e?.message;
     error.value = Array.isArray(msg) ? msg.join(", ") : (msg ?? "Save failed");
@@ -156,7 +180,7 @@ async function submit(event: any) {
   }
 }
 
-// Delete booth
+// ── Delete ────────────────────────────────────────────────────────────────────
 const showDelete = ref(false);
 const deleteConfirm = ref("");
 const deleteLoading = ref(false);
@@ -175,18 +199,7 @@ async function deleteBooth() {
   }
 }
 
-// 3D Model handling
-const modelPath = ref<string | null>(props.booth?.modelPath ?? null);
-const modelFileName = ref<string | null>(
-  props.booth?.modelPath
-    ? (props.booth.modelPath.split(/[\\/]/).pop() ?? null)
-    : null,
-);
-const uploadedFile = ref<File | null>(null);
-const fileError = ref<string | null>(null);
-// Incrementing this key forces UFileUpload to fully remount (clears its internal state)
-const fileUploadKey = ref(0);
-
+// ── File upload ───────────────────────────────────────────────────────────────
 watch(uploadedFile, (file) => {
   if (!file) return;
   fileError.value = null;
@@ -210,24 +223,19 @@ watch(uploadedFile, (file) => {
   modelFileName.value = file.name;
 });
 
-const removingModel = ref(false);
-
 async function removeModel() {
-  // Clear local state immediately
   uploadedFile.value = null;
   modelPath.value = null;
   modelFileName.value = null;
   fileError.value = null;
-  fileUploadKey.value++; // force UFileUpload to remount empty
+  fileUploadKey.value++;
 
-  // If editing an existing booth, persist the removal to the DB right away
-  // so that a page reload doesn't bring the old modelPath back
   if (mode.value === "edit" && props.booth?.id) {
     removingModel.value = true;
     try {
       await api.patch(`/booths/${props.booth.id}`, { modelPath: null });
     } catch {
-      // non-fatal the next "Save Changes" will also send null
+      // non-fatal — next Save will also send null
     } finally {
       removingModel.value = false;
     }
@@ -267,33 +275,20 @@ defineExpose({ modelPath });
 
       <!-- Company -->
       <div class="rounded-xl border border-gray-400 bg-gray-50 px-8 py-3">
-        <p
-          class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2.5"
-        >
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2.5">
           Company info
         </p>
-
         <template v-if="mode === 'create'">
-          <div
-            v-if="loadingCompany"
-            class="flex items-center gap-2 text-sm text-gray-400"
-          >
+          <div v-if="loadingCompany" class="flex items-center gap-2 text-sm text-gray-400">
             <UIcon name="i-lucide-loader-circle" class="w-4 h-4 animate-spin" />
             Detecting your company…
           </div>
           <div v-else-if="myCompany" class="flex items-center gap-3">
-            <div
-              class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0"
-            >
-              <UIcon
-                name="i-lucide-building-2"
-                class="w-4 h-4 text-violet-600"
-              />
+            <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-violet-600" />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-semibold text-gray-800 truncate">
-                {{ myCompany.name }}
-              </p>
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ myCompany.name }}</p>
               <p class="text-xs text-gray-400">ID #{{ myCompany.id }}</p>
             </div>
           </div>
@@ -301,33 +296,19 @@ defineExpose({ modelPath });
             v-else
             class="flex items-start gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2"
           >
-            <UIcon
-              name="i-lucide-triangle-alert"
-              class="w-4 h-4 shrink-0 mt-0.5"
-            />
-            <span
-              >No company found. Go to <strong>Company</strong> tab in the
-              sidebar to register one first.</span
-            >
+            <UIcon name="i-lucide-triangle-alert" class="w-4 h-4 shrink-0 mt-0.5" />
+            <span>No company found. Go to <strong>Company</strong> tab in the sidebar to register one first.</span>
           </div>
         </template>
-
         <template v-else>
           <div v-if="booth?.company" class="flex items-center gap-3">
-            <div
-              class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0"
-            >
-              <UIcon
-                name="i-lucide-building-2"
-                class="w-4 h-4 text-violet-600"
-              />
+            <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-violet-600" />
             </div>
             <div class="min-w-0">
-              <p class="text-sm font-semibold text-gray-800 truncate">
-                {{ booth.company.name }}
-              </p>
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ booth.company.name }}</p>
               <p class="text-xs text-gray-400">
-                ID #{{ booth.companyId }} · {{ booth.company.industry ?? "—" }}
+                ID #{{ booth.companyId }}
               </p>
             </div>
           </div>
@@ -346,9 +327,9 @@ defineExpose({ modelPath });
       >
         <UIcon name="i-lucide-circle-check" class="shrink-0 text-emerald-500" />
         Booth {{ mode === "create" ? "registered" : "updated" }} successfully!
-        <span v-if="mode === 'create'" class="text-emerald-600 ml-1"
-          >Check "My Booths" in the sidebar.</span
-        >
+        <span v-if="mode === 'create'" class="text-emerald-600 ml-1">
+          Check "Booths" in the sidebar.
+        </span>
       </div>
     </Transition>
 
@@ -368,29 +349,21 @@ defineExpose({ modelPath });
           <UFormField
             name="name"
             label="Booth Name"
-            :ui="{
-              error: 'text-red-500 italic text-xs mt-1',
-              label: 'font-bold',
-            }"
+            :ui="{ error: 'text-red-500 italic text-xs mt-1', label: 'font-bold' }"
           >
             <UInput
               v-model="state.name"
               placeholder="e.g. TechCorp Innovation Booth"
               :disabled="saving"
               class="w-full"
-              :ui="{
-                base: 'border border-gray-400 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-              }"
+              :ui="{ base: 'border border-gray-400 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }"
             />
           </UFormField>
 
           <UFormField
             name="description"
             label="Description"
-            :ui="{
-              error: 'text-red-500 italic text-xs mt-1',
-              label: 'font-bold',
-            }"
+            :ui="{ error: 'text-red-500 italic text-xs mt-1', label: 'font-bold' }"
           >
             <UTextarea
               v-model="state.description"
@@ -398,9 +371,7 @@ defineExpose({ modelPath });
               :rows="4"
               :disabled="saving"
               class="w-full"
-              :ui="{
-                base: 'border border-gray-400 focus:border-[#3d52d5] px-3 py-2 rounded-xl',
-              }"
+              :ui="{ base: 'border border-gray-400 focus:border-[#3d52d5] px-3 py-2 rounded-xl' }"
             />
           </UFormField>
 
@@ -439,25 +410,17 @@ defineExpose({ modelPath });
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-1">
           3D Booth Model
-          <span class="font-normal text-gray-400 text-xs ml-1"
-            >(only .glb - max 20 MB)</span
-          >
+          <span class="font-normal text-gray-400 text-xs ml-1">(only .glb - max 20 MB)</span>
         </label>
 
-        <!-- Currently linked model pill -->
         <Transition name="slide-down">
           <div
             v-if="hasModel"
             class="mb-3 flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3"
           >
-            <UIcon
-              name="i-lucide-box"
-              class="w-5 h-5 text-violet-500 shrink-0"
-            />
+            <UIcon name="i-lucide-box" class="w-5 h-5 text-violet-500 shrink-0" />
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-violet-900 truncate">
-                {{ modelFileName }}
-              </p>
+              <p class="text-sm font-semibold text-violet-900 truncate">{{ modelFileName }}</p>
             </div>
             <button
               type="button"
@@ -475,7 +438,6 @@ defineExpose({ modelPath });
           </div>
         </Transition>
 
-        <!-- Key forces full remount when we need to clear the picker -->
         <UFileUpload
           :key="fileUploadKey"
           v-model="uploadedFile"
@@ -492,10 +454,7 @@ defineExpose({ modelPath });
             v-if="fileError"
             class="mt-2 flex items-start gap-2 text-xs text-red-600 rounded-xl px-3 py-2"
           >
-            <UIcon
-              name="i-lucide-circle-alert"
-              class="w-3.5 h-3.5 shrink-0 mt-0.5"
-            />
+            <UIcon name="i-lucide-circle-alert" class="w-3.5 h-3.5 shrink-0 mt-0.5" />
             {{ fileError }}
           </div>
         </Transition>
@@ -510,13 +469,7 @@ defineExpose({ modelPath });
           class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-6"
           size="md"
         >
-          {{
-            saving
-              ? "Saving…"
-              : mode === "create"
-                ? "Register Booth"
-                : "Save Changes"
-          }}
+          {{ saving ? "Saving…" : mode === "create" ? "Register Booth" : "Save Changes" }}
         </UButton>
       </div>
     </UForm>
@@ -526,7 +479,7 @@ defineExpose({ modelPath });
       <div class="mt-10 pt-8 border-t border-gray-100">
         <button
           type="button"
-          class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2 cursor-pointer----"
+          class="text-sm text-red-400 hover:text-red-600 transition flex items-center gap-2 cursor-pointer"
           @click="showDelete = !showDelete"
         >
           <UIcon name="i-lucide-trash-2" class="w-4 h-4" />Delete this booth
@@ -543,9 +496,7 @@ defineExpose({ modelPath });
               v-model="deleteConfirm"
               placeholder="Booth name"
               class="mb-4 w-full max-w-xs"
-              :ui="{
-                base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl',
-              }"
+              :ui="{ base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl' }"
             />
             <UButton
               :disabled="!canDelete || deleteLoading"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CreateExpoSchema, UpdateExpoSchema } from "@vexpo/schema";
 import DeleteConfirm from "~/components/common/DeleteConfirm.vue";
+import Input from "~/components/common/Input.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
 import {} from "~/utils/form.constants";
 
@@ -128,17 +129,14 @@ async function deleteExpo() {
 
     <!-- Form -->
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
-      <UFormField name="name" label="Expo name">
-        <UInput
-          v-model="state.name"
-          placeholder="Tech Innovation Expo 2026"
-          :disabled="saving"
-          class="w-full"
-          :ui="{
-            base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-          }"
-        />
-      </UFormField>
+      <!--Make a list & then for loop through it instead :3-->
+      <Input
+        :name="'name'"
+        :label="'Expo name'"
+        :saving="saving"
+        :placeholder="'Tech Innovation Expo 2026'"
+        :state-property="state.name"
+      />
 
       <UFormField name="type" label="Expo type">
         <UInput

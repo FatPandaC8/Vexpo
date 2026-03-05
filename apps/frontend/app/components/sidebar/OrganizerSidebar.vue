@@ -7,25 +7,14 @@ import SidebarEmptyState from "./components/SidebarEmptyState.vue";
 import SidebarItem from "./components/SidebarItem.vue";
 
 const dashboard = useDashboardStore();
-
+const expoStore = useExpoStore();
 const api = useApi();
+
 const section = ref<"expos" | "booths">("expos");
 
-const expos = ref<any[]>([]);
+// Booth requests are always fetched fresh
 const booths = ref<any[]>([]);
-const loadingExpos = ref(false);
 const loadingBooths = ref(false);
-
-async function loadExpos() {
-  loadingExpos.value = true;
-  try {
-    expos.value = await api.get("me/expos");
-  } catch {
-    expos.value = [];
-  } finally {
-    loadingExpos.value = false;
-  }
-}
 
 async function loadBooths() {
   loadingBooths.value = true;
@@ -39,18 +28,18 @@ async function loadBooths() {
   }
 }
 
-onMounted(loadExpos);
+onMounted(() => expoStore.fetchMyExpos(api));
+
 watch(section, (s) => {
   if (s === "booths") loadBooths();
 });
+
 watch(
   () => dashboard.activeId,
   () => {
     if (section.value === "booths") loadBooths();
-  },
+  }
 );
-
-defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths });
 </script>
 
 <template>
@@ -61,12 +50,10 @@ defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths });
     <template v-if="section === 'expos'">
       <SidebarSection
         label="My Expos"
-        :loading="loadingExpos"
-        @refresh="loadExpos"
+        :loading="expoStore.loading"
+        @refresh="expoStore.reset(); expoStore.fetchMyExpos(api)"
       >
         <button
-          size="xs"
-          icon="i-lucide-plus"
           class="bg-[#3d52d5] text-white rounded w-6 h-6"
           @click="dashboard.select('expo-create')"
         >
@@ -75,13 +62,13 @@ defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths });
       </SidebarSection>
 
       <SidebarEmptyState
-        v-if="expos.length === 0"
+        v-if="expoStore.myExpos.length === 0"
         icon="i-lucide-calendar-x"
         title="No expos yet"
       />
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
         <SidebarItem
-          v-for="expo in expos"
+          v-for="expo in expoStore.myExpos"
           :key="expo.id"
           :title="expo.name"
           :active="dashboard.activeId === expo.id"

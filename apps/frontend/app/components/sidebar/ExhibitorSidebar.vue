@@ -6,93 +6,55 @@ import SidebarEmptyState from "./components/SidebarEmptyState.vue";
 import SidebarItem from "./components/SidebarItem.vue";
 
 const dashboard = useDashboardStore();
-
+const boothStore = useBoothStore();
+const companyStore = useCompanyStore();
+const expoStore = useExpoStore();
 const api = useApi();
+
 const section = ref<"booth" | "expos" | "company">("booth");
-
-const myBooth = ref<any>();
-const expos = ref<any[]>([]);
-const company = ref<any>(null);
-const loadingBooths = ref(false);
-const loadingExpos = ref(false);
-const loadingCompany = ref(false);
-
-async function loadBooth() {
-  loadingBooths.value = true;
-  try {
-    myBooth.value = await api.get<any>("/me/booth");
-  } catch {
-    myBooth.value = [];
-  } finally {
-    loadingBooths.value = false;
-  }
-}
-async function loadExpos() {
-  loadingExpos.value = true;
-  try {
-    expos.value = await api.get<any[]>("/expos");
-  } catch {
-    expos.value = [];
-  } finally {
-    loadingExpos.value = false;
-  }
-}
-async function loadCompany() {
-  loadingCompany.value = true;
-  try {
-    company.value = await api.get<any>("/me/company");
-  } catch {
-    company.value = null;
-  } finally {
-    loadingCompany.value = false;
-  }
-}
 
 watch(
   section,
   (v) => {
-    if (v === "booth") loadBooth();
-    else if (v === "expos") loadExpos();
-    else loadCompany();
+    if (v === "booth")    boothStore.fetchMyBooth(api);
+    else if (v === "expos") expoStore.fetchAllExpos(api);
+    else                  companyStore.fetchMyCompany(api);
   },
-  { immediate: true },
+  { immediate: true }
 );
-
-defineExpose({ refreshBooths: loadBooth });
 </script>
 
 <template>
   <aside class="flex flex-col h-full">
     <SidebarTabs v-model="section" :tabs="TABS" :cols="3" />
 
-    <!-- My myBooth -->
+    <!-- My Booth -->
     <template v-if="section === 'booth'">
       <SidebarSection
-        label="My myBooth"
-        :loading="loadingBooths"
-        @refresh="loadBooth"
+        label="My Booth"
+        :loading="boothStore.loading"
+        @refresh="boothStore.reset(); boothStore.fetchMyBooth(api)"
       />
 
       <SidebarEmptyState
-        v-if="myBooth === undefined"
+        v-if="!boothStore.booth"
         icon="i-lucide-store"
-        title="No myBooth yet"
+        title="No booth yet"
         subtitle='Use "Find Expo" to register a booth'
       />
 
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
         <SidebarItem
-          :key="myBooth.id"
-          :title="myBooth.name ?? 'Booth #' + myBooth.id"
-          :subtitle="`Expo #${myBooth.expoId}`"
+          :title="boothStore.booth.name ?? 'Booth #' + boothStore.booth.id"
+          :subtitle="`Expo #${boothStore.booth.expoId}`"
           :active="
             dashboard.activeView === 'booth-edit' &&
-            dashboard.activeId === myBooth.id
+            dashboard.activeId === boothStore.booth.id
           "
           active-color="border-[#3d52d5]/40 bg-blue-50"
-          @click="dashboard.select('booth-edit', myBooth)"
+          @click="dashboard.select('booth-edit', boothStore.booth)"
         >
-          <StatusBadge :status="myBooth.status ?? 'pending'" class="mt-1.5" />
+          <StatusBadge :status="boothStore.booth.status ?? 'pending'" class="mt-1.5" />
         </SidebarItem>
       </div>
     </template>
@@ -101,18 +63,18 @@ defineExpose({ refreshBooths: loadBooth });
     <template v-else-if="section === 'expos'">
       <SidebarSection
         label="Available Expos"
-        :loading="loadingExpos"
-        @refresh="loadExpos"
+        :loading="expoStore.loading"
+        @refresh="expoStore.fetchAllExpos(api)"
       />
 
       <SidebarEmptyState
-        v-if="expos.length === 0"
+        v-if="expoStore.allExpos.length === 0"
         icon="i-lucide-calendar-x"
         title="No expos available"
       />
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
         <SidebarItem
-          v-for="expo in expos"
+          v-for="expo in expoStore.allExpos"
           :key="expo.id"
           :title="expo.name"
           :subtitle="expo.type ?? '#'"
@@ -123,9 +85,7 @@ defineExpose({ refreshBooths: loadBooth });
           active-color="border-[#3d52d5]/40 bg-blue-50"
           @click="dashboard.select('register-booth', expo)"
         >
-          <span
-            class="inline-flex items-center gap-1 mt-1.5 text-xs text-violet-600 font-medium"
-          >
+          <span class="inline-flex items-center gap-1 mt-1.5 text-xs text-violet-600 font-medium">
             <UIcon name="i-lucide-store" class="w-3 h-3" />
             Register booth →
           </span>
@@ -137,12 +97,12 @@ defineExpose({ refreshBooths: loadBooth });
     <template v-else>
       <SidebarSection
         label="My Company"
-        :loading="loadingCompany"
-        @refresh="loadCompany"
+        :loading="companyStore.loading"
+        @refresh="companyStore.reset(); companyStore.fetchMyCompany(api)"
       />
 
       <SidebarEmptyState
-        v-if="!company"
+        v-if="!companyStore.company"
         icon="i-lucide-building-2"
         title="No company yet"
         subtitle="Register your company to start exhibiting"
@@ -157,11 +117,11 @@ defineExpose({ refreshBooths: loadBooth });
 
       <div v-else class="space-y-2 overflow-y-auto flex-1 pr-0.5">
         <SidebarItem
-          :title="company.name"
-          :subtitle="company.industry ?? 'Company'"
+          :title="companyStore.company.name"
+          :subtitle="companyStore.company.industry ?? 'Company'"
           :active="dashboard.activeView === 'company-edit'"
           active-color="border-[#3d52d5]/40 bg-blue-50"
-          @click="dashboard.select('company-edit', company)"
+          @click="dashboard.select('company-edit', companyStore.company)"
         />
       </div>
     </template>

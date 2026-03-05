@@ -49,7 +49,7 @@ const emit = defineEmits<{
         <!--User type sth -> input gives new val -> send to parent -> parent update deleteConfirm-->
         <UInput
           :model-value="deleteConfirm"
-          @update:model-value="(val) => emit('update:deleteConfirm', val)"
+          @update:model-value="(val: string) => emit('update:deleteConfirm', val)"
           class="mb-4 w-full max-w-xs"
           :ui="{
             base: 'border border-red-200 focus:border-red-400 px-3 h-10 rounded-xl',

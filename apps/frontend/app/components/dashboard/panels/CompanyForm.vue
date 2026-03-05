@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Exhibitor: create a new company (mode='create') or edit existing (mode='edit')
-import { RegisterCompanySchema, UpdateCompanySchema } from "@vexpo/schema";
 import DeleteConfirm from "~/components/common/DeleteConfirm.vue";
+import FormInput from "~/components/common/FormInput.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
+import { stateProps } from "~/utils/form/company";
 
 const props = defineProps<{
   company?: any;
@@ -13,99 +14,21 @@ const emit = defineEmits<{
   deleted: [];
 }>();
 
-const api = useApi();
-const mode = computed(() => (props.company ? "edit" : "create"));
+const {
+  state,
+  schema,
+  mode,
+  saving,
+  success,
+  error,
+  submit,
+  deleteCompany,
+  showDelete,
+  deleteConfirm,
+  deleteLoading,
+  canDelete
+} = useCompanyForm(props, emit)
 
-const schema = computed(() =>
-  props.company ? UpdateCompanySchema : RegisterCompanySchema,
-);
-
-const state = reactive({
-  name: props.company?.name ?? "",
-  email: props.company?.email ?? "",
-  country: props.company?.country ?? "",
-  description: props.company?.description ?? "",
-  industry: props.company?.industry ?? "",
-  website: props.company?.website ?? "",
-  city: props.company?.city ?? "",
-});
-
-watch(
-  () => props.company,
-  (c) => {
-    state.name = c?.name ?? "";
-    state.email = c?.email ?? "";
-    state.description = c?.description ?? "";
-    state.industry = c?.industry ?? "";
-    state.website = c?.website ?? "";
-    state.country = c?.country ?? "";
-    state.city = c?.city ?? "";
-  },
-);
-
-const saving = ref(false);
-const success = ref(false);
-const error = ref<string | null>(null);
-
-async function submit(event: any) {
-  saving.value = true;
-  error.value = null;
-  success.value = false;
-
-  try {
-    let result: any;
-    if (mode.value === "create") {
-      result = await api.post<any>("/companies", event.data);
-    } else {
-      result = await api.patch<any>(
-        `/companies/${props.company!.id}`,
-        event.data,
-      );
-    }
-
-    success.value = true;
-    emit("saved", result);
-
-    if (mode.value === "create") {
-      state.name =
-        state.description =
-        state.industry =
-        state.country =
-        state.website =
-        state.city =
-          "";
-    }
-
-    setTimeout(() => {
-      success.value = false;
-    }, 3000);
-  } catch (e: any) {
-    const msg = e?.data?.message ?? e?.message;
-    error.value = Array.isArray(msg) ? msg.join(", ") : (msg ?? "Save failed");
-  } finally {
-    saving.value = false;
-  }
-}
-
-// Delete
-const showDelete = ref(false);
-const deleteConfirm = ref("");
-const deleteLoading = ref(false);
-const canDelete = computed(() => deleteConfirm.value === props.company?.name);
-
-async function deleteCompany() {
-  if (!canDelete.value) return;
-  deleteLoading.value = true;
-
-  try {
-    await api.del(`/companies/${props.company!.id}`);
-    emit("deleted");
-  } catch (e: any) {
-    error.value = e?.data?.message ?? "Delete failed";
-  } finally {
-    deleteLoading.value = false;
-  }
-}
 </script>
 
 <template>
@@ -135,118 +58,13 @@ async function deleteCompany() {
     <SuccessIndicator :success="success" :message="error" />
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
-      <UFormField
-        name="name"
-        label="Company Name"
-        :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-      >
-        <UInput
-          v-model="state.name"
-          placeholder="e.g. Acme Corporation"
-          :disabled="saving"
-          class="w-full"
-          :ui="{
-            base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-          }"
-        />
-      </UFormField>
-
-      <UFormField
-        name="email"
-        label="Email"
-        :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-      >
-        <UInput
-          v-model="state.email"
-          placeholder="company@business.com"
-          :disabled="saving"
-          class="w-full"
-          :ui="{
-            base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-          }"
-        />
-      </UFormField>
-
-      <UFormField
-        name="industry"
-        label="Industry"
-        :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-      >
-        <UInput
-          v-model="state.industry"
-          placeholder="e.g. Technology, Healthcare, Finance"
-          :disabled="saving"
-          class="w-full"
-          :ui="{
-            base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-          }"
-        />
-      </UFormField>
-
-      <UFormField
-        name="country"
-        label="Country"
-        :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-      >
-        <UInput
-          v-model="state.country"
-          placeholder="e.g. America, France, ..."
-          :disabled="saving"
-          class="w-full"
-          :ui="{
-            base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-          }"
-        />
-      </UFormField>
-
-      <UFormField
-        name="city"
-        label="City"
-        :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-      >
-        <UInput
-          v-model="state.city"
-          placeholder="e.g. Hanoi, HCM, ..."
-          :disabled="saving"
-          class="w-full"
-          :ui="{
-            base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-          }"
-        />
-      </UFormField>
-
-      <UFormField
-        name="website"
-        label="Website"
-        :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-      >
-        <UInput
-          v-model="state.website"
-          placeholder="https://yourcompany.com"
-          :disabled="saving"
-          class="w-full"
-          :ui="{
-            base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-          }"
-        />
-      </UFormField>
-
-      <UFormField
-        name="description"
-        label="Description"
-        :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-      >
-        <UTextarea
-          v-model="state.description"
-          placeholder="What does your company do?"
-          :rows="4"
-          :disabled="saving"
-          class="w-full"
-          :ui="{
-            base: 'border border-gray-200 focus:border-[#3d52d5] px-3 py-2 rounded-xl',
-          }"
-        />
-      </UFormField>
+      <FormInput
+      v-for="field in stateProps"
+      :key="field.name"
+      v-bind="field"
+      :saving="saving"
+      :state-property="state"
+      />
 
       <div class="pt-2">
         <UButton

@@ -4,6 +4,7 @@ import StatusBadge from "../common/StatusBadge.vue";
 import SidebarSection from "./components/SidebarSection.vue";
 import SidebarEmptyState from "./components/SidebarEmptyState.vue";
 import SidebarItem from "./components/SidebarItem.vue";
+import SidebarTabs from "./components/SidebarTabs.vue";
 
 const dashboard = useDashboardStore();
 const boothStore = useBoothStore();

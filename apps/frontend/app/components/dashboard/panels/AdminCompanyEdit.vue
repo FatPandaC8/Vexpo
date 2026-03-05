@@ -89,8 +89,8 @@ async function deleteCompany() {
       </div>
     </div>
 
-    <SuccessIndicator :success="success" :message="admin_company_successMsg"/>
-    <SuccessIndicator :success="success" :message="error"/>
+    <SuccessIndicator :success="success" :message="admin_company_successMsg" />
+    <SuccessIndicator :success="success" :message="error" />
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <UFormField
@@ -202,7 +202,6 @@ async function deleteCompany() {
             :loading="deleteLoading"
             size="sm"
             class="rounded-xl cursor-pointer px-5"
-            "
             @click="deleteCompany"
           >
             {{ deleteLoading ? "Deleting…" : "Delete Company" }}

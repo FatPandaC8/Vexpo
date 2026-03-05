@@ -131,8 +131,8 @@ async function deleteCompany() {
       </div>
     </div>
 
-    <SuccessIndicator :success="success" :message="company_successMsg"/>
-    <SuccessIndicator :success="success" :message="error"/>
+    <SuccessIndicator :success="success" :message="company_successMsg" />
+    <SuccessIndicator :success="success" :message="error" />
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <UFormField

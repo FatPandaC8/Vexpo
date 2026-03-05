@@ -10,8 +10,7 @@ const api = useApi();
 
 const canEditStatus = computed(
   () =>
-    auth.user.value?.role === "admin" ||
-    auth.user.value?.role === "organizer",
+    auth.user.value?.role === "admin" || auth.user.value?.role === "organizer",
 );
 
 const props = defineProps<{
@@ -51,20 +50,7 @@ const fileUploadKey = ref(0);
 const removingModel = ref(false);
 
 // Company
-const myCompany = ref<any>(null);
-const loadingCompany = ref(false);
-
-async function loadMyCompany() {
-  if (mode.value !== "create") return;
-  loadingCompany.value = true;
-  try {
-    myCompany.value = await api.get<any>("/me/company");
-  } catch {
-    myCompany.value = null;
-  } finally {
-    loadingCompany.value = false;
-  }
-}
+const companyStore = useCompanyStore();
 
 // State (must contain every field the schema needs)
 const state = reactive({
@@ -89,7 +75,7 @@ watch(modelPath, (val) => {
 });
 
 // Keep state.companyId in sync when company loads (create mode)
-watch(myCompany, (company) => {
+watch(companyStore.company, (company) => {
   if (company?.id && !state.companyId) {
     state.companyId = company.id;
   }
@@ -113,7 +99,7 @@ async function loadOccupied() {
 
 onMounted(() => {
   loadOccupied();
-  loadMyCompany();
+  companyStore.fetchMyCompany(api);
 });
 
 // Sync everything when the booth prop changes (e.g. switching between booths)
@@ -145,7 +131,7 @@ watch(
   },
 );
 
-// Submit 
+// Submit
 
 const saving = ref(false);
 const success = ref(false);
@@ -174,7 +160,9 @@ async function submit(event: any) {
     }
 
     success.value = true;
-    setTimeout(() => { success.value = false; }, 4000);
+    setTimeout(() => {
+      success.value = false;
+    }, 4000);
   } catch (e: any) {
     const msg = e?.data?.message ?? e?.message;
     error.value = Array.isArray(msg) ? msg.join(", ") : (msg ?? "Save failed");
@@ -278,41 +266,64 @@ defineExpose({ modelPath });
 
       <!-- Company -->
       <div class="rounded-xl border border-gray-400 bg-gray-50 px-8 py-3">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2.5">
+        <p
+          class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2.5"
+        >
           Company info
         </p>
         <template v-if="mode === 'create'">
-          <div v-if="loadingCompany" class="flex items-center gap-2 text-sm text-gray-400">
+          <div
+            v-if="companyStore.loading"
+            class="flex items-center gap-2 text-sm text-gray-400"
+          >
             <UIcon name="i-lucide-loader-circle" class="w-4 h-4 animate-spin" />
             Detecting your company…
           </div>
-          <div v-else-if="myCompany" class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
-              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-violet-600" />
+          <div v-else-if="companyStore.company" class="flex items-center gap-3">
+            <div
+              class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0"
+            >
+              <UIcon
+                name="i-lucide-building-2"
+                class="w-4 h-4 text-violet-600"
+              />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-semibold text-gray-800 truncate">{{ myCompany.name }}</p>
-              <p class="text-xs text-gray-400">ID #{{ myCompany.id }}</p>
+              <p class="text-sm font-semibold text-gray-800 truncate">
+                {{ companyStore.company.name }}
+              </p>
+              <p class="text-xs text-gray-400">ID #{{ companyStore.company.id }}</p>
             </div>
           </div>
           <div
             v-else
             class="flex items-start gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2"
           >
-            <UIcon name="i-lucide-triangle-alert" class="w-4 h-4 shrink-0 mt-0.5" />
-            <span>No company found. Go to <strong>Company</strong> tab in the sidebar to register one first.</span>
+            <UIcon
+              name="i-lucide-triangle-alert"
+              class="w-4 h-4 shrink-0 mt-0.5"
+            />
+            <span
+              >No company found. Go to <strong>Company</strong> tab in the
+              sidebar to register one first.</span
+            >
           </div>
         </template>
         <template v-else>
           <div v-if="booth?.company" class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
-              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-violet-600" />
+            <div
+              class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0"
+            >
+              <UIcon
+                name="i-lucide-building-2"
+                class="w-4 h-4 text-violet-600"
+              />
             </div>
             <div class="min-w-0">
-              <p class="text-sm font-semibold text-gray-800 truncate">{{ booth.company.name }}</p>
-              <p class="text-xs text-gray-400">
-                ID #{{ booth.companyId }}
+              <p class="text-sm font-semibold text-gray-800 truncate">
+                {{ booth.company.name }}
               </p>
+              <p class="text-xs text-gray-400">ID #{{ booth.companyId }}</p>
             </div>
           </div>
           <div v-else class="text-sm text-gray-400 italic">
@@ -322,8 +333,8 @@ defineExpose({ modelPath });
       </div>
     </div>
 
-    <SuccessIndicator :success="success" :message="booth_successMsg"/>
-    <SuccessIndicator :success="success" :message="error"/>
+    <SuccessIndicator :success="success" :message="booth_successMsg" />
+    <SuccessIndicator :success="success" :message="error" />
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <div class="grid grid-cols-2 gap-5">
@@ -331,21 +342,29 @@ defineExpose({ modelPath });
           <UFormField
             name="name"
             label="Booth Name"
-            :ui="{ error: 'text-red-500 italic text-xs mt-1', label: 'font-bold' }"
+            :ui="{
+              error: 'text-red-500 italic text-xs mt-1',
+              label: 'font-bold',
+            }"
           >
             <UInput
               v-model="state.name"
               placeholder="e.g. TechCorp Innovation Booth"
               :disabled="saving"
               class="w-full"
-              :ui="{ base: 'border border-gray-400 focus:border-[#3d52d5] px-3 h-10 rounded-xl' }"
+              :ui="{
+                base: 'border border-gray-400 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
+              }"
             />
           </UFormField>
 
           <UFormField
             name="description"
             label="Description"
-            :ui="{ error: 'text-red-500 italic text-xs mt-1', label: 'font-bold' }"
+            :ui="{
+              error: 'text-red-500 italic text-xs mt-1',
+              label: 'font-bold',
+            }"
           >
             <UTextarea
               v-model="state.description"
@@ -353,7 +372,9 @@ defineExpose({ modelPath });
               :rows="4"
               :disabled="saving"
               class="w-full"
-              :ui="{ base: 'border border-gray-400 focus:border-[#3d52d5] px-3 py-2 rounded-xl' }"
+              :ui="{
+                base: 'border border-gray-400 focus:border-[#3d52d5] px-3 py-2 rounded-xl',
+              }"
             />
           </UFormField>
 
@@ -392,7 +413,9 @@ defineExpose({ modelPath });
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-1">
           3D Booth Model
-          <span class="font-normal text-gray-400 text-xs ml-1">(only .glb - max 20 MB)</span>
+          <span class="font-normal text-gray-400 text-xs ml-1"
+            >(only .glb - max 20 MB)</span
+          >
         </label>
 
         <Transition name="slide-down">
@@ -400,9 +423,14 @@ defineExpose({ modelPath });
             v-if="hasModel"
             class="mb-3 flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3"
           >
-            <UIcon name="i-lucide-box" class="w-5 h-5 text-violet-500 shrink-0" />
+            <UIcon
+              name="i-lucide-box"
+              class="w-5 h-5 text-violet-500 shrink-0"
+            />
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-violet-900 truncate">{{ modelFileName }}</p>
+              <p class="text-sm font-semibold text-violet-900 truncate">
+                {{ modelFileName }}
+              </p>
             </div>
             <button
               type="button"
@@ -436,7 +464,10 @@ defineExpose({ modelPath });
             v-if="fileError"
             class="mt-2 flex items-start gap-2 text-xs text-red-600 rounded-xl px-3 py-2"
           >
-            <UIcon name="i-lucide-circle-alert" class="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <UIcon
+              name="i-lucide-circle-alert"
+              class="w-3.5 h-3.5 shrink-0 mt-0.5"
+            />
             {{ fileError }}
           </div>
         </Transition>
@@ -451,7 +482,13 @@ defineExpose({ modelPath });
           class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-6"
           size="md"
         >
-          {{ saving ? "Saving…" : mode === "create" ? "Register Booth" : "Save Changes" }}
+          {{
+            saving
+              ? "Saving…"
+              : mode === "create"
+                ? "Register Booth"
+                : "Save Changes"
+          }}
         </UButton>
       </div>
     </UForm>

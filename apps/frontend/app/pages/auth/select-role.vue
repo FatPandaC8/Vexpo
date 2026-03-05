@@ -3,7 +3,7 @@
 // New Google OAuth users land here with ?token=xxx (a temp token, 10 min TTL).
 // They pick a role → POST /auth/oauth/complete → get a full token → go to dashboard.
 
-import Logo from '~/components/common/Logo.vue';
+import Logo from "~/components/common/Logo.vue";
 
 const route = useRoute();
 const auth = useAuth();

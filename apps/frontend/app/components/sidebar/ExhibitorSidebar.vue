@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { TABS } from '~/utils/sidebar/exhibitor.sidebar.constants';
-import StatusBadge from '../common/StatusBadge.vue';
+import { TABS } from "~/utils/sidebar/exhibitor.sidebar.constants";
+import StatusBadge from "../common/StatusBadge.vue";
+import SidebarSection from "./components/SidebarSection.vue";
+import SidebarEmptyState from "./components/SidebarEmptyState.vue";
+import SidebarItem from "./components/SidebarItem.vue";
 
-const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
-const props = defineProps<{ activeView: string; activeId?: string }>();
+const dashboard = useDashboardStore();
 
 const api = useApi();
 const section = ref<"booth" | "expos" | "company">("booth");
@@ -83,9 +85,12 @@ defineExpose({ refreshBooths: loadBooth });
           :key="myBooth.id"
           :title="myBooth.name ?? 'Booth #' + myBooth.id"
           :subtitle="`Expo #${myBooth.expoId}`"
-          :active="activeView === 'booth-edit' && activeId === myBooth.id"
+          :active="
+            dashboard.activeView === 'booth-edit' &&
+            dashboard.activeId === myBooth.id
+          "
           active-color="border-[#3d52d5]/40 bg-blue-50"
-          @click="emit('select', { view: 'booth-edit', data: myBooth })"
+          @click="dashboard.select('booth-edit', myBooth)"
         >
           <StatusBadge :status="myBooth.status ?? 'pending'" class="mt-1.5" />
         </SidebarItem>
@@ -111,9 +116,12 @@ defineExpose({ refreshBooths: loadBooth });
           :key="expo.id"
           :title="expo.name"
           :subtitle="expo.type ?? '#'"
-          :active="activeView === 'register-booth' && activeId === expo.id"
+          :active="
+            dashboard.activeView === 'register-booth' &&
+            dashboard.activeId === expo.id
+          "
           active-color="border-[#3d52d5]/40 bg-blue-50"
-          @click="emit('select', { view: 'register-booth', data: expo })"
+          @click="dashboard.select('register-booth', expo)"
         >
           <span
             class="inline-flex items-center gap-1 mt-1.5 text-xs text-violet-600 font-medium"
@@ -141,7 +149,7 @@ defineExpose({ refreshBooths: loadBooth });
       >
         <button
           class="mt-3 text-xs font-semibold text-[#3d52d5] hover:underline"
-          @click="emit('select', { view: 'company-create' })"
+          @click="dashboard.select('company-create')"
         >
           + Register Company
         </button>
@@ -151,9 +159,9 @@ defineExpose({ refreshBooths: loadBooth });
         <SidebarItem
           :title="company.name"
           :subtitle="company.industry ?? 'Company'"
-          :active="activeView === 'company-edit'"
+          :active="dashboard.activeView === 'company-edit'"
           active-color="border-[#3d52d5]/40 bg-blue-50"
-          @click="emit('select', { view: 'company-edit', data: company })"
+          @click="dashboard.select('company-edit', company)"
         />
       </div>
     </template>

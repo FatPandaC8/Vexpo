@@ -1,8 +1,16 @@
 <script setup lang="ts">
-import { EDIT_VIEW, ENDPOINT, TABS, type Section } from '~/utils/sidebar/admin.sidebar.constants';
+import {
+  EDIT_VIEW,
+  ENDPOINT,
+  TABS,
+  type Section,
+} from "~/utils/sidebar/admin.sidebar.constants";
+import SidebarSection from "./components/SidebarSection.vue";
+import SidebarTabs from "./components/SidebarTabs.vue";
+import SidebarEmptyState from "./components/SidebarEmptyState.vue";
+import SidebarItem from "./components/SidebarItem.vue";
 
-const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
-const props = defineProps<{ activeView: string; activeId?: string }>();
+const dashboard = useDashboardStore();
 
 const api = useApi();
 
@@ -61,8 +69,11 @@ function sub(item: any) {
         :key="item.id"
         :title="label(item)"
         :subtitle="sub(item)"
-        :active="activeId === item.id && activeView === EDIT_VIEW[section]"
-        @click="emit('select', { view: EDIT_VIEW[section], data: item })"
+        :active="
+          dashboard.activeId === item.id &&
+          dashboard.activeView === EDIT_VIEW[section]
+        "
+        @click="dashboard.select(EDIT_VIEW[section], item)"
       />
     </div>
   </aside>

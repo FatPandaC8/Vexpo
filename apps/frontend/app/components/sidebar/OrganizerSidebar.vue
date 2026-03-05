@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { TABS } from '~/utils/sidebar/organizer.sidebar.constants';
-import StatusBadge from '../common/StatusBadge.vue';
+import { TABS } from "~/utils/sidebar/organizer.sidebar.constants";
+import StatusBadge from "../common/StatusBadge.vue";
+import SidebarSection from "./components/SidebarSection.vue";
+import SidebarTabs from "./components/SidebarTabs.vue";
+import SidebarEmptyState from "./components/SidebarEmptyState.vue";
+import SidebarItem from "./components/SidebarItem.vue";
 
-const emit = defineEmits<{ select: [payload: { view: string; data?: any }] }>();
-const props = defineProps<{ activeView: string; activeId?: string }>();
+const dashboard = useDashboardStore();
 
 const api = useApi();
 const section = ref<"expos" | "booths">("expos");
@@ -41,7 +44,7 @@ watch(section, (s) => {
   if (s === "booths") loadBooths();
 });
 watch(
-  () => props.activeId,
+  () => dashboard.activeId,
   () => {
     if (section.value === "booths") loadBooths();
   },
@@ -61,13 +64,14 @@ defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths });
         :loading="loadingExpos"
         @refresh="loadExpos"
       >
-        <UButton
+        <button
           size="xs"
           icon="i-lucide-plus"
-          class="bg-[#3d52d5] text-white hover:bg-blue-700"
-          @click="emit('select', { view: 'expo-create' })"
-          >New</UButton
+          class="bg-[#3d52d5] text-white rounded w-6 h-6"
+          @click="dashboard.select('expo-create')"
         >
+          +
+        </button>
       </SidebarSection>
 
       <SidebarEmptyState
@@ -80,9 +84,9 @@ defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths });
           v-for="expo in expos"
           :key="expo.id"
           :title="expo.name"
-          :active="activeId === expo.id"
+          :active="dashboard.activeId === expo.id"
           active-color="border-[#3d52d5]/40 bg-blue-50"
-          @click="emit('select', { view: 'expo-manage', data: expo })"
+          @click="dashboard.select('expo-manage', expo)"
         />
       </div>
     </template>
@@ -106,8 +110,11 @@ defineExpose({ refreshExpos: loadExpos, refreshBooths: loadBooths });
           :key="booth.id"
           :title="booth.name ?? 'Booth #' + booth.id"
           :subtitle="booth.expo?.name"
-          :active="activeId === booth.id && activeView === 'booth-review'"
-          @click="emit('select', { view: 'booth-review', data: booth })"
+          :active="
+            dashboard.activeId === booth.id &&
+            dashboard.activeView === 'booth-review'
+          "
+          @click="dashboard.select('booth-review', booth)"
         >
           <StatusBadge :status="booth.status ?? 'pending'" class="mt-1.5" />
         </SidebarItem>

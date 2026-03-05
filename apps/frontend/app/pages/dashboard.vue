@@ -1,123 +1,53 @@
 <script setup lang="ts">
-import Logo from '~/components/common/Logo.vue';
+import Logo from "~/components/common/Logo.vue";
+import ExhibitorSidebar from "~/components/sidebar/ExhibitorSidebar.vue";
+import OrganizerSidebar from "~/components/sidebar/OrganizerSidebar.vue";
+import AdminSidebar from "~/components/sidebar/AdminSidebar.vue";
 
 definePageMeta({ middleware: "auth" });
 
 const auth = useAuth();
+const { roleBadgeColor, roleLabel, greeting, welcomeConfig } =
+  useDashboardUI(auth);
+const dashboard = useDashboardStore();
 
-// Role display
-const roleLabel = computed(() => {
-  const r = auth.role.value;
-  if (!r) return "";
-  return r.charAt(0) + r.slice(1).toLowerCase();
-});
+function onBoothRegistered(booth: any) {}
 
-const roleBadgeColor = computed(() => {
-  if (auth.isExhibitor.value) return "bg-violet-100 text-violet-700";
-  if (auth.isOrganizer.value) return "bg-emerald-100 text-emerald-700";
-  if (auth.isAdmin.value) return "bg-red-100 text-red-700";
-  return "bg-gray-100 text-gray-600";
-});
-
-const greeting = computed(() => {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
-});
-
-// Active view state
-const activeView = ref<string>("welcome");
-const activeData = ref<any>(null);
-const activeId = computed(() => activeData.value?.id ?? null);
-
-function select({ view, data }: { view: string; data?: any }) {
-  activeView.value = view;
-  activeData.value = data ?? null;
-}
-
-// Sidebar refs (for programmatic refresh)
-const exhibitorSidebar = ref<any>(null);
-const organizerSidebar = ref<any>(null);
-const adminSidebar = ref<any>(null);
-
-// EXHIBITOR events
-function onBoothRegistered() {
-  exhibitorSidebar.value?.refreshBooths();
-  // Keep the success state visible in the panel
-}
-
-function onCompanyUpdated(companyData: any) {
-  // Switch to edit mode with the newly saved company
-  activeData.value = companyData;
+function onCompanyUpdated(company: any) {
+  dashboard.activeData = company;
 }
 
 function onCompanyDeleted() {
-  select({ view: "welcome" });
-  exhibitorSidebar.value?.refresh();
+  dashboard.reset();
 }
 
-// ORGANIZER events
 function onExpoCreated(expo: any) {
-  select({ view: "expo-manage", data: expo });
-  organizerSidebar.value?.refresh();
+  dashboard.select("expo-manage", expo);
 }
 
 function onExpoDeleted() {
-  select({ view: "welcome" });
-  organizerSidebar.value?.refresh();
+  dashboard.reset();
 }
 
 function onExpoUpdated(expo: any) {
-  activeData.value = expo;
+  dashboard.activeData = expo;
 }
 
 function onBoothReviewed(booth: any) {
-  activeData.value = booth;
-  organizerSidebar.value?.refreshBooths();
+  dashboard.activeData = booth;
 }
 
-// ADMIN events
 function onAdminSaved() {
-  adminSidebar.value?.refresh();
-  select({ view: "welcome" });
+  dashboard.reset();
 }
 
 function onAdminUpdated(item: any) {
-  activeData.value = item;
-  adminSidebar.value?.refresh();
+  dashboard.activeData = item;
 }
 
 function onAdminDeleted() {
-  select({ view: "welcome" });
-  adminSidebar.value?.refresh();
+  dashboard.reset();
 }
-
-// Welcome copy per role
-const welcomeConfig = computed(() => {
-  if (auth.isExhibitor.value)
-    return {
-      icon: "i-lucide-store",
-      color: "bg-violet-100 text-violet-500",
-      title: "Manage Your Booths & Company",
-      body: "Select a booth to edit it, find an expo to register a new booth, or manage your company.",
-    };
-  if (auth.isOrganizer.value)
-    return {
-      icon: "i-lucide-calendar",
-      color: "bg-emerald-100 text-emerald-500",
-      title: "Select or Create an Expo",
-      body: "Click an expo in the sidebar to manage it, approve booths, or hit + New to create one.",
-    };
-  if (auth.isAdmin.value)
-    return {
-      icon: "i-lucide-shield",
-      color: "bg-red-100 text-red-500",
-      title: "Admin Control Panel",
-      body: "Manage users, expos, booths, and companies. Select a resource type from the sidebar.",
-    };
-  return null;
-});
 </script>
 
 <template>
@@ -158,29 +88,9 @@ const welcomeConfig = computed(() => {
       >
         <!-- Scrollable sidebar body -->
         <div class="flex-1 overflow-y-auto p-4 flex flex-col min-h-0">
-          <DashboardExhibitorSidebar
-            v-if="auth.isExhibitor.value"
-            ref="exhibitorSidebar"
-            :active-view="activeView"
-            :active-id="activeId"
-            @select="select"
-          />
-
-          <DashboardOrganizerSidebar
-            v-else-if="auth.isOrganizer.value"
-            ref="organizerSidebar"
-            :active-view="activeView"
-            :active-id="activeId"
-            @select="select"
-          />
-
-          <DashboardAdminSidebar
-            v-else-if="auth.isAdmin.value"
-            ref="adminSidebar"
-            :active-view="activeView"
-            :active-id="activeId"
-            @select="select"
-          />
+          <ExhibitorSidebar v-if="auth.isExhibitor.value" />
+          <OrganizerSidebar v-else-if="auth.isOrganizer.value" />
+          <AdminSidebar v-else-if="auth.isAdmin.value" />
 
           <div v-else class="flex-1 flex items-center justify-center">
             <UIcon
@@ -224,7 +134,7 @@ const welcomeConfig = computed(() => {
       <!--  MAIN CONTENT PANEL -->
       <main class="flex-1 overflow-y-auto p-8 min-w-0">
         <!-- Welcome / empty state -->
-        <template v-if="activeView === 'welcome' && welcomeConfig">
+        <template v-if="dashboard.activeView === 'welcome' && welcomeConfig">
           <div
             class="h-full flex flex-col items-center justify-center text-center py-20"
           >
@@ -251,28 +161,34 @@ const welcomeConfig = computed(() => {
 
         <!-- Edit booth -->
         <DashboardPanelsBoothForm
-          v-else-if="activeView === 'booth-edit' && activeData"
-          :booth="activeData"
-          @updated="activeData = $event"
+          v-else-if="
+            dashboard.activeView === 'booth-edit' && dashboard.activeData
+          "
+          :booth="dashboard.activeData"
+          @updated="dashboard.activeData = $event"
         />
 
         <!-- Register booth for an expo -->
         <DashboardPanelsBoothForm
-          v-else-if="activeView === 'register-booth' && activeData"
-          :expo="activeData"
+          v-else-if="
+            dashboard.activeView === 'register-booth' && dashboard.activeData
+          "
+          :expo="dashboard.activeData"
           @registered="onBoothRegistered"
         />
 
         <!-- Create company -->
         <DashboardPanelsCompanyForm
-          v-else-if="activeView === 'company-create'"
+          v-else-if="dashboard.activeView === 'company-create'"
           @saved="onCompanyUpdated"
         />
 
         <!-- Edit company -->
         <DashboardPanelsCompanyForm
-          v-else-if="activeView === 'company-edit' && activeData"
-          :company="activeData"
+          v-else-if="
+            dashboard.activeView === 'company-edit' && dashboard.activeData
+          "
+          :company="dashboard.activeData"
           @saved="onCompanyUpdated"
           @deleted="onCompanyDeleted"
         />
@@ -281,22 +197,26 @@ const welcomeConfig = computed(() => {
 
         <!-- Manage expo: edit details + approve booths -->
         <DashboardPanelsExpoForm
-          v-else-if="activeView === 'expo-manage' && activeData"
-          :expo="activeData"
+          v-else-if="
+            dashboard.activeView === 'expo-manage' && dashboard.activeData
+          "
+          :expo="dashboard.activeData"
           @saved="onExpoUpdated"
           @deleted="onExpoDeleted"
         />
 
         <!--Create Expo-->
         <DashboardPanelsExpoForm
-          v-else-if="activeView === 'expo-create'"
+          v-else-if="dashboard.activeView === 'expo-create'"
           @saved="onExpoCreated"
         />
 
         <!-- Manage booths -->
         <DashboardPanelsBoothForm
-          v-else-if="activeView === 'booth-review' && activeData"
-          :booth="activeData"
+          v-else-if="
+            dashboard.activeView === 'booth-review' && dashboard.activeData
+          "
+          :booth="dashboard.activeData"
           @updated="onBoothReviewed"
         />
 
@@ -304,39 +224,48 @@ const welcomeConfig = computed(() => {
 
         <!-- Edit user role / delete user -->
         <DashboardPanelsAdminUserEdit
-          v-else-if="activeView === 'admin-user-edit' && activeData"
-          :user="activeData"
-          :key="activeData.id"
+          v-else-if="
+            dashboard.activeView === 'admin-user-edit' && dashboard.activeData
+          "
+          :user="dashboard.activeData"
+          :key="dashboard.activeData.id"
           @updated="onAdminUpdated"
           @deleted="onAdminDeleted"
         />
 
         <!-- Create expo (admin) -->
         <DashboardPanelsAdminExpoEdit
-          v-else-if="activeView === 'admin-expo-create'"
+          v-else-if="dashboard.activeView === 'admin-expo-create'"
           @saved="onAdminSaved"
         />
 
         <!-- Edit expo (admin) -->
         <DashboardPanelsAdminExpoEdit
-          v-else-if="activeView === 'admin-expo-edit' && activeData"
-          :expo="activeData"
+          v-else-if="
+            dashboard.activeView === 'admin-expo-edit' && dashboard.activeData
+          "
+          :expo="dashboard.activeData"
           @saved="onAdminUpdated"
           @deleted="onAdminDeleted"
         />
 
         <!-- Edit booth (admin) -->
         <DashboardPanelsAdminBoothEdit
-          v-else-if="activeView === 'admin-booth-edit' && activeData"
-          :booth="activeData"
+          v-else-if="
+            dashboard.activeView === 'admin-booth-edit' && dashboard.activeData
+          "
+          :booth="dashboard.activeData"
           @updated="onAdminUpdated"
           @deleted="onAdminDeleted"
         />
 
         <!-- Edit company (admin) -->
         <DashboardPanelsAdminCompanyEdit
-          v-else-if="activeView === 'admin-company-edit' && activeData"
-          :company="activeData"
+          v-else-if="
+            dashboard.activeView === 'admin-company-edit' &&
+            dashboard.activeData
+          "
+          :company="dashboard.activeData"
           @updated="onAdminUpdated"
           @deleted="onAdminDeleted"
         />

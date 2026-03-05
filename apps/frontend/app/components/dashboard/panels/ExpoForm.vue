@@ -2,7 +2,7 @@
 import { CreateExpoSchema, UpdateExpoSchema } from "@vexpo/schema";
 import DeleteConfirm from "~/components/common/DeleteConfirm.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
-import {  } from "~/utils/form.constants";
+import {} from "~/utils/form.constants";
 
 // Reminder: defineProps is for falling through attribute from parent to child
 const props = defineProps<{
@@ -121,10 +121,10 @@ async function deleteExpo() {
     </div>
 
     <!-- Success -->
-    <SuccessIndicator :success="success" :message="expo_successMsg"/>
+    <SuccessIndicator :success="success" :message="expo_successMsg" />
 
     <!-- Error -->
-    <SuccessIndicator :success="success" :message="error"/>
+    <SuccessIndicator :success="success" :message="error" />
 
     <!-- Form -->
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">

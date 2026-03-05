@@ -94,8 +94,8 @@ async function deleteExpo() {
       </div>
     </div>
 
-    <SuccessIndicator :success="success" :message="admin_expo_successMsg"/>
-    <SuccessIndicator :success="success" :message="error"/>
+    <SuccessIndicator :success="success" :message="admin_expo_successMsg" />
+    <SuccessIndicator :success="success" :message="error" />
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <UFormField

@@ -128,8 +128,8 @@ const statusColor: Record<string, string> = {
       </span>
     </div>
 
-    <SuccessIndicator :success="success" :message="admin_booth_successMsg"/>
-    <SuccessIndicator :success="success" :message="error"/>
+    <SuccessIndicator :success="success" :message="admin_booth_successMsg" />
+    <SuccessIndicator :success="success" :message="error" />
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <UFormField
@@ -218,14 +218,14 @@ const statusColor: Record<string, string> = {
             :loading="deleteLoading"
             size="sm"
             class="rounded-xl cursor-pointer px-5"
-            "
             @click="deleteBooth"
           >
             {{ deleteLoading ? "Deleting…" : "Delete Company" }}
           </UButton>
         </div>
       </Transition>
-    </div>  </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>

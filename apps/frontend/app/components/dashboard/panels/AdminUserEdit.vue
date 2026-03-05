@@ -106,8 +106,8 @@ const roleBadge: Record<string, string> = {
       </div>
     </div>
 
-    <SuccessIndicator :success="success" :message="admin_user_successMsg"/>
-    <SuccessIndicator :success="success" :message="error"/>
+    <SuccessIndicator :success="success" :message="admin_user_successMsg" />
+    <SuccessIndicator :success="success" :message="error" />
 
     <!-- Role change form -->
     <UCard class="rounded-2xl border border-gray-300 p-6 mb-6">

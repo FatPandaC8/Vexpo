@@ -1,13 +1,13 @@
 <script setup lang="ts">
 defineProps<{
-  name: string
-  type?: string
-  label: string
-  saving: boolean
-  placeholder?: string
-  component?: string
-  stateProperty: Record<string, any>
-}>()
+  name: string;
+  type?: string;
+  label: string;
+  saving: boolean;
+  placeholder?: string;
+  component?: string;
+  stateProperty: Record<string, any>;
+}>();
 </script>
 
 <template>

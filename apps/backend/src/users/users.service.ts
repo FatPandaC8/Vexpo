@@ -62,9 +62,11 @@ export class UsersService {
     });
     if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
 
-    let role = await this.roleRepository.findOne({ where: { name: roleName } });
+    const role = await this.roleRepository.findOne({
+      where: { name: roleName },
+    });
     if (!role) {
-      throw new BadRequestException('Invalid role')
+      throw new BadRequestException('Invalid role');
     }
 
     // Point user to the shared role row (works for both new users and role changes)

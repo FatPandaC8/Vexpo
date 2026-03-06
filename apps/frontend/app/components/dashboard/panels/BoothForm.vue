@@ -291,7 +291,9 @@ defineExpose({ modelPath });
               <p class="text-sm font-semibold text-gray-800 truncate">
                 {{ companyStore.company.name }}
               </p>
-              <p class="text-xs text-gray-400">ID #{{ companyStore.company.id }}</p>
+              <p class="text-xs text-gray-400">
+                ID #{{ companyStore.company.id }}
+              </p>
             </div>
           </div>
           <div

@@ -7,7 +7,7 @@ exports.MAP_COLS = 6;
 exports.CreateBoothSchema = zod_1.z.object({
     name: zod_1.z.string().min(1),
     description: zod_1.z.string().optional(),
-    companyId: zod_1.z.string().optional(),
+    companyId: zod_1.z.string(),
     modelPath: zod_1.z.string().optional(),
     mapRow: zod_1.z.number().int().min(0).max(exports.MAP_ROWS - 1),
     mapCol: zod_1.z.number().int().min(0).max(exports.MAP_COLS - 1),

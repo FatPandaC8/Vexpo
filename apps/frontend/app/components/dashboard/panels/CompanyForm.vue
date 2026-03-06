@@ -26,9 +26,8 @@ const {
   showDelete,
   deleteConfirm,
   deleteLoading,
-  canDelete
-} = useCompanyForm(props, emit)
-
+  canDelete,
+} = useCompanyForm(props, emit);
 </script>
 
 <template>
@@ -59,11 +58,11 @@ const {
 
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <FormInput
-      v-for="field in stateProps"
-      :key="field.name"
-      v-bind="field"
-      :saving="saving"
-      :state-property="state"
+        v-for="field in stateProps"
+        :key="field.name"
+        v-bind="field"
+        :saving="saving"
+        :state-property="state"
       />
 
       <div class="pt-2">

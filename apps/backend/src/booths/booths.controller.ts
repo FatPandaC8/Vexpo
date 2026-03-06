@@ -18,6 +18,9 @@ import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { BoothsService } from './booths.service';
 import { UpdateBoothDTO } from './dto/update-booth.dto';
+import { PaginatedResponse } from '@vexpo/schema';
+import type { AuthRequest } from 'src/auth/interfaces/auth-request.interface';
+import { Booth } from 'src/entities/booth.entity';
 
 @ApiTags('Booths')
 @Controller('booths')
@@ -29,14 +32,17 @@ export class BoothsController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all booths (paginated)' })
-  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 20) {
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 20,
+  ): Promise<PaginatedResponse<Booth>> {
     return this.boothsService.findAllPaginated(page, limit);
   }
 
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get booth by ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Booth> {
     return this.boothsService.getBoothById(id);
   }
 
@@ -50,17 +56,16 @@ export class BoothsController {
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateBoothDTO,
-    @Req() req: any,
-  ) {
-    const role: string = req.user.role as string;
-    const userId: string = req.user.userId;
+    @Req() req: AuthRequest,
+  ): Promise<Booth> {
+    const { role, userId } = req.user;
 
     if (role === 'admin' || role === 'organizer') {
       return this.boothsService.updateBooth(id, dto);
     }
 
     // Exhibitor: strip status - cannot self-approve
-    const { status, ...exhibitorDto } = dto;
+    const { status: _status, ...exhibitorDto } = dto;
     return this.boothsService.updateBoothByExhibitor(id, userId, exhibitorDto);
   }
 
@@ -70,7 +75,10 @@ export class BoothsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete booth' })
-  async remove(@Param('id', ParseUUIDPipe) id: string, @Req() req: any) {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthRequest,
+  ): Promise<{ message: string } | void> {
     const role: string = req.user.role as string;
     const userId: string = req.user.userId;
 

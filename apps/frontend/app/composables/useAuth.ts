@@ -1,11 +1,5 @@
-import type { RegisterDTO } from "@vexpo/schema"
+import type { AuthUser, RegisterDTO, UserRole } from "@vexpo/schema"
 
-interface AuthUser {
-  id: number
-  name: string
-  email: string
-  role: string
-}
 
 export const useAuth = () => {
   const config = useRuntimeConfig()
@@ -20,7 +14,7 @@ export const useAuth = () => {
   const user = useState<AuthUser | null>('auth_user', () => null)
   const isLoggedIn = computed(() => !!token.value)
 
-  const role = computed(() => user.value?.role ?? null)
+  const role = computed<UserRole | null>(() => user.value?.role ?? null)
   const isExhibitor = computed(() => role.value === 'exhibitor')
   const isOrganizer = computed(() => role.value === 'organizer')
   const isAdmin     = computed(() => role.value === 'admin')

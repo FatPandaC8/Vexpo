@@ -20,6 +20,7 @@ __exportStar(require("./expo.schema"), exports);
 __exportStar(require("./booth.schema"), exports);
 __exportStar(require("./company.schema"), exports);
 __exportStar(require("./user.schema"), exports);
+__exportStar(require("./types"), exports);
 exports.MAP_COLS = 6;
 exports.MAP_ROWS = 5;
 // Nuxt uses CJS import vs Nest uses ESM import type

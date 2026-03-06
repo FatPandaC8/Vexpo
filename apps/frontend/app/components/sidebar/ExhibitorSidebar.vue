@@ -17,11 +17,11 @@ const section = ref<"booth" | "expos" | "company">("booth");
 watch(
   section,
   (v) => {
-    if (v === "booth")    boothStore.fetchMyBooth(api);
+    if (v === "booth") boothStore.fetchMyBooth(api);
     else if (v === "expos") expoStore.fetchAllExpos(api);
-    else                  companyStore.fetchMyCompany(api);
+    else companyStore.fetchMyCompany(api);
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 
@@ -34,7 +34,10 @@ watch(
       <SidebarSection
         label="My Booth"
         :loading="boothStore.loading"
-        @refresh="boothStore.reset(); boothStore.fetchMyBooth(api)"
+        @refresh="
+          boothStore.reset();
+          boothStore.fetchMyBooth(api);
+        "
       />
 
       <SidebarEmptyState
@@ -55,7 +58,10 @@ watch(
           active-color="border-[#3d52d5]/40 bg-blue-50"
           @click="dashboard.select('booth-edit', boothStore.booth)"
         >
-          <StatusBadge :status="boothStore.booth.status ?? 'pending'" class="mt-1.5" />
+          <StatusBadge
+            :status="boothStore.booth.status ?? 'pending'"
+            class="mt-1.5"
+          />
         </SidebarItem>
       </div>
     </template>
@@ -86,7 +92,9 @@ watch(
           active-color="border-[#3d52d5]/40 bg-blue-50"
           @click="dashboard.select('register-booth', expo)"
         >
-          <span class="inline-flex items-center gap-1 mt-1.5 text-xs text-violet-600 font-medium">
+          <span
+            class="inline-flex items-center gap-1 mt-1.5 text-xs text-violet-600 font-medium"
+          >
             <UIcon name="i-lucide-store" class="w-3 h-3" />
             Register booth →
           </span>
@@ -99,7 +107,10 @@ watch(
       <SidebarSection
         label="My Company"
         :loading="companyStore.loading"
-        @refresh="companyStore.reset(); companyStore.fetchMyCompany(api)"
+        @refresh="
+          companyStore.reset();
+          companyStore.fetchMyCompany(api);
+        "
       />
 
       <SidebarEmptyState

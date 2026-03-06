@@ -17,6 +17,11 @@ import { CompaniesService } from 'src/companies/companies.service';
 import { UpdateCompanyDto } from 'src/companies/dto/update-company.dto';
 import { ExposService } from 'src/expos/expos.service';
 import { UsersService } from './users.service';
+import type { AuthRequest } from 'src/auth/interfaces/auth-request.interface';
+import { AuthUser } from '@vexpo/schema';
+import { Booth } from 'src/entities/booth.entity';
+import { Company } from 'src/entities/company.entity';
+import { Expo } from 'src/entities/expo.entity';
 
 @ApiTags('Me')
 @ApiBearerAuth()
@@ -34,14 +39,14 @@ export class UsersMeController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get own profile' })
-  async getProfile(@Req() req: any) {
+  async getProfile(@Req() req: AuthRequest): Promise<AuthUser | null> {
     const user = await this.usersService.findOneById(req.user.userId);
     if (!user) return null;
     return {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role.name,
+      role: user.role.name as AuthUser['role'],
     };
   }
 
@@ -50,7 +55,7 @@ export class UsersMeController {
   @Roles('exhibitor')
   @Get('me/booth')
   @ApiOperation({ summary: 'Get my booths' })
-  getMyBooths(@Req() req: any) {
+  getMyBooths(@Req() req: AuthRequest): Promise<Booth | null> {
     return this.boothsService.getBoothsByExhibitor(req.user.userId);
   }
 
@@ -59,7 +64,7 @@ export class UsersMeController {
   @Roles('exhibitor')
   @Get('me/company')
   @ApiOperation({ summary: 'Get my company' })
-  getMyCompany(@Req() req: any) {
+  getMyCompany(@Req() req: AuthRequest): Promise<Company | null> {
     return this.companiesService.getCompanyByExhibitor(req.user.userId);
   }
 
@@ -69,7 +74,7 @@ export class UsersMeController {
   updateCompany(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCompanyDto,
-  ) {
+  ): Promise<Company> {
     return this.companiesService.updateCompany(id, dto);
   }
 
@@ -78,7 +83,7 @@ export class UsersMeController {
   @Roles('organizer')
   @Get('me/expos')
   @ApiOperation({ summary: 'Get my expos' })
-  getMyExpos(@Req() req: any) {
+  getMyExpos(@Req() req: AuthRequest): Promise<Expo[]> {
     return this.exposService.getExposByOrganizer(req.user.userId);
   }
 }

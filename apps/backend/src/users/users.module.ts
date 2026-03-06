@@ -12,7 +12,7 @@ import { UsersMeController } from './users.me.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role,  Company]),
+    TypeOrmModule.forFeature([User, Role, Company]),
     BoothsModule,
     ExposModule,
     CompaniesModule,

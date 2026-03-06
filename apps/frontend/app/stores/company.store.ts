@@ -1,13 +1,16 @@
+import type { Company } from "@vexpo/schema"
+import type { Api } from "~/composables/useApi"
+
 export const useCompanyStore = defineStore('company', () => {
-    const company = ref<any>(null)
+    const company = ref<Company | null>(null)
     const loading = ref(false)
     const loaded = ref(false)  // prevent redundant fetches
 
-    async function fetchMyCompany(api: any) {
+    async function fetchMyCompany(api: Api) {
         if (loaded.value) return   // already have it
             loading.value = true
         try {
-            company.value = await api.get('/me/company')
+            company.value = await api.get<Company>('/me/company')
             loaded.value = true
         } catch {
             company.value = null

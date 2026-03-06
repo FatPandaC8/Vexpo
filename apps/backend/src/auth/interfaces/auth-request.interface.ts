@@ -1,8 +1,6 @@
+import { JwtUser } from '@vexpo/schema';
 import { Request } from 'express';
 
 export interface AuthRequest extends Request {
-  user: {
-    userId: string;
-    role: string;
-  };
+  user: JwtUser;
 }

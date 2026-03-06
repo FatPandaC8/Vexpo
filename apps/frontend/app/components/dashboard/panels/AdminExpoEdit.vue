@@ -60,7 +60,7 @@ async function submit(event: any) {
 const showDelete = ref(false);
 const deleteConfirm = ref("");
 const deleteLoading = ref(false);
-const canDelete = computed(() => deleteConfirm.value === props.expo?.title);
+const canDelete = computed(() => deleteConfirm.value === props.expo?.name);
 
 async function deleteExpo() {
   if (!canDelete.value) return;

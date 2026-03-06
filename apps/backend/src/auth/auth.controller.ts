@@ -23,6 +23,7 @@ import { RegisterDTO } from './dto/register.dto';
 import { GoogleOAuthGuard } from './google-auth.guard';
 import { OAuthCompleteDTO } from './dto/oauthcomplete.dto';
 import express from 'express';
+import type { AuthRequest } from './interfaces/auth-request.interface';
 // endpoints which serve sensitive data must be protected by
 
 @ApiTags('Authentication')
@@ -43,7 +44,10 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
-  async googleAuthRedirect(@Request() req, @Res() res: express.Response) {
+  async googleAuthRedirect(
+    @Request() req: AuthRequest & { user: any },
+    @Res() res: express.Response,
+  ): Promise<void> {
     const result = await this.authService.oauthLogin(req.user);
 
     if (result.is_new_user) {
@@ -67,11 +71,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('oauth/complete')
   async completeOAuthRegistration(
-    @Request() req,
+    @Request() req: AuthRequest,
     @Body() dto: OAuthCompleteDTO,
-  ) {
-    const userId = req.user.userId;
-    return this.authService.completeOAuthRegistration(userId, dto.role);
+  ): Promise<{ access_token: string }> {
+    return this.authService.completeOAuthRegistration(
+      req.user.userId,
+      dto.role,
+    );
   }
 
   @ApiOperation({ description: 'Register a new user.' })
@@ -82,7 +88,7 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  async register(@Body() dto: RegisterDTO) {
+  async register(@Body() dto: RegisterDTO): Promise<{ access_token: string }> {
     return this.authService.register(dto);
   }
 
@@ -91,14 +97,14 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() dto: LoginDTO) {
+  async login(@Body() dto: LoginDTO): Promise<{ access_token: string }> {
     return this.authService.login(dto);
   }
 
   @ApiOperation({ description: 'Log out of current user.' })
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout() {
+  logout(): void {
     return this.authService.logout();
   }
 }

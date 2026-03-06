@@ -1,14 +1,17 @@
+import type { Expo } from "@vexpo/schema"
+import type { Api } from "~/composables/useApi"
+
 export const useExpoStore = defineStore('expo', () => {
-  const myExpos = ref<any[]>([])
-  const allExpos = ref<any[]>([])
+  const myExpos = ref<Expo[]>([])
+  const allExpos = ref<Expo[]>([])
   const loading = ref(false)
   const loaded = ref(false)
 
-  async function fetchMyExpos(api: any) {
+  async function fetchMyExpos(api: Api) {
     if (loaded.value) return
     loading.value = true
     try {
-      myExpos.value = await api.get('me/expos')
+      myExpos.value = await api.get<Expo[]>('me/expos')
       loaded.value = true
     } catch {
       myExpos.value = []
@@ -17,10 +20,10 @@ export const useExpoStore = defineStore('expo', () => {
     }
   }
 
-  async function fetchAllExpos(api: any) {
+  async function fetchAllExpos(api: Api) {
     loading.value = true
     try {
-      allExpos.value = await api.get('/expos')
+      allExpos.value = await api.get<Expo[]>('/expos')
     } catch {
       allExpos.value = []
     } finally {
@@ -28,16 +31,16 @@ export const useExpoStore = defineStore('expo', () => {
     }
   }
 
-  function addExpo(expo: any) {
+  function addExpo(expo: Expo) {
     myExpos.value.unshift(expo)
   }
 
-  function updateExpo(expo: any) {
+  function updateExpo(expo: Expo) {
     const i = myExpos.value.findIndex(e => e.id === expo.id)
     if (i !== -1) myExpos.value[i] = expo
   }
 
-  function removeExpo(id: any) {
+  function removeExpo(id: string) {
     myExpos.value = myExpos.value.filter(e => e.id !== id)
   }
 

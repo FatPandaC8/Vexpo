@@ -1,13 +1,16 @@
+import type { Booth } from "@vexpo/schema"
+import type { Api } from "~/composables/useApi"
+
 export const useBoothStore = defineStore('booth', () => {
-  const booth = ref<any>(null)
+  const booth = ref<Booth | null>(null)
   const loading = ref(false)
   const loaded = ref(false)
 
-  async function fetchMyBooth(api: any) {
+  async function fetchMyBooth(api: Api) {
     if (loaded.value) return
     loading.value = true
     try {
-      booth.value = await api.get('/me/booth')
+      booth.value = await api.get<Booth>('/me/booth')
       loaded.value = true
     } catch {
       booth.value = null
@@ -16,13 +19,13 @@ export const useBoothStore = defineStore('booth', () => {
     }
   }
 
-  async function updateBooth(api: any, id: string, payload: any) {
-    const updated = await api.patch(`/booths/${id}`, payload)
+  async function updateBooth(api: Api, id: string, payload: any): Promise<Booth> {
+    const updated = await api.patch<Booth>(`/booths/${id}`, payload)
     booth.value = updated
     return updated
   }
 
-  async function deleteBooth(api: any, id: string) {
+  async function deleteBooth(api: Api, id: string) {
     await api.del(`/booths/${id}`)
     booth.value = null
     loaded.value = false

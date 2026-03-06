@@ -38,7 +38,7 @@ watch(
   () => dashboard.activeId,
   () => {
     if (section.value === "booths") loadBooths();
-  }
+  },
 );
 </script>
 
@@ -51,7 +51,10 @@ watch(
       <SidebarSection
         label="My Expos"
         :loading="expoStore.loading"
-        @refresh="expoStore.reset(); expoStore.fetchMyExpos(api)"
+        @refresh="
+          expoStore.reset();
+          expoStore.fetchMyExpos(api);
+        "
       >
         <button
           class="bg-[#3d52d5] text-white rounded w-6 h-6"

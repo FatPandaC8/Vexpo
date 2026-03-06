@@ -27,6 +27,9 @@ import { CreateExpoDTO } from './dto/create-expo.dto';
 import { UpdateExpoDTO } from './dto/update-expo.dto';
 import { CreateBoothContentDTO } from 'src/booths/dto/create-booth-content.dto';
 import { BoothsService } from 'src/booths/booths.service';
+import { Expo } from 'src/entities/expo.entity';
+import { Booth } from 'src/entities/booth.entity';
+import type { AuthRequest } from 'src/auth/interfaces/auth-request.interface';
 
 @ApiTags('Expos')
 @Controller('expos')
@@ -42,21 +45,21 @@ export class ExposController {
   @Get()
   @ApiOperation({ summary: 'Get all expos' })
   @ApiQuery({ name: 'type', required: false })
-  findAll(@Query('type') type?: string) {
+  findAll(@Query('type') type?: string): Promise<Expo[]> {
     return this.expoService.findAll({ type });
   }
 
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get expo by ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Expo> {
     return this.expoService.findExpoById(id);
   }
 
   @Public()
   @Get(':id/booths')
   @ApiOperation({ summary: 'Get approved booths of an expo' })
-  findBooths(@Param('id', ParseUUIDPipe) id: string) {
+  findBooths(@Param('id', ParseUUIDPipe) id: string): Promise<Booth[]> {
     return this.expoService.findAllBoothsByExpoId(id);
   }
 
@@ -67,7 +70,7 @@ export class ExposController {
   @Roles('organizer')
   @Post()
   @ApiOperation({ summary: 'Create expo (organizer)' })
-  create(@Body() dto: CreateExpoDTO, @Req() req: any) {
+  create(@Body() dto: CreateExpoDTO, @Req() req: AuthRequest) {
     return this.expoService.createExpo(req.user.userId, dto);
   }
 
@@ -81,10 +84,9 @@ export class ExposController {
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateExpoDTO,
-    @Req() req: any,
-  ) {
-    const userRole: string = (req.user.role as string).toLowerCase();
-    if (userRole === 'admin') return this.expoService.updateExpo(id, dto);
+    @Req() req: AuthRequest,
+  ): Promise<Expo> {
+    if (req.user.role === 'admin') return this.expoService.updateExpo(id, dto);
     return this.expoService.updateExpoByOrganizer(id, req.user.userId, dto);
   }
 
@@ -96,9 +98,11 @@ export class ExposController {
   @ApiOperation({
     summary: 'Delete expo organizer must own it, admin bypasses',
   })
-  async remove(@Param('id', ParseUUIDPipe) id: string, @Req() req: any) {
-    const userRole: string = (req.user.role as string).toLowerCase();
-    if (userRole === 'admin') return this.expoService.deleteExpo(id);
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthRequest,
+  ): Promise<{ message: string } | void> {
+    if (req.user.role === 'admin') return this.expoService.deleteExpo(id);
     return this.expoService.deleteExpoByOrganizer(id, req.user.userId);
   }
 
@@ -114,10 +118,10 @@ export class ExposController {
   })
   async findAllBoothsManage(
     @Param('id', ParseUUIDPipe) id: string,
-    @Req() req: any,
-  ) {
-    const userRole: string = (req.user.role as string).toLowerCase();
-    if (userRole === 'admin') return this.expoService.findAllBoothsByExpoId(id);
+    @Req() req: AuthRequest,
+  ): Promise<Booth[]> {
+    if (req.user.role === 'admin')
+      return this.expoService.findAllBoothsByExpoId(id);
     return this.expoService.getExpoBoothsByOrganizer(id, req.user.userId);
   }
 
@@ -128,8 +132,8 @@ export class ExposController {
   createBooth(
     @Param('expoId', ParseUUIDPipe) expoId: string,
     @Body() dto: CreateBoothContentDTO,
-    @Req() req: any,
-  ) {
+    @Req() req: AuthRequest,
+  ): Promise<Booth> {
     return this.boothsService.createBooth(expoId, req.user.userId, dto);
   }
 }

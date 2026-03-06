@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import type { UserRole } from '@vexpo/schema';
 import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateUserDTO {
@@ -16,5 +17,5 @@ export class UpdateUserDTO {
   @ApiProperty({ example: 'exhibitor', required: false })
   @IsOptional()
   @IsString()
-  role?: string;
+  role?: UserRole;
 }

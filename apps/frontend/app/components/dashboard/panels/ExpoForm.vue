@@ -27,8 +27,8 @@ const {
   deleteConfirm,
   deleteLoading,
   canDelete,
-  deleteExpo
-} = useExpoForm(props, emit)
+  deleteExpo,
+} = useExpoForm(props, emit);
 </script>
 
 <template>
@@ -63,7 +63,7 @@ const {
     <!-- Form -->
     <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
       <!--Make a list & then for loop through it instead :3-->
-      
+
       <FormInput
         v-for="field in stateProps"
         :key="field.name"

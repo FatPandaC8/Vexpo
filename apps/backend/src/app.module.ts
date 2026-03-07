@@ -14,6 +14,7 @@ import { Role } from './entities/role.entity';
 import { Expo } from './entities/expo.entity';
 import { Booth } from './entities/booth.entity';
 import { Company } from './entities/company.entity';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { Company } from './entities/company.entity';
     ExposModule,
     BoothsModule,
     CompaniesModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

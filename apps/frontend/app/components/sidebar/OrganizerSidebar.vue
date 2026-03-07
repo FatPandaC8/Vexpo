@@ -5,6 +5,7 @@ import SidebarSection from "./components/SidebarSection.vue";
 import SidebarTabs from "./components/SidebarTabs.vue";
 import SidebarEmptyState from "./components/SidebarEmptyState.vue";
 import SidebarItem from "./components/SidebarItem.vue";
+import type { Booth } from "@vexpo/schema";
 
 const dashboard = useDashboardStore();
 const expoStore = useExpoStore();
@@ -13,14 +14,14 @@ const api = useApi();
 const section = ref<"expos" | "booths">("expos");
 
 // Booth requests are always fetched fresh
-const booths = ref<any[]>([]);
+const booths = ref<Booth[]>([]);
 const loadingBooths = ref(false);
 
 async function loadBooths() {
   loadingBooths.value = true;
   try {
-    const res = await api.getPaginated<any>("/booths", { page: 1, limit: 20 });
-    booths.value = res.items;
+    const res = await api.getPaginated<Booth[]>("/booths", { page: 1, limit: 20 });
+    booths.value = res.items.flat();
   } catch {
     booths.value = [];
   } finally {

@@ -3,6 +3,7 @@
 import DeleteConfirm from "~/components/common/DeleteConfirm.vue";
 import FormInput from "~/components/common/FormInput.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
+import { useCompanyForm } from "~/composables/form/useCompanyForm";
 import { stateProps } from "~/utils/form/company";
 
 const props = defineProps<{

@@ -35,13 +35,18 @@ export interface Booth {
     description: string | null;
     status: BoothStatus;
     modelPath: string | null;
-    mapRow: number | null;
-    mapCol: number | null;
+    mapRow: number;
+    mapCol: number;
     expoId: string;
     companyId: string;
     company?: Pick<Company, 'id' | 'name' | 'industry' | 'email' | 'website' | 'description'>;
     expo?: Pick<Expo, 'id' | 'name'>;
 }
+export type BoothFormEmit = {
+    (evt: "saved", booth: Booth): void;
+    (evt: "registered", booth: Booth): void;
+    (evt: "deleted"): void;
+};
 export interface User {
     id: number;
     name: string;

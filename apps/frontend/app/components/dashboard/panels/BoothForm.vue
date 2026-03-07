@@ -1,240 +1,79 @@
 <script setup lang="ts">
-import { CreateBoothSchema, UpdateBoothSchema } from "@vexpo/schema";
-import type { Cell, OccupiedCell } from "~/components/BoothMapPicker.vue";
+import { CreateBoothSchema, UpdateBoothSchema, type Booth, type Expo } from "@vexpo/schema";
 import DeleteConfirm from "~/components/common/DeleteConfirm.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
+import { useBoothMap } from "~/composables/booth/useBoothMap";
+import { useBoothModel } from "~/composables/booth/useBoothModel";
+import { useBoothForm } from "~/composables/form/useBoothForm";
 import { STATUSES } from "~/utils/sidebar/admin.sidebar.constants";
+import type { BoothFormEmit } from "@vexpo/schema";
 
 const auth = useAuth();
 const api = useApi();
-
+const companyStore = useCompanyStore()
 const canEditStatus = computed(
   () =>
     auth.user.value?.role === "admin" || auth.user.value?.role === "organizer",
 );
 
 const props = defineProps<{
-  expo?: any;
-  booth?: any;
+  expo?: Expo;
+  booth?: Booth;
 }>();
 
-const emit = defineEmits<{
-  saved: [booth: any];
-  registered: [booth: any];
-  deleted: [];
-}>();
+const emit = defineEmits<BoothFormEmit>();
 
-const mode = computed(() => (props.booth ? "edit" : "create"));
+const map = useBoothMap(
+  api,
+  () => props.expo?.id ?? props.booth?.expoId
+);
+
+const model = useBoothModel(
+  api,
+  () => props.booth?.id
+);
+
+const form = useBoothForm(
+  api,
+  props,
+  emit,
+  () => map.mapPosition.value,
+  () => model.modelPath.value,
+  canEditStatus,
+);
 
 const schema = computed(() =>
-  mode.value === "edit" ? UpdateBoothSchema : CreateBoothSchema,
+  form.mode.value === "edit" ? UpdateBoothSchema : CreateBoothSchema
 );
 
-// Map position
-const mapPosition = ref<Cell | null>(
-  props.booth?.mapRow != null && props.booth?.mapCol != null
-    ? { row: props.booth.mapRow, col: props.booth.mapCol }
-    : null,
+watch(map.mapPosition, (pos) => form.syncMap(pos));
+
+watch(model.modelPath, (val) => form.syncModel(val));
+
+watch(
+  () => companyStore.company,
+  (company) => form.syncCompany(company?.id)
 );
 
-// 3D model
-const modelPath = ref<string | null>(props.booth?.modelPath ?? null);
-const modelFileName = ref<string | null>(
-  props.booth?.modelPath
-    ? (props.booth.modelPath.split(/[\\/]/).pop() ?? null)
-    : null,
-);
-const uploadedFile = ref<File | null>(null);
-const fileError = ref<string | null>(null);
-const fileUploadKey = ref(0);
-const removingModel = ref(false);
-
-// Company
-const companyStore = useCompanyStore();
-
-// State (must contain every field the schema needs)
-const state = reactive({
-  name: props.booth?.name ?? "",
-  description: props.booth?.description ?? "",
-  companyId: props.booth?.companyId as string | undefined,
-  status: props.booth?.status ?? "pending",
-  modelPath: props.booth?.modelPath as string | undefined,
-  mapRow: props.booth?.mapRow as number | undefined,
-  mapCol: props.booth?.mapCol as number | undefined,
-});
-
-// Keep state.mapRow / mapCol in sync with the map picker
-watch(mapPosition, (pos) => {
-  state.mapRow = pos?.row;
-  state.mapCol = pos?.col;
-});
-
-// Keep state.modelPath in sync with the model ref
-watch(modelPath, (val) => {
-  state.modelPath = val ?? undefined;
-});
-
-// Keep state.companyId in sync when company loads (create mode)
-watch(companyStore.company, (company) => {
-  if (company?.id && !state.companyId) {
-    state.companyId = company.id;
-  }
-});
-
-// Occupied cells
-const occupiedCells = ref<OccupiedCell[]>([]);
-
-async function loadOccupied() {
-  const expoId = props.expo?.id ?? props.booth?.expoId;
-  if (!expoId) return;
-  try {
-    const booths = await api.get<any[]>(`/expos/${expoId}/booths`);
-    occupiedCells.value = (booths as any[])
-      .filter((b: any) => b.mapRow != null && b.mapCol != null)
-      .map((b: any) => ({ row: b.mapRow, col: b.mapCol, name: b.name }));
-  } catch {
-    occupiedCells.value = [];
-  }
-}
-
-onMounted(() => {
-  loadOccupied();
-  companyStore.fetchMyCompany(api);
-});
-
-// Sync everything when the booth prop changes (e.g. switching between booths)
 watch(
   () => props.booth,
   (b) => {
-    state.name = b?.name ?? "";
-    state.description = b?.description ?? "";
-    state.companyId = b?.companyId ?? undefined;
-    state.status = b?.status ?? "pending";
-    state.mapRow = b?.mapRow ?? undefined;
-    state.mapCol = b?.mapCol ?? undefined;
-    state.modelPath = b?.modelPath ?? undefined;
-
-    mapPosition.value =
-      b?.mapRow != null && b?.mapCol != null
-        ? { row: b.mapRow, col: b.mapCol }
-        : null;
-
-    modelPath.value = b?.modelPath ?? null;
-    modelFileName.value = b?.modelPath
-      ? (b.modelPath.split(/[\\/]/).pop() ?? null)
-      : null;
-
-    uploadedFile.value = null;
-    fileUploadKey.value++;
-    fileError.value = null;
-    loadOccupied();
-  },
+    form.syncFromBooth(b);
+    map.initPosition(b);
+    model.initModel(b);
+    map.loadOccupied();
+  }
 );
 
-// Submit
-const saving = ref(false);
-const success = ref(false);
-const error = ref<string | null>(null);
-
-// UForm calls @submit only after schema passes — event.data is the validated payload
-async function submit(event: any) {
-  console.log("Pressed", event.data);
-  saving.value = true;
-  error.value = null;
-  success.value = false;
-
-  try {
-    const payload = { ...event.data };
-
-    // Exhibitors cannot set status
-    if (!canEditStatus.value) delete payload.status;
-
-    let result: any;
-    if (mode.value === "create") {
-      result = await api.post<any>(`/expos/${props.expo!.id}/booths`, payload);
-      emit("registered", result);
-    } else {
-      result = await api.patch<any>(`/booths/${props.booth!.id}`, payload);
-      emit("saved", result);
-    }
-
-    success.value = true;
-    setTimeout(() => {
-      success.value = false;
-    }, 4000);
-  } catch (e: any) {
-    const msg = e?.data?.message ?? e?.message;
-    error.value = Array.isArray(msg) ? msg.join(", ") : (msg ?? "Save failed");
-  } finally {
-    saving.value = false;
-  }
-}
-
-// Delete
-const showDelete = ref(false);
-const deleteConfirm = ref("");
-const deleteLoading = ref(false);
-const canDelete = computed(() => deleteConfirm.value === props.booth?.name);
-
-async function deleteBooth() {
-  if (!canDelete.value) return;
-  deleteLoading.value = true;
-  try {
-    await api.del(`/booths/${props.booth!.id}`);
-    emit("deleted");
-  } catch (e: any) {
-    error.value = e?.data?.message ?? "Delete failed";
-  } finally {
-    deleteLoading.value = false;
-  }
-}
-
-// File upload
-watch(uploadedFile, (file) => {
-  if (!file) return;
-  fileError.value = null;
-
-  const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
-  if (ext !== ".glb") {
-    fileError.value = "Only a .glb file is accepted.";
-    uploadedFile.value = null;
-    fileUploadKey.value++;
-    return;
-  }
-
-  if (file.size > 20 * 1024 * 1024) {
-    fileError.value = "File too large (max 20 MB).";
-    uploadedFile.value = null;
-    fileUploadKey.value++;
-    return;
-  }
-
-  modelPath.value = file.name;
-  modelFileName.value = file.name;
+onMounted(() => {
+  map.initPosition(props.booth);
+  model.initModel(props.booth);
+  map.loadOccupied();
+  companyStore.fetchMyCompany(api);
 });
 
-async function removeModel() {
-  uploadedFile.value = null;
-  modelPath.value = null;
-  modelFileName.value = null;
-  fileError.value = null;
-  fileUploadKey.value++;
+defineExpose({ modelPath: model.modelPath });
 
-  if (mode.value === "edit" && props.booth?.id) {
-    removingModel.value = true;
-    try {
-      await api.patch(`/booths/${props.booth.id}`, { modelPath: null });
-    } catch {
-      // non-fatal — next Save will also send null
-    } finally {
-      removingModel.value = false;
-    }
-  }
-}
-
-const hasModel = computed(() => !!modelFileName.value);
-
-defineExpose({ modelPath });
 </script>
 
 <template>
@@ -249,10 +88,10 @@ defineExpose({ modelPath });
         </div>
         <div>
           <h2 class="text-2xl font-bold text-gray-900">
-            {{ mode === "create" ? "Register Booth" : "Edit Booth" }}
+            {{ form.mode.value === "create" ? "Register Booth" : "Edit Booth" }}
           </h2>
           <p class="text-sm text-gray-400 mt-0.5">
-            <template v-if="mode === 'create'">
+            <template v-if="form.mode.value === 'create'">
               Registering for:
               <strong class="text-gray-700">{{ expo?.name }}</strong>
             </template>
@@ -270,7 +109,7 @@ defineExpose({ modelPath });
         >
           Company info
         </p>
-        <template v-if="mode === 'create'">
+        <template v-if="form.mode.value === 'create'">
           <div
             v-if="companyStore.loading"
             class="flex items-center gap-2 text-sm text-gray-400"
@@ -334,10 +173,10 @@ defineExpose({ modelPath });
       </div>
     </div>
 
-    <SuccessIndicator :success="success" :message="booth_successMsg" />
-    <SuccessIndicator :success="success" :message="error" />
+    <SuccessIndicator :success="form.success.value" :message="booth_successMsg" />
+    <SuccessIndicator :success="form.success.value" :message="form.error.value" />
 
-    <UForm :state="state" :schema="schema" class="space-y-5" @submit="submit">
+    <UForm :state="form.state" :schema="schema" class="space-y-5" @submit="form.submit">
       <div class="grid grid-cols-2 gap-5">
         <div class="space-y-3">
           <UFormField
@@ -349,9 +188,9 @@ defineExpose({ modelPath });
             }"
           >
             <UInput
-              v-model="state.name"
+              v-model="form.state.name"
               placeholder="e.g. TechCorp Innovation Booth"
-              :disabled="saving"
+              :disabled="form.saving.value"
               class="w-full"
               :ui="{
                 base: 'border border-gray-400 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
@@ -368,10 +207,10 @@ defineExpose({ modelPath });
             }"
           >
             <UTextarea
-              v-model="state.description"
+              v-model="form.state.description"
               placeholder="What will you be showcasing at this booth?"
               :rows="4"
-              :disabled="saving"
+              :disabled="form.saving.value"
               class="w-full"
               :ui="{
                 base: 'border border-gray-400 focus:border-[#3d52d5] px-3 py-2 rounded-xl',
@@ -387,7 +226,7 @@ defineExpose({ modelPath });
           >
             <USelect
               trailing-icon="null"
-              v-model="state.status"
+              v-model="form.state.status"
               variant="soft"
               :items="STATUSES"
               placeholder="Select a status"
@@ -404,8 +243,8 @@ defineExpose({ modelPath });
 
         <!-- Floor Map Position -->
         <BoothMapPicker
-          v-model="mapPosition"
-          :occupied="occupiedCells"
+          v-model="map.mapPosition.value"
+          :occupied="map.occupiedCells.value"
           label="Floor Map Position"
         />
       </div>
@@ -421,7 +260,7 @@ defineExpose({ modelPath });
 
         <Transition name="slide-down">
           <div
-            v-if="hasModel"
+            v-if="model.hasModel.value"
             class="mb-3 flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3"
           >
             <UIcon
@@ -430,29 +269,29 @@ defineExpose({ modelPath });
             />
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-violet-900 truncate">
-                {{ modelFileName }}
+                {{ model.modelFileName.value }}
               </p>
             </div>
             <button
               type="button"
-              :disabled="removingModel"
+              :disabled="model.removingModel.value"
               class="text-violet-300 hover:text-red-500 transition shrink-0 p-1 rounded-lg hover:bg-red-50 disabled:opacity-40"
               title="Remove model"
-              @click="removeModel"
+              @click="model.removeModel"
             >
               <UIcon
-                :name="removingModel ? 'i-lucide-loader-circle' : 'i-lucide-x'"
+                :name="model.removingModel.value ? 'i-lucide-loader-circle' : 'i-lucide-x'"
                 class="w-4 h-4"
-                :class="{ 'animate-spin': removingModel }"
+                :class="{ 'animate-spin': model.removingModel.value }"
               />
             </button>
           </div>
         </Transition>
 
         <UFileUpload
-          :key="fileUploadKey"
-          v-model="uploadedFile"
-          accept=".glb,.gltf"
+          :key="model.fileUploadKey.value"
+          v-model="model.uploadedFile.value"
+          accept=".glb"
           :multiple="false"
           label="Drop your 3D model here or click to browse"
           description="Supported: .glb - max 20 MB"
@@ -462,14 +301,14 @@ defineExpose({ modelPath });
 
         <Transition name="fade">
           <div
-            v-if="fileError"
+            v-if="model.fileError.value"
             class="mt-2 flex items-start gap-2 text-xs text-red-600 rounded-xl px-3 py-2"
           >
             <UIcon
               name="i-lucide-circle-alert"
               class="w-3.5 h-3.5 shrink-0 mt-0.5"
             />
-            {{ fileError }}
+            {{ model.fileError }}
           </div>
         </Transition>
       </div>
@@ -478,15 +317,15 @@ defineExpose({ modelPath });
       <div class="pt-2">
         <UButton
           type="submit"
-          :loading="saving"
-          :disabled="saving"
+          :loading="form.saving.value"
+          :disabled="form.saving.value"
           class="bg-[#3d52d5] text-white rounded-xl shadow-sm shadow-blue-500/20 cursor-pointer px-6"
           size="md"
         >
           {{
-            saving
+            form.saving.value
               ? "Saving…"
-              : mode === "create"
+              : form.mode.value === "create"
                 ? "Register Booth"
                 : "Save Changes"
           }}
@@ -496,14 +335,14 @@ defineExpose({ modelPath });
 
     <!-- Delete (edit only) -->
     <DeleteConfirm
-      :mode="mode"
-      v-model:showDelete="showDelete"
-      v-model:deleteConfirm="deleteConfirm"
+      :mode="form.mode.value"
+      v-model:showDelete="form.showDelete.value"
+      v-model:deleteConfirm="form.deleteConfirm.value"
       :title="'booth'"
       :name="booth?.name"
-      :can-delete="canDelete"
-      :delete-loading="deleteLoading"
-      @delete="deleteBooth"
+      :can-delete="form.canDelete.value"
+      :delete-loading="form.deleteLoading.value"
+      @delete="form.deleteBooth"
     />
   </div>
 </template>

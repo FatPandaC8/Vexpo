@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UpdateBoothSchema } from "@vexpo/schema";
+import { UpdateBoothSchema, type Booth } from "@vexpo/schema";
 import type { Cell, OccupiedCell } from "~/components/BoothMapPicker.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
 import { STATUSES } from "~/utils/sidebar/admin.sidebar.constants";
@@ -29,8 +29,8 @@ async function loadOccupied() {
   const expoId = props.booth?.expoId;
   if (!expoId) return;
   try {
-    const booths = await api.get<any[]>(`/expos/${expoId}/booths`);
-    occupiedCells.value = (booths as any[])
+    const booths = await api.get<Booth[]>(`/expos/${expoId}/booths`);
+    occupiedCells.value = (booths)
       .filter((b: any) => b.mapRow != null && b.mapCol != null)
       .map((b: any) => ({ row: b.mapRow, col: b.mapCol, name: b.name }));
   } catch {

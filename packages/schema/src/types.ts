@@ -51,6 +51,12 @@ export interface Booth {
 }
 // pick<type, keys>: construct a stype by icking the set of props Keys from Type
 
+export type BoothFormEmit = {
+  (evt: "saved", booth: Booth): void
+  (evt: "registered", booth: Booth): void
+  (evt: "deleted"): void
+}
+
 export interface User {
   id: number
   name: string

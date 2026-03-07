@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { CreateBoothSchema, UpdateBoothSchema, type Booth, type Expo } from "@vexpo/schema";
+import {
+  CreateBoothSchema,
+  UpdateBoothSchema,
+  type Booth,
+  type Expo,
+} from "@vexpo/schema";
 import DeleteConfirm from "~/components/common/DeleteConfirm.vue";
 import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
 import { useBoothMap } from "~/composables/booth/useBoothMap";
@@ -10,7 +15,7 @@ import type { BoothFormEmit } from "@vexpo/schema";
 
 const auth = useAuth();
 const api = useApi();
-const companyStore = useCompanyStore()
+const companyStore = useCompanyStore();
 const canEditStatus = computed(
   () =>
     auth.user.value?.role === "admin" || auth.user.value?.role === "organizer",
@@ -23,15 +28,9 @@ const props = defineProps<{
 
 const emit = defineEmits<BoothFormEmit>();
 
-const map = useBoothMap(
-  api,
-  () => props.expo?.id ?? props.booth?.expoId
-);
+const map = useBoothMap(api, () => props.expo?.id ?? props.booth?.expoId);
 
-const model = useBoothModel(
-  api,
-  () => props.booth?.id
-);
+const model = useBoothModel(api, () => props.booth?.id);
 
 const form = useBoothForm(
   api,
@@ -43,7 +42,7 @@ const form = useBoothForm(
 );
 
 const schema = computed(() =>
-  form.mode.value === "edit" ? UpdateBoothSchema : CreateBoothSchema
+  form.mode.value === "edit" ? UpdateBoothSchema : CreateBoothSchema,
 );
 
 watch(map.mapPosition, (pos) => form.syncMap(pos));
@@ -52,7 +51,7 @@ watch(model.modelPath, (val) => form.syncModel(val));
 
 watch(
   () => companyStore.company,
-  (company) => form.syncCompany(company?.id)
+  (company) => form.syncCompany(company?.id),
 );
 
 watch(
@@ -62,7 +61,7 @@ watch(
     map.initPosition(b);
     model.initModel(b);
     map.loadOccupied();
-  }
+  },
 );
 
 onMounted(() => {
@@ -73,7 +72,6 @@ onMounted(() => {
 });
 
 defineExpose({ modelPath: model.modelPath });
-
 </script>
 
 <template>
@@ -173,10 +171,21 @@ defineExpose({ modelPath: model.modelPath });
       </div>
     </div>
 
-    <SuccessIndicator :success="form.success.value" :message="booth_successMsg" />
-    <SuccessIndicator :success="form.success.value" :message="form.error.value" />
+    <SuccessIndicator
+      :success="form.success.value"
+      :message="booth_successMsg"
+    />
+    <SuccessIndicator
+      :success="form.success.value"
+      :message="form.error.value"
+    />
 
-    <UForm :state="form.state" :schema="schema" class="space-y-5" @submit="form.submit">
+    <UForm
+      :state="form.state"
+      :schema="schema"
+      class="space-y-5"
+      @submit="form.submit"
+    >
       <div class="grid grid-cols-2 gap-5">
         <div class="space-y-3">
           <UFormField
@@ -280,7 +289,11 @@ defineExpose({ modelPath: model.modelPath });
               @click="model.removeModel"
             >
               <UIcon
-                :name="model.removingModel.value ? 'i-lucide-loader-circle' : 'i-lucide-x'"
+                :name="
+                  model.removingModel.value
+                    ? 'i-lucide-loader-circle'
+                    : 'i-lucide-x'
+                "
                 class="w-4 h-4"
                 :class="{ 'animate-spin': model.removingModel.value }"
               />

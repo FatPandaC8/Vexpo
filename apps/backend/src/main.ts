@@ -5,11 +5,15 @@ import {
   SwaggerDocumentOptions,
   SwaggerModule,
 } from '@nestjs/swagger';
-import { VersioningType } from '@nestjs/common';
+import { ConsoleLogger, VersioningType } from '@nestjs/common';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new ConsoleLogger({
+      timestamp: true,
+    }),
+  });
 
   const options: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,

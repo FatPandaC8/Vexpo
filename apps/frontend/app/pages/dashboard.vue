@@ -3,6 +3,7 @@ import Logo from "~/components/common/Logo.vue";
 import ExhibitorSidebar from "~/components/sidebar/ExhibitorSidebar.vue";
 import OrganizerSidebar from "~/components/sidebar/OrganizerSidebar.vue";
 import AdminSidebar from "~/components/sidebar/AdminSidebar.vue";
+import type { Booth, Expo, Company, User } from "@vexpo/schema";
 
 definePageMeta({ middleware: "auth" });
 
@@ -13,12 +14,16 @@ const companyStore = useCompanyStore();
 const expoStore = useExpoStore();
 const { roleBadgeColor, roleLabel, greeting, welcomeConfig } =
   useDashboardUI(auth);
+const asBooth = computed(() => dashboard.activeData as Booth);
+const asExpo = computed(() => dashboard.activeData as Expo);
+const asCompany = computed(() => dashboard.activeData as Company);
+const asUser = computed(() => dashboard.activeData as User);
 
-function onBoothRegistered(booth: any) {
+function onBoothRegistered(booth: Booth) {
   boothStore.setBooth(booth);
 }
 
-function onCompanyUpdated(company: any) {
+function onCompanyUpdated(company: Company) {
   companyStore.company = company;
   dashboard.activeData = company;
 }
@@ -28,22 +33,22 @@ function onCompanyDeleted() {
   dashboard.reset();
 }
 
-function onExpoCreated(expo: any) {
+function onExpoCreated(expo: Expo) {
   expoStore.addExpo(expo);
   dashboard.select("expo-manage", expo);
 }
 
 function onExpoDeleted() {
-  expoStore.removeExpo(dashboard.activeData?.id);
+  expoStore.removeExpo(dashboard.activeId ?? undefined);
   dashboard.reset();
 }
 
-function onExpoUpdated(expo: any) {
+function onExpoUpdated(expo: Expo) {
   expoStore.updateExpo(expo);
   dashboard.activeData = expo;
 }
 
-function onBoothReviewed(booth: any) {
+function onBoothReviewed(booth: Booth) {
   dashboard.activeData = booth;
 }
 
@@ -51,7 +56,7 @@ function onAdminSaved() {
   dashboard.reset();
 }
 
-function onAdminUpdated(item: any) {
+function onAdminUpdated(item: Booth | Expo | Company | User) {
   dashboard.activeData = item;
 }
 
@@ -96,7 +101,6 @@ function onAdminDeleted() {
         class="w-72 shrink-0 border-r border-gray-100 bg-white flex flex-col overflow-hidden"
       >
         <div class="flex-1 overflow-y-auto p-4 flex flex-col min-h-0">
-          <!-- Sidebars use stores directly — no props/emits needed -->
           <ExhibitorSidebar v-if="auth.isExhibitor.value" />
           <OrganizerSidebar v-else-if="auth.isOrganizer.value" />
           <AdminSidebar v-else-if="auth.isAdmin.value" />
@@ -176,7 +180,7 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'booth-edit' && dashboard.activeData
           "
-          :booth="dashboard.activeData"
+          :booth="asBooth"
           @updated="
             dashboard.activeData = $event;
             boothStore.setBooth($event);
@@ -186,7 +190,7 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'register-booth' && dashboard.activeData
           "
-          :expo="dashboard.activeData"
+          :expo="asExpo"
           @registered="onBoothRegistered"
         />
         <DashboardPanelsCompanyForm
@@ -197,7 +201,7 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'company-edit' && dashboard.activeData
           "
-          :company="dashboard.activeData"
+          :company="asCompany"
           @saved="onCompanyUpdated"
           @deleted="onCompanyDeleted"
         />
@@ -207,7 +211,7 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'expo-manage' && dashboard.activeData
           "
-          :expo="dashboard.activeData"
+          :expo="asExpo"
           @saved="onExpoUpdated"
           @deleted="onExpoDeleted"
         />
@@ -219,7 +223,7 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'booth-review' && dashboard.activeData
           "
-          :booth="dashboard.activeData"
+          :booth="asBooth"
           @updated="onBoothReviewed"
         />
 
@@ -228,8 +232,8 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'admin-user-edit' && dashboard.activeData
           "
-          :user="dashboard.activeData"
-          :key="dashboard.activeData.id"
+          :user="asUser"
+          :key="dashboard.activeId ?? ''"
           @updated="onAdminUpdated"
           @deleted="onAdminDeleted"
         />
@@ -241,7 +245,7 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'admin-expo-edit' && dashboard.activeData
           "
-          :expo="dashboard.activeData"
+          :expo="asExpo"
           @saved="onAdminUpdated"
           @deleted="onAdminDeleted"
         />
@@ -249,7 +253,7 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'admin-booth-edit' && dashboard.activeData
           "
-          :booth="dashboard.activeData"
+          :booth="asBooth"
           @updated="onAdminUpdated"
           @deleted="onAdminDeleted"
         />
@@ -258,7 +262,7 @@ function onAdminDeleted() {
             dashboard.activeView === 'admin-company-edit' &&
             dashboard.activeData
           "
-          :company="dashboard.activeData"
+          :company="asCompany"
           @updated="onAdminUpdated"
           @deleted="onAdminDeleted"
         />

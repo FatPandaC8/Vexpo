@@ -30,7 +30,7 @@ async function loadOccupied() {
   if (!expoId) return;
   try {
     const booths = await api.get<Booth[]>(`/expos/${expoId}/booths`);
-    occupiedCells.value = (booths)
+    occupiedCells.value = booths
       .filter((b: any) => b.mapRow != null && b.mapCol != null)
       .map((b: any) => ({ row: b.mapRow, col: b.mapCol, name: b.name }));
   } catch {

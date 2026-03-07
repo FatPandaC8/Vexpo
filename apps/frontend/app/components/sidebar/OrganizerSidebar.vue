@@ -20,7 +20,10 @@ const loadingBooths = ref(false);
 async function loadBooths() {
   loadingBooths.value = true;
   try {
-    const res = await api.getPaginated<Booth[]>("/booths", { page: 1, limit: 20 });
+    const res = await api.getPaginated<Booth[]>("/booths", {
+      page: 1,
+      limit: 20,
+    });
     booths.value = res.items.flat();
   } catch {
     booths.value = [];

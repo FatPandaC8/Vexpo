@@ -40,7 +40,7 @@ export const useExpoStore = defineStore('expo', () => {
     if (i !== -1) myExpos.value[i] = expo
   }
 
-  function removeExpo(id: string) {
+  function removeExpo(id: string | undefined) {
     myExpos.value = myExpos.value.filter(e => e.id !== id)
   }
 

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
-import Unsupported from "~/components/common/Unsupported.vue";
+import SuccessIndicator from "~/components/common/SuccessIndicator.vue";
+import FormInput from "~/components/common/FormInput.vue";
+import { stateProps } from "~/utils/form/me";
 
 definePageMeta({ middleware: "auth" });
 
@@ -140,13 +142,18 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
               {{ auth.user.value?.email }}
             </p>
 
-            <span
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-              :class="roleBadgeClass"
+            <div class="mb-3">
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+                :class="roleBadgeClass"
+              >
+                <UIcon :name="roleIcon" class="w-3 h-3" />
+                {{ roleLabel }}
+              </span>
+            </div>
+            <span class="text-xs text-gray-400"
+              >Contact admin to change role</span
             >
-              <UIcon :name="roleIcon" class="w-3 h-3" />
-              {{ roleLabel }}
-            </span>
           </UCard>
 
           <!-- Section nav -->
@@ -192,30 +199,15 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
                 </div>
               </div>
 
-              <Transition name="fade">
-                <div
-                  v-if="profileSuccess"
-                  class="mb-6 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700"
-                >
-                  <UIcon
-                    name="i-lucide-circle-check"
-                    class="shrink-0 text-emerald-500"
-                  />
-                  Profile updated successfully.
-                </div>
-              </Transition>
-              <Transition name="fade">
-                <div
-                  v-if="profileError"
-                  class="mb-6 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
-                >
-                  <UIcon
-                    name="i-lucide-circle-alert"
-                    class="shrink-0 text-red-500"
-                  />
-                  {{ profileError }}
-                </div>
-              </Transition>
+              <SuccessIndicator
+                :success="profileSuccess"
+                message="Profile updated successfully."
+              />
+
+              <SuccessIndicator
+                :success="!!profileError"
+                :message="profileError"
+              />
 
               <UForm
                 :state="profileState"
@@ -223,59 +215,13 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
                 class="space-y-5"
                 @submit="saveProfile"
               >
-                <UFormField
-                  name="name"
-                  label="Full Name"
-                  :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-                >
-                  <UInput
-                    v-model="profileState.name"
-                    placeholder="John Doe"
-                    :disabled="profileSaving"
-                    :ui="{
-                      base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-                    }"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <UFormField
-                  name="email"
-                  label="Email Address"
-                  :ui="{ error: 'text-red-500 italic text-xs mt-1' }"
-                >
-                  <UInput
-                    v-model="profileState.email"
-                    type="email"
-                    placeholder="you@example.com"
-                    :disabled="profileSaving"
-                    :ui="{
-                      base: 'border border-gray-200 focus:border-[#3d52d5] px-3 h-10 rounded-xl',
-                    }"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <!-- Role: read-only -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5"
-                    >Role</label
-                  >
-                  <div
-                    class="flex items-center gap-3 h-10 px-3 rounded-xl border border-gray-100 bg-gray-50"
-                  >
-                    <span
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-                      :class="roleBadgeClass"
-                    >
-                      <UIcon :name="roleIcon" class="w-3 h-3" />
-                      {{ roleLabel }}
-                    </span>
-                    <span class="text-xs text-gray-400"
-                      >Contact admin to change role</span
-                    >
-                  </div>
-                </div>
+                <FormInput
+                  v-for="field in stateProps"
+                  :key="field.name"
+                  v-bind="field"
+                  :saving="profileSaving"
+                  :state-property="profileState"
+                />
 
                 <div class="pt-2 flex items-center gap-4">
                   <UButton
@@ -294,8 +240,6 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
 
           <!-- SECURITY -->
           <template v-else-if="activeSection === 'security'">
-            <Unsupported />
-
             <UCard class="rounded-2xl border border-gray-400 p-8 bg-white">
               <div class="flex items-center gap-3 mb-8">
                 <div
@@ -312,31 +256,6 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
                   </p>
                 </div>
               </div>
-
-              <Transition name="fade">
-                <div
-                  v-if="passwordSuccess"
-                  class="mb-6 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700"
-                >
-                  <UIcon
-                    name="i-lucide-circle-check"
-                    class="shrink-0 text-emerald-500"
-                  />
-                  Password updated successfully.
-                </div>
-              </Transition>
-              <Transition name="fade">
-                <div
-                  v-if="passwordError"
-                  class="mb-6 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
-                >
-                  <UIcon
-                    name="i-lucide-circle-alert"
-                    class="shrink-0 text-red-500"
-                  />
-                  {{ passwordError }}
-                </div>
-              </Transition>
 
               <UForm
                 :state="passwordState"

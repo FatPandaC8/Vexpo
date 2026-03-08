@@ -14,6 +14,7 @@ export const CreateBoothSchema = z.object({
 
 export const UpdateBoothSchema = CreateBoothSchema.partial().extend({
   status: z.enum(['pending', 'approved', 'rejected']).optional(),
+  rejectionReason: z.string().max(500).optional().nullable(),
 });
 
 export type CreateBoothDTO = z.infer<typeof CreateBoothSchema>;

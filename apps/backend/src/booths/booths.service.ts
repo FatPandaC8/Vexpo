@@ -9,12 +9,14 @@ import { Booth } from 'src/entities/booth.entity';
 import { Repository } from 'typeorm';
 import { UpdateBoothDTO } from './dto/update-booth.dto';
 import { CreateBoothContentDTO } from './dto/create-booth-content.dto';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class BoothsService {
   constructor(
     @InjectRepository(Booth)
     private boothRepository: Repository<Booth>,
+    private emailService: EmailService
   ) {}
 
   async getBoothById(boothId: string) {
@@ -106,8 +108,25 @@ export class BoothsService {
 
   async updateBooth(id: string, dto: UpdateBoothDTO) {
     const booth = await this.getBoothById(id);
+    const previousStatus = booth.status;
     Object.assign(booth, dto);
-    return this.boothRepository.save(booth);
+    const saved = await this.boothRepository.save(booth);
+
+    if (
+      dto.status === 'rejected' && previousStatus !== 'rejected' && booth.company.email 
+    ) {
+      await this.emailService.sendBoothRejectionEmail({
+        companyEmail: booth.company.email,
+        companyName: booth.company.name,
+        boothName: booth.name,
+        expoName: booth.expo.name,
+        rejectionReason: dto.rejectionReason ?? undefined,
+      }).catch((err) => {
+        console.error('Failed to send rejection email:', err);
+      });
+    }
+
+    return saved;
   }
 
   async deleteBooth(id: string) {

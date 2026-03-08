@@ -15,9 +15,14 @@ export function useBoothForm(
     description: props.booth?.description ?? '',
     companyId: props.booth?.companyId as string | undefined,
     status: props.booth?.status ?? 'pending',
+    rejectionReason: props.booth?.rejectionReason ?? '',
     modelPath: props.booth?.modelPath as string | undefined,
     mapRow: props.booth?.mapRow as number | undefined,
     mapCol: props.booth?.mapCol as number | undefined,
+  })
+
+  watch(() => state.status, (val) => {
+    if (val !== 'rejected') state.rejectionReason = ''
   })
 
   function syncMap(pos: { row: number; col: number } | null) {
@@ -40,6 +45,7 @@ export function useBoothForm(
     state.description = b?.description ?? ''
     state.companyId = b?.companyId ?? undefined
     state.status = b?.status ?? 'pending'
+    state.rejectionReason = b?.rejectionReason ?? ''
     state.mapRow = b?.mapRow ?? undefined
     state.mapCol = b?.mapCol ?? undefined
     state.modelPath = b?.modelPath ?? undefined

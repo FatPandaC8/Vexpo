@@ -11,4 +11,5 @@ export const CreateBoothSchema = z.object({
 });
 export const UpdateBoothSchema = CreateBoothSchema.partial().extend({
     status: z.enum(['pending', 'approved', 'rejected']).optional(),
+    rejectionReason: z.string().max(500).optional().nullable(),
 });

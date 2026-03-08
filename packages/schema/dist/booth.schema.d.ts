@@ -32,6 +32,7 @@ export declare const UpdateBoothSchema: z.ZodObject<{
     mapCol: z.ZodOptional<z.ZodNumber>;
 } & {
     status: z.ZodOptional<z.ZodEnum<["pending", "approved", "rejected"]>>;
+    rejectionReason: z.ZodNullable<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     name?: string | undefined;
     description?: string | undefined;
@@ -40,6 +41,7 @@ export declare const UpdateBoothSchema: z.ZodObject<{
     modelPath?: string | undefined;
     mapRow?: number | undefined;
     mapCol?: number | undefined;
+    rejectionReason?: string | null | undefined;
 }, {
     name?: string | undefined;
     description?: string | undefined;
@@ -48,6 +50,7 @@ export declare const UpdateBoothSchema: z.ZodObject<{
     modelPath?: string | undefined;
     mapRow?: number | undefined;
     mapCol?: number | undefined;
+    rejectionReason?: string | null | undefined;
 }>;
 export type CreateBoothDTO = z.infer<typeof CreateBoothSchema>;
 export type UpdateBoothDTO = z.infer<typeof UpdateBoothSchema>;

@@ -70,8 +70,7 @@ export class CompaniesController {
   registerCompany(
     @Body() dto: RegisterCompanyDTO,
     @Request() req: AuthRequest,
-  ): Promise<Company> {
-    console.log(req);
+  ): Promise<Company> {    
     return this.companyService.registerCompany(req.user.userId, dto);
   }
 }

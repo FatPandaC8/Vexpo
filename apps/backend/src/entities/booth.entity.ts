@@ -30,6 +30,9 @@ export class Booth {
   @Column({ default: 'pending' })
   status: 'pending' | 'approved' | 'rejected';
 
+  @Column({ type: 'text', nullable: true })
+  rejectionReason: string | null;
+
   @Column({ nullable: true })
   name: string;
 

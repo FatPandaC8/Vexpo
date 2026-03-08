@@ -14,4 +14,5 @@ exports.CreateBoothSchema = zod_1.z.object({
 });
 exports.UpdateBoothSchema = exports.CreateBoothSchema.partial().extend({
     status: zod_1.z.enum(['pending', 'approved', 'rejected']).optional(),
+    rejectionReason: zod_1.z.string().max(500).optional().nullable(),
 });

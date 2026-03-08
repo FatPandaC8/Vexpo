@@ -28,7 +28,7 @@ export function useBoothModel(api: Api, getBoothId: () => string | undefined) {
   }
 
   // Watch uploadedFile and validate on change
-  watch(uploadedFile, (file) => {
+  watch(uploadedFile, async (file) => {
     if (!file) return
     fileError.value = null
 
@@ -46,8 +46,28 @@ export function useBoothModel(api: Api, getBoothId: () => string | undefined) {
       return
     }
 
-    modelPath.value = file.name
-    modelFileName.value = file.name
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const token = useCookie('auth_token').value
+      const res = await fetch('http://localhost:3000/upload/model', {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      
+      if (!res.ok) throw new Error('Upload failed')
+        
+      const { filename } = await res.json() as { filename: string }
+      modelPath.value = filename
+      modelFileName.value = filename
+    } catch (e: any) {
+      fileError.value = e?.message ?? 'Upload failed'
+      uploadedFile.value = null
+      fileUploadKey.value++
+    }
+
   })
 
   async function removeModel() {
@@ -60,7 +80,7 @@ export function useBoothModel(api: Api, getBoothId: () => string | undefined) {
     try {
       await api.patch(`/booths/${boothId}`, { modelPath: null })
     } catch {
-      // non-fatal — the next full save will also send null
+
     } finally {
       removingModel.value = false
     }

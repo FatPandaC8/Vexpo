@@ -15,6 +15,7 @@ import { Expo } from './entities/expo.entity';
 import { Booth } from './entities/booth.entity';
 import { Company } from './entities/company.entity';
 import { EmailModule } from './email/email.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { EmailModule } from './email/email.module';
     BoothsModule,
     CompaniesModule,
     EmailModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

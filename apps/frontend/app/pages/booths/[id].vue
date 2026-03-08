@@ -7,6 +7,14 @@ const api = useApi();
 const boothId = String(route.params.id);
 
 const booth = ref<any>(null);
+const modelSrc = computed(() => {
+  const p = booth.value?.modelPath
+  if (!p) return undefined
+  if (p.startsWith('http')) return p
+  // strip any accidental leading slash before joining
+  return `http://localhost:3001/${p.replace(/^\//, '')}`
+})
+
 const loading = ref(true);
 const activeTab = ref<"overview" | "3d">("3d");
 
@@ -112,7 +120,7 @@ onMounted(() => [import("@google/model-viewer")]);
               >
                 <ClientOnly>
                   <model-viewer
-                    :src="booth.modelPath ?? undefined"
+                    :src="modelSrc"
                     ar
                     ar-modes="webxr scene-viewer quick-look"
                     camera-controls

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Company } from "@vexpo/schema";
 import Header from "~/components/common/Header.vue";
 
 const api = useApi();
@@ -6,23 +7,14 @@ const api = useApi();
 const search = ref("");
 const selectedIndustry = ref("All");
 const loading = ref(false);
-const companies = ref<any[]>([]);
+const companies = ref<Company[]>([]);
 
 async function fetchCompanies() {
   loading.value = true;
   try {
-    const data = await api.getPaginated<any>("/companies", {
-      page: 1,
-      limit: 20,
-    });
-    companies.value = data.items ?? data;
+    companies.value = await api.get<Company[]>("/companies");
   } catch {
-    // fallback: try non-paginated
-    try {
-      companies.value = await api.get<any[]>("/companies");
-    } catch {
-      companies.value = [];
-    }
+    companies.value = [];
   } finally {
     loading.value = false;
   }

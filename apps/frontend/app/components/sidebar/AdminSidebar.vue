@@ -22,7 +22,7 @@ const loading = ref(false);
 async function load(s: Section) {
   loading.value = true;
   try {
-    const res = await api.getPaginated(ENDPOINT[s], { page: 1, limit: 20 });
+    const res = await api.get(ENDPOINT[s]);
     items.value = (res as any).items ?? res;
   } catch {
     items.value = [];

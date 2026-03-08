@@ -39,8 +39,6 @@ export class ExposController {
     private boothsService: BoothsService,
   ) {}
 
-  // Public
-
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all expos' })
@@ -63,14 +61,12 @@ export class ExposController {
     return this.expoService.findAllBoothsByExpoId(id);
   }
 
-  // Organizer / Admin
-
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('organizer')
   @Post()
   @ApiOperation({ summary: 'Create expo (organizer)' })
-  create(@Body() dto: CreateExpoDTO, @Req() req: AuthRequest) {
+  create(@Body() dto: CreateExpoDTO, @Req() req: AuthRequest): Promise<Expo> {
     return this.expoService.createExpo(req.user.userId, dto);
   }
 
@@ -78,9 +74,7 @@ export class ExposController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('organizer')
   @Patch(':id')
-  @ApiOperation({
-    summary: 'Update expo organizer must own it, admin bypasses',
-  })
+  @ApiOperation({ summary: 'Update expo (organizer must own it, admin bypasses)' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateExpoDTO,
@@ -95,9 +89,7 @@ export class ExposController {
   @Roles('organizer')
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({
-    summary: 'Delete expo organizer must own it, admin bypasses',
-  })
+  @ApiOperation({ summary: 'Delete expo (organizer must own it, admin bypasses)' })
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: AuthRequest,
@@ -106,16 +98,11 @@ export class ExposController {
     return this.expoService.deleteExpoByOrganizer(id, req.user.userId);
   }
 
-  // Organizer booth management within their expo
-
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('organizer')
   @Get(':id/booths/all')
-  @ApiOperation({
-    summary:
-      'Get ALL booths of expo (organizer/admin - not filtered by status)',
-  })
+  @ApiOperation({ summary: 'Get ALL booths of expo (organizer/admin)' })
   async findAllBoothsManage(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: AuthRequest,

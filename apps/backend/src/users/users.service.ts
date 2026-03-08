@@ -18,6 +18,13 @@ export class UsersService {
     private roleRepository: Repository<Role>,
   ) {}
 
+  async findAll() {
+    return this.userRepository.find({
+      relations: ['role'],
+      order: { id: 'DESC' },
+    });
+  }
+
   async findOneByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { email },
@@ -100,21 +107,6 @@ export class UsersService {
   async deleteUser(id: string) {
     const result = await this.userRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException('User not found');
-  }
-
-  async findAllPaginated(page: number = 1, limit: number = 20) {
-    // TODO: not optimized if the the number are large Bach :(7
-    const [items, total] = await this.userRepository.findAndCount({
-      relations: ['role'],
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { id: 'DESC' },
-    });
-
-    return {
-      items,
-      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
-    };
   }
 
   async updatePassword(userId: string, hashedPassword: string): Promise<void> {

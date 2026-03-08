@@ -1,5 +1,3 @@
-import type { PaginatedResponse } from '@vexpo/schema';
-
 export const useApi = () => {
     const config = useRuntimeConfig()
     const BASE   = config.public.apiBase
@@ -23,14 +21,6 @@ export const useApi = () => {
         throw errors
     }
 
-    async function getPaginated<T>(path: string, params?: Record<string, any>): Promise<PaginatedResponse<T>> {
-        return $fetch<PaginatedResponse<T>>(path, {
-            baseURL: BASE,
-            headers: headers(),
-            query: params
-        }).catch(handleError);
-    }
-
     async function post<T>(path: string, body?: any): Promise<T> {
         return $fetch<T>(path, { method: 'POST', baseURL: BASE, headers: headers(), body }).catch(handleError)
     }
@@ -43,7 +33,7 @@ export const useApi = () => {
         return $fetch<T>(path, { method: 'DELETE', baseURL: BASE, headers: headers() }).catch(handleError)
     }
 
-    return { get, post, patch, del, getPaginated }
+    return { get, post, patch, del }
 }
 
 export type Api = ReturnType<typeof useApi>

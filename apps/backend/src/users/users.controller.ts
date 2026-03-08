@@ -8,7 +8,6 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -44,8 +43,8 @@ export class UsersController {
   @ApiOkResponse({ description: 'A list of users' })
   @ApiForbiddenResponse({ description: 'Forbidden resource' })
   @Get()
-  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 20) {
-    return this.userService.findAllPaginated(page, limit);
+  findAll() {
+    return this.userService.findAll();
   }
 
   @Roles('admin')

@@ -9,7 +9,6 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -20,7 +19,6 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { RegisterCompanyDTO } from './dto/create-company.dto';
 import { RolesGuard } from 'src/auth/roles.guard';
-import { PaginatedResponse } from '@vexpo/schema';
 import { Company } from 'src/entities/company.entity';
 import type { AuthRequest } from 'src/auth/interfaces/auth-request.interface';
 
@@ -31,10 +29,9 @@ export class CompaniesController {
   @Public()
   @Get()
   findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
-  ): Promise<PaginatedResponse<Company>> {
-    return this.companyService.findAllPaginated(page, limit);
+
+  ): Promise<Company[]> {
+    return this.companyService.findAll();
   }
 
   @Public()

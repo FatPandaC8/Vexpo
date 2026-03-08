@@ -19,7 +19,7 @@ export class ExposService {
     private boothRepository: Repository<Booth>,
   ) {}
 
-  async findAll(filters?: { type?: string }) {
+  async findAll(filters?: { type?: string }): Promise<Expo[]> {
     const query = this.expoRepository.createQueryBuilder('expo');
 
     if (filters?.type) {
@@ -32,30 +32,24 @@ export class ExposService {
       .getMany();
   }
 
-  async findExpoById(expoId: string) {
+  async findExpoById(expoId: string): Promise<Expo> {
     const expo = await this.expoRepository.findOne({
       where: { id: expoId },
       relations: ['booths'],
     });
     if (!expo) throw new NotFoundException(`Expo with ID ${expoId} not found`);
-
     return expo;
   }
 
-  async findAllBoothsByExpoId(expoId: string) {
-    // need to make a booth content table
+  async findAllBoothsByExpoId(expoId: string): Promise<Booth[]> {
     await this.findExpoById(expoId);
-
     return this.boothRepository.find({
-      where: {
-        expoId,
-        status: 'approved',
-      },
+      where: { expoId, status: 'approved' },
       relations: ['company'],
     });
   }
 
-  async getExposByOrganizer(organizerId: string) {
+  async getExposByOrganizer(organizerId: string): Promise<Expo[]> {
     return this.expoRepository.find({
       where: { organizerId },
       relations: ['booths'],
@@ -63,12 +57,8 @@ export class ExposService {
     });
   }
 
-  async createExpo(organizerId: string, dto: CreateExpoDTO) {
-    const expo = this.expoRepository.create({
-      ...dto,
-      organizerId,
-    });
-
+  async createExpo(organizerId: string, dto: CreateExpoDTO): Promise<Expo> {
+    const expo = this.expoRepository.create({ ...dto, organizerId });
     return this.expoRepository.save(expo);
   }
 
@@ -76,37 +66,32 @@ export class ExposService {
     expoId: string,
     organizerId: string,
     dto: UpdateExpoDTO,
-  ) {
+  ): Promise<Expo> {
     const expo = await this.findExpoById(expoId);
-
     if (expo.organizerId !== organizerId) {
       throw new ForbiddenException('You can only update your own expos');
     }
-
-    Object.assign(expo, dto); // copy the content of the dto then return it
+    Object.assign(expo, dto);
     return this.expoRepository.save(expo);
   }
 
   async deleteExpoByOrganizer(expoId: string, organizerId: string) {
     const expo = await this.findExpoById(expoId);
-
     if (expo.organizerId !== organizerId) {
       throw new ForbiddenException('You can only delete your own expos');
     }
-
     await this.expoRepository.remove(expo);
     return { message: 'Expo deleted successfully' };
   }
 
-  async getExpoBoothsByOrganizer(expoId: string, organizerId: string) {
+  async getExpoBoothsByOrganizer(
+    expoId: string,
+    organizerId: string,
+  ): Promise<Booth[]> {
     const expo = await this.findExpoById(expoId);
-
     if (expo.organizerId !== organizerId) {
-      throw new ForbiddenException(
-        'You can only view booths of your own expos',
-      );
+      throw new ForbiddenException('You can only view booths of your own expos');
     }
-
     return this.boothRepository.find({
       where: { expoId },
       relations: ['company'],
@@ -114,8 +99,7 @@ export class ExposService {
     });
   }
 
-  // Admin
-  async updateExpo(id: string, dto: UpdateExpoDTO) {
+  async updateExpo(id: string, dto: UpdateExpoDTO): Promise<Expo> {
     const expo = await this.findExpoById(id);
     Object.assign(expo, dto);
     return this.expoRepository.save(expo);

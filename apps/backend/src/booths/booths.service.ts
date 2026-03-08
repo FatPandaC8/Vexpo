@@ -19,6 +19,13 @@ export class BoothsService {
     private emailService: EmailService
   ) {}
 
+  async findAll() {
+    return this.boothRepository.find({
+      relations: ['expo', 'company'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async getBoothById(boothId: string) {
     const booth = await this.boothRepository.findOne({
       where: { id: boothId },
@@ -86,24 +93,6 @@ export class BoothsService {
     }
     await this.boothRepository.remove(booth);
     return { message: 'Booth deleted successfully' };
-  }
-
-  async findAllPaginated(page: number = 1, limit: number = 20) {
-    const [items, total] = await this.boothRepository.findAndCount({
-      relations: ['expo', 'company'],
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { createdAt: 'DESC' },
-    });
-    return {
-      items,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
   }
 
   async updateBooth(id: string, dto: UpdateBoothDTO) {

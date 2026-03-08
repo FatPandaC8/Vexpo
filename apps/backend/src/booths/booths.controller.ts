@@ -8,7 +8,6 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -18,7 +17,6 @@ import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { BoothsService } from './booths.service';
 import { UpdateBoothDTO } from './dto/update-booth.dto';
-import { PaginatedResponse } from '@vexpo/schema';
 import type { AuthRequest } from 'src/auth/interfaces/auth-request.interface';
 import { Booth } from 'src/entities/booth.entity';
 
@@ -31,12 +29,10 @@ export class BoothsController {
 
   @Public()
   @Get()
-  @ApiOperation({ summary: 'Get all booths (paginated)' })
+  @ApiOperation({ summary: 'Get all booths' })
   findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 20,
-  ): Promise<PaginatedResponse<Booth>> {
-    return this.boothsService.findAllPaginated(page, limit);
+  ): Promise<Booth[]> {
+    return this.boothsService.findAll();
   }
 
   @Public()

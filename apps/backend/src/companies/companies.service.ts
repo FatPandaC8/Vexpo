@@ -12,22 +12,10 @@ export class CompaniesService {
     private companyRepository: Repository<Company>,
   ) {}
 
-  async findAllPaginated(page: number = 1, limit: number = 20) {
-    const [items, total] = await this.companyRepository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
+  async findAll() {
+    return this.companyRepository.find({
       order: { createdAt: 'DESC' },
     });
-
-    return {
-      items,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
   }
 
   async getCompanyByExhibitor(exhibitorId: string) {

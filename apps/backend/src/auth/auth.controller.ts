@@ -24,6 +24,7 @@ import { GoogleOAuthGuard } from './google-auth.guard';
 import { OAuthCompleteDTO } from './dto/oauthcomplete.dto';
 import express from 'express';
 import type { AuthRequest } from './interfaces/auth-request.interface';
+import { ChangePasswordDTO } from './dto/change-password.dto';
 // endpoints which serve sensitive data must be protected by
 
 @ApiTags('Authentication')
@@ -104,7 +105,18 @@ export class AuthController {
   @ApiOperation({ description: 'Log out of current user.' })
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout(): void {
+  logout(): {message: string} {
     return this.authService.logout();
+  }
+
+  @ApiOperation({ description: 'Change password for the authenticated user.' })
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('change-password')
+  async changePassword(
+    @Request() req: AuthRequest,
+    @Body() dto: ChangePasswordDTO,
+  ): Promise<{ message: string }> {
+    return this.authService.changePassword(req.user.userId, dto);
   }
 }

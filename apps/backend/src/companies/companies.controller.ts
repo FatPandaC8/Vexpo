@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { JwtAuthGuard, Public } from 'src/auth/jwt-auth.guard';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { RegisterCompanyDTO } from './dto/create-company.dto';
@@ -43,6 +43,8 @@ export class CompaniesController {
     return this.companyService.findById(id);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Patch(':id')
   @ApiOperation({ summary: 'Update company' })
@@ -53,6 +55,8 @@ export class CompaniesController {
     return this.companyService.updateCompany(id, dto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Delete(':id')
   @ApiOperation({ summary: 'Delete company' })
@@ -63,6 +67,7 @@ export class CompaniesController {
     return this.companyService.deleteCompany(id);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('exhibitor')
   @Post()

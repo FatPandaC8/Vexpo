@@ -116,4 +116,12 @@ export class UsersService {
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
   }
+
+  async updatePassword(userId: string, hashedPassword: string): Promise<void> {
+    const result = await this.userRepository.update(userId, {
+      password: hashedPassword,
+    });
+
+    if (result.affected === 0) throw new NotFoundException('User not found in the repository');
+  }
 }

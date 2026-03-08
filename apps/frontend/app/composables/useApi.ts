@@ -15,24 +15,32 @@ export const useApi = () => {
         return $fetch<T>(path, { baseURL: BASE, headers: headers() })
     }
 
+    async function handleError(errors: any): Promise<never> {
+        if (errors?.response?.status === 401 || errors?.status === 401) {
+            auth.token.value = null
+            await navigateTo('/auth');
+        }
+        throw errors
+    }
+
     async function getPaginated<T>(path: string, params?: Record<string, any>): Promise<PaginatedResponse<T>> {
         return $fetch<PaginatedResponse<T>>(path, {
             baseURL: BASE,
             headers: headers(),
             query: params
-        })
+        }).catch(handleError);
     }
 
     async function post<T>(path: string, body?: any): Promise<T> {
-        return $fetch<T>(path, { method: 'POST', baseURL: BASE, headers: headers(), body })
+        return $fetch<T>(path, { method: 'POST', baseURL: BASE, headers: headers(), body }).catch(handleError)
     }
 
     async function patch<T>(path: string, body: any): Promise<T> {
-        return $fetch<T>(path, { method: 'PATCH', baseURL: BASE, headers: headers(), body })
+        return $fetch<T>(path, { method: 'PATCH', baseURL: BASE, headers: headers(), body }).catch(handleError)
     }
 
     async function del<T = void>(path: string): Promise<T> {
-        return $fetch<T>(path, { method: 'DELETE', baseURL: BASE, headers: headers() })
+        return $fetch<T>(path, { method: 'DELETE', baseURL: BASE, headers: headers() }).catch(handleError)
     }
 
     return { get, post, patch, del, getPaginated }

@@ -11,6 +11,7 @@ const rememberMe = ref(true);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const agreeTerms = ref(false);
+type Role = "exhibitor" | "organizer"
 
 // Separate form states
 // The reactive state might seem like a computed, but no
@@ -21,13 +22,14 @@ const signInState = reactive({
   password: "",
 });
 
+
 const signUpState = reactive({
   name: "",
   email: "",
   password: "",
   confirmPassword: "",
-  role: "",
-});
+  role: "exhibitor" as Role
+})
 
 const signInSchema = LoginSchema;
 // signUpSchema still needs the local .refine() for confirmPassword — keep that one local
@@ -413,11 +415,11 @@ function googleLogin() {
 
                   <div class="flex items-center justify-center">
                     <UButton
-                      @click="googleLogin"
-                      variant="outline"
-                      block
-                      class="border border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-blue-500 hover:cursor-pointer h-8 rounded-xl"
-                      icon="i-logos-google-icon"
+                    variant="outline"
+                    block
+                    class="border border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-blue-500 hover:cursor-pointer h-8 rounded-xl"
+                    icon="i-logos-google-icon"
+                    @click="googleLogin"
                     >
                       Google
                     </UButton>

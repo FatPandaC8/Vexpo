@@ -232,8 +232,8 @@ function onAdminDeleted() {
           v-else-if="
             dashboard.activeView === 'admin-user-edit' && dashboard.activeData
           "
-          :user="asUser"
           :key="dashboard.activeId ?? ''"
+          :user="asUser"
           @updated="onAdminUpdated"
           @deleted="onAdminDeleted"
         />

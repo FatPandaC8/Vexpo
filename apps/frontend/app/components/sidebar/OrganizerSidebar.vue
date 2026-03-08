@@ -28,8 +28,8 @@ async function loadBooths() {
     }
     const results = await Promise.all(
       myExpos.map((expo) =>
-        api.get<Booth[]>(`/expos/${expo.id}/booths/all`).catch(() => [])
-      )
+        api.get<Booth[]>(`/expos/${expo.id}/booths/all`).catch(() => []),
+      ),
     );
     booths.value = results.flat();
   } catch {

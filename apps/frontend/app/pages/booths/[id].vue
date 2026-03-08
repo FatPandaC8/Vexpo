@@ -4,7 +4,6 @@ import Header from "~/components/common/Header.vue";
 const route = useRoute();
 const api = useApi();
 
-const expoId = String(route.params.id);
 const boothId = String(route.params.id);
 
 const booth = ref<any>(null);
@@ -15,7 +14,6 @@ async function fetchBooth() {
   loading.value = true;
   try {
     booth.value = await api.get<any>(`/booths/${boothId}`);
-    // IMPORTANT: booth's company and company's id is null now
   } catch {
     booth.value = null;
   } finally {
@@ -43,9 +41,16 @@ onMounted(() => [import("@google/model-viewer")]);
     <div v-else-if="!booth" class="text-center py-32">
       <p class="text-gray-500">Booth not found.</p>
       <NuxtLink
-        :to="`/expos/${expoId}`"
+        v-if="booth?.expoId"
+        :to="`/expos/${booth.expoId}`"
         class="text-[#3d52d5] hover:underline text-sm mt-2 block"
-        >← Back to Expo</NuxtLink
+        >Back to Expo</NuxtLink
+      >
+      <NuxtLink
+        v-else
+        to="/expos"
+        class="text-[#3d52d5] hover:underline text-sm mt-2 block"
+        >Back to Expos</NuxtLink
       >
     </div>
 
@@ -60,7 +65,7 @@ onMounted(() => [import("@google/model-viewer")]);
           >
           <UIcon name="i-lucide-chevron-right" class="w-3.5 h-3.5" />
           <NuxtLink
-            :to="`/expos/${expoId}`"
+            :to="`/expos/${booth.expoId}`"
             class="hover:text-gray-700 transition"
             >{{ booth.expo?.name }}</NuxtLink
           >
@@ -106,9 +111,8 @@ onMounted(() => [import("@google/model-viewer")]);
                 style="height: 560px"
               >
                 <ClientOnly>
-                  <!--Now make it take the model from the booth instead of hard coding like this-->
                   <model-viewer
-                    src="http://localhost:3001/test.glb"
+                    :src="booth.modelPath ?? undefined"
                     ar
                     ar-modes="webxr scene-viewer quick-look"
                     camera-controls
@@ -117,19 +121,6 @@ onMounted(() => [import("@google/model-viewer")]);
                     shadow-intensity="1"
                     class="w-full h-full"
                   >
-                    <button
-                      class="Hotspot"
-                      slot="hotspot-1"
-                      data-position="-0.09532721890993273m 0.5332810798281482m 0.37321912248479805m"
-                      data-normal="-0.03489653688320022m 0.9947374591506833m 0.09633077948403657m"
-                      data-visibility-attribute="visible"
-                    >
-                      <div class="HotspotAnnotation">
-                        <span class="bg-white rounded-xl p-3"
-                          >Angel of Grief</span
-                        >
-                      </div>
-                    </button>
                     <div class="progress-bar hide" slot="progress-bar">
                       <div class="update-bar"></div>
                     </div>

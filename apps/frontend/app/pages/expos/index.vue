@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Expo } from "@vexpo/schema";
 import Header from "~/components/common/Header.vue";
 
 const api = useApi();
@@ -7,14 +8,12 @@ const search = ref("");
 const selectedType = ref("All");
 const selectedStatus = ref("All");
 const loading = ref(false);
-const expos = ref<any[]>([]);
+const expos = ref<Expo[]>([]);
 
 async function fetchExpos() {
   loading.value = true;
   try {
-    const params =
-      selectedType.value !== "All" ? { type: selectedType.value } : {}; // consider for filter type for searching expo
-    const data = await api.get<any[]>("/expos");
+    const data = await api.get<Expo[]>("/expos");
     expos.value = data;
   } catch {
     expos.value = [];
@@ -110,7 +109,7 @@ function boothCount(expo: any) {
               type="text"
               placeholder="Search expo name or description..."
               class="w-full pl-12 pr-4 py-3 rounded-xl border-0 bg-white text-gray-800 text-sm shadow-lg focus:ring-2 focus:ring-blue-300 outline-none"
-            />
+            >
           </div>
           <button
             class="px-6 py-3 bg-white text-[#3d52d5] font-semibold rounded-xl shadow-lg hover:bg-blue-50 transition text-sm"

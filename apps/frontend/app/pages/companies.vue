@@ -105,7 +105,7 @@ function boothCount(company: any) {
               type="text"
               placeholder="Search company name, industry..."
               class="w-full pl-12 pr-4 py-3 rounded-xl border-0 bg-white text-gray-800 text-sm shadow-lg focus:ring-2 focus:ring-blue-300 outline-none"
-            />
+            >
           </div>
           <button
             class="px-6 py-3 bg-[#3d52d5] text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700 transition text-sm"

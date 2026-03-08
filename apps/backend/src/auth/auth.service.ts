@@ -68,6 +68,34 @@ export class AuthService {
 
   logout() {
     console.log('LOG OUT');
+    return { message: 'Logged out successfully' };
+  }
+
+  async changePassword(
+    userId: string,
+    dto: {
+      currentPassword: string;
+      newPassword: string
+    }
+  ): Promise<{message: string}> {
+    const user = await this.usersService.findOneById(userId);
+    if (!user) throw new NotFoundException('User not found when trying to change password');
+
+    if (!user.password) {
+      throw new BadRequestException(
+        'This account uses OAuth and has no password to change'
+      );
+    }
+
+    const isMatch = await bcrypt.compare(dto.currentPassword, user.password);
+    if (!isMatch) throw new UnauthorizedException("Current password is incorrect");
+
+    const hashed = await bcrypt.hash(dto.newPassword, 10);
+    await this.usersService.updatePassword(userId, hashed);
+
+    return {
+      message: 'Password updated successfullt'
+    };
   }
 
   async oauthLogin(oauthUser: {

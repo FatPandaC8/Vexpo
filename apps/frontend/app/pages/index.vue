@@ -89,7 +89,7 @@ const statusDot: Record<string, string> = {
           <img
             src="~/assets/images/expo_info_home.jpg"
             class="rounded-xl border-[#3d52d5] border-20 shadow-2xl w-200"
-          />
+          >
         </div>
       </div>
     </section>

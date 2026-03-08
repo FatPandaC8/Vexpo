@@ -8,6 +8,8 @@ import { stateProps } from "~/utils/form/me";
 definePageMeta({ middleware: "auth" });
 
 const auth = useAuth();
+const api = useApi();
+const config = useRuntimeConfig();
 
 // Role display helpers
 const roleLabel = computed(() => {
@@ -55,13 +57,26 @@ async function saveProfile(event: FormSubmitEvent<typeof profileState>) {
   profileError.value = null;
   profileSuccess.value = false;
   profileSaving.value = true;
-  // TODO: wire to PATCH /me when backend endpoint is ready
-  await new Promise((r) => setTimeout(r, 600));
-  profileSaving.value = false;
-  profileSuccess.value = true;
-  setTimeout(() => {
-    profileSuccess.value = false;
-  }, 3000);
+  try {
+    await api.patch(`/users/${auth.user.value!.id}`, {
+      name: event.data.name,
+      email: event.data.email,
+    });
+
+    await auth.fetchProfile();
+
+    profileSuccess.value = true;
+    setTimeout(() => {
+      profileSuccess.value = false;
+    }, 3000);
+  } catch (e: any) {
+    const msg = e?.data?.message ?? e?.message;
+    profileError.value = Array.isArray(msg)
+      ? msg.join(", ")
+      : (msg ?? "Update failed");
+  } finally {
+    profileSaving.value = false;
+  }
 }
 
 // Password form
@@ -90,15 +105,34 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
   passwordError.value = null;
   passwordSuccess.value = false;
   passwordSaving.value = true;
-  await new Promise((r) => setTimeout(r, 600));
-  passwordSaving.value = false;
-  passwordSuccess.value = true;
-  passwordState.currentPassword = "";
-  passwordState.newPassword = "";
-  passwordState.confirmPassword = "";
-  setTimeout(() => {
-    passwordSuccess.value = false;
-  }, 3000);
+  try {
+    await $fetch("/auth/change-password", {
+      method: "POST",
+      baseURL: config.public.apiBase,
+      headers: { Authorization: `Bearer ${auth.token.value}` },
+      body: {
+        currentPassword: event.data.currentPassword,
+        newPassword: event.data.newPassword,
+      },
+    });
+
+    passwordSuccess.value = true;
+    passwordState.currentPassword = "";
+    passwordState.newPassword = "";
+    passwordState.confirmPassword = "";
+
+    setTimeout(async () => {
+      await navigateTo('/auth')
+    }, 1500);
+    
+  } catch (e: any) {
+    const msg = e?.data?.message ?? e?.message;
+    passwordError.value = Array.isArray(msg)
+      ? msg.join(", ")
+      : (msg ?? "Password update failed");
+  } finally {
+    passwordSaving.value = false;
+  }
 }
 </script>
 
@@ -126,13 +160,11 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
             class="rounded-2xl border border-gray-300 p-6 text-center bg-white"
           >
             <div class="relative inline-block mb-4">
-              <!-- Avatar -->
               <div
                 class="w-20 h-20 rounded-full bg-[#3d52d5] text-white text-3xl font-bold flex items-center justify-center select-none shadow-lg shadow-blue-500/20 mx-auto"
               >
                 {{ auth.user.value?.name?.charAt(0).toUpperCase() ?? "?" }}
               </div>
-              <!-- Role badge overlay -->
             </div>
 
             <p class="font-bold text-gray-900 text-sm mb-0.5 truncate">
@@ -182,7 +214,6 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
           <!--  PROFILE  -->
           <template v-if="activeSection === 'profile'">
             <UCard class="rounded-2xl border border-gray-400 p-8 bg-white">
-              <!-- Section heading -->
               <div class="flex items-center gap-3 mb-8">
                 <div
                   class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center"
@@ -203,7 +234,6 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
                 :success="profileSuccess"
                 message="Profile updated successfully."
               />
-
               <SuccessIndicator
                 :success="!!profileError"
                 :message="profileError"
@@ -256,6 +286,15 @@ async function savePassword(event: FormSubmitEvent<typeof passwordState>) {
                   </p>
                 </div>
               </div>
+
+              <SuccessIndicator
+                :success="passwordSuccess"
+                message="Password updated successfully."
+              />
+              <SuccessIndicator
+                :success="!!passwordError"
+                :message="passwordError"
+              />
 
               <UForm
                 :state="passwordState"

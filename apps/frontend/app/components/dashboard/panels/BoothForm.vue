@@ -63,7 +63,7 @@ watch(
     map.loadOccupied();
 
     if (b?.companyId) {
-      companyStore.fetchById(api, b.companyId);  // ← same split
+      companyStore.fetchById(api, b.companyId); // ← same split
     }
   },
 );
@@ -72,23 +72,24 @@ watch(
   () => props.expo?.id,
   (newId, oldId) => {
     if (newId && newId !== oldId) {
-      map.mapPosition.value = null   // clear any previously selected cell
-      map.loadOccupied()             // fetch occupied cells for the new expo
+      map.mapPosition.value = null; // clear any previously selected cell
+      map.loadOccupied(); // fetch occupied cells for the new expo
     }
   },
-)
+);
 
 onMounted(() => {
   map.initPosition(props.booth);
   model.initModel(props.booth);
   map.loadOccupied();
-if (props.booth?.companyId) {
+  if (props.booth?.companyId) {
     // Edit mode: booth already has a company — fetch it by ID (public endpoint, works for all roles)
     companyStore.fetchById(api, props.booth.companyId);
   } else {
     // Create mode: exhibitor needs to know their own company
     companyStore.fetchMyCompany(api);
-  }});
+  }
+});
 
 defineExpose({ modelPath: model.modelPath });
 </script>
@@ -272,7 +273,10 @@ defineExpose({ modelPath: model.modelPath });
             v-if="canEditStatus && form.state.status === 'rejected'"
             name="rejectionReason"
             label="Rejection Reason"
-            :ui="{ error: 'text-red-500 italic text-xs mt-1', label: 'font-bold' }"
+            :ui="{
+              error: 'text-red-500 italic text-xs mt-1',
+              label: 'font-bold',
+            }"
           >
             <UTextarea
               v-model="form.state.rejectionReason"

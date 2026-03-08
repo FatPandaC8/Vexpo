@@ -14,7 +14,7 @@ export interface Company {
     website: string | null;
     country: string | null;
     city: string | null;
-    exhibitorId: number;
+    exhibitorId: string;
     booths?: Booth[];
 }
 export type ExpoStatus = 'Live' | 'Upcoming' | 'Past';
@@ -25,7 +25,7 @@ export interface Expo {
     description: string | null;
     startDate: string;
     endDate: string;
-    organizerId: number;
+    organizerId: string;
     booths?: Booth[];
 }
 export type BoothStatus = 'pending' | 'approved' | 'rejected';
@@ -36,8 +36,8 @@ export interface Booth {
     status: BoothStatus;
     rejectionReason: string | null;
     modelPath: string | null;
-    mapRow: number | null;
-    mapCol: number | null;
+    mapRow: number;
+    mapCol: number;
     expoId: string;
     companyId: string;
     company?: Pick<Company, 'id' | 'name' | 'industry' | 'email' | 'website' | 'description'>;
@@ -49,7 +49,7 @@ export type BoothFormEmit = {
     (evt: "deleted"): void;
 };
 export interface User {
-    id: number;
+    id: string;
     name: string;
     email: string;
     role: UserRole;

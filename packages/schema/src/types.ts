@@ -1,6 +1,6 @@
 // FRONTEND
 export interface AuthUser {
-  id: number
+  id: string
   name: string
   email: string
   role: 'exhibitor' | 'organizer' | 'admin'
@@ -17,7 +17,7 @@ export interface Company {
   website: string | null
   country: string | null
   city: string | null
-  exhibitorId: number
+  exhibitorId: string
   booths?: Booth[]
 }
 
@@ -30,7 +30,7 @@ export interface Expo {
   description: string | null
   startDate: string
   endDate: string
-  organizerId: number
+  organizerId: string
   booths?: Booth[]
 }
 
@@ -41,9 +41,10 @@ export interface Booth {
   name: string
   description: string | null
   status: BoothStatus
+  rejectionReason: string | null
   modelPath: string | null
-  mapRow: number | null
-  mapCol: number | null
+  mapRow: number
+  mapCol: number
   expoId: string
   companyId: string
   company?: Pick<Company, 'id' | 'name' | 'industry' | 'email' | 'website' | 'description'>
@@ -58,7 +59,7 @@ export type BoothFormEmit = {
 }
 
 export interface User {
-  id: number
+  id: string
   name: string
   email: string
   role: UserRole

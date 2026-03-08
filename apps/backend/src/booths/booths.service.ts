@@ -121,8 +121,6 @@ export class BoothsService {
         boothName: booth.name,
         expoName: booth.expo.name,
         rejectionReason: dto.rejectionReason ?? undefined,
-      }).catch((err) => {
-        console.error('Failed to send rejection email:', err);
       });
     }
 

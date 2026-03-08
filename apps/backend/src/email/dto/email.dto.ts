@@ -1,16 +1,11 @@
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { z } from 'zod';
+import { createZodDto } from 'nestjs-zod';
 
-export class sendEmailDTO {
-  @IsEmail({}, { each: true })
-  recipients: string[];
+export const SendEmailSchema = z.object({
+  recipients: z.array(z.string().email()),
+  subject: z.string().min(1),
+  html: z.string().min(1),
+  text: z.string().optional(),
+});
 
-  @IsString()
-  subject: string;
-
-  @IsString()
-  html: string;
-
-  @IsOptional()
-  @IsString()
-  text?: string;
-}
+export class SendEmailDTOo extends createZodDto(SendEmailSchema) {}

@@ -20,11 +20,18 @@ const loadingBooths = ref(false);
 async function loadBooths() {
   loadingBooths.value = true;
   try {
-    const res = await api.getPaginated<Booth[]>("/booths", {
-      page: 1,
-      limit: 20,
-    });
-    booths.value = res.items.flat();
+    // Fetch booths only from expos that belong to this organizer
+    const myExpos = expoStore.myExpos;
+    if (!myExpos.length) {
+      booths.value = [];
+      return;
+    }
+    const results = await Promise.all(
+      myExpos.map((expo) =>
+        api.get<Booth[]>(`/expos/${expo.id}/booths/all`).catch(() => [])
+      )
+    );
+    booths.value = results.flat();
   } catch {
     booths.value = [];
   } finally {
@@ -34,8 +41,11 @@ async function loadBooths() {
 
 onMounted(() => expoStore.fetchMyExpos(api));
 
-watch(section, (s) => {
-  if (s === "booths") loadBooths();
+watch(section, async (s) => {
+  if (s === "booths") {
+    if (!expoStore.loaded) await expoStore.fetchMyExpos(api);
+    loadBooths();
+  }
 });
 
 watch(

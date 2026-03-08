@@ -181,7 +181,7 @@ function onAdminDeleted() {
             dashboard.activeView === 'booth-edit' && dashboard.activeData
           "
           :booth="asBooth"
-          @updated="
+          @saved="
             dashboard.activeData = $event;
             boothStore.setBooth($event);
           "

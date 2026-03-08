@@ -195,7 +195,7 @@ defineExpose({ modelPath: model.modelPath });
       :message="booth_successMsg"
     />
     <SuccessIndicator
-      :success="form.success.value"
+      :success="!!form.error.value"
       :message="form.error.value"
     />
 

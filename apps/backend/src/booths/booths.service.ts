@@ -109,6 +109,12 @@ export class BoothsService {
   async updateBooth(id: string, dto: UpdateBoothDTO) {
     const booth = await this.getBoothById(id);
     const previousStatus = booth.status;
+
+    console.log('[updateBooth] previousStatus:', previousStatus);
+    console.log('[updateBooth] dto.status:', dto.status);
+    console.log('[updateBooth] booth.company:', booth.company);
+    console.log('[updateBooth] booth.company?.email:', booth.company?.email);
+
     Object.assign(booth, dto);
     const saved = await this.boothRepository.save(booth);
 
@@ -121,6 +127,12 @@ export class BoothsService {
         boothName: booth.name,
         expoName: booth.expo.name,
         rejectionReason: dto.rejectionReason ?? undefined,
+      });
+    } else {
+      console.log('[updateBooth]: email NOT sent. Conditions:', {
+        isRejected: dto.status === 'rejected',
+        wasNotAlreadyRejected: previousStatus !== 'rejected',
+        hasCompanyEmail: !!booth.company?.email,
       });
     }
 
